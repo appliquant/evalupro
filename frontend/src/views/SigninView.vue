@@ -6,14 +6,22 @@
     <form action="">
       <!-- courriel -->
       <div class="form-floating mb-3">
-        <input type="email" class="form-control" id="emailInput" placeholder="nom@example.com" required>
+        <input type="email" 
+               :pattern="dataLengthValidations?.email?.regex"
+               :minlength="dataLengthValidations?.email?.minlength"
+               :maxlength="dataLengthValidations?.email?.maxlength"
+               class="form-control" id="emailInput" placeholder="nom@example.com" required>
         <label for="emailInput">Adresse courriel</label>
       </div>
 
       <!-- mdp -->
       <div class="form-floating mb-3">
-        <input type="password" id="passwdInput" class="form-control" aria-describedby="passwordHelpBlock" required>
-        <label for="passwdInput" class="form-label">Password</label>
+        <input type="password" 
+               :pattern="dataLengthValidations?.password?.regex"
+               :minlength="dataLengthValidations?.password?.minlength"
+               :maxlength="dataLengthValidations?.password?.maxlength"
+               id="passwdInput" class="form-control" aria-describedby="passwordHelpBlock" required>
+        <label for="passwdInput" class="form-label">Mot de passe</label>
       </div>
 
         
@@ -24,3 +32,6 @@
     </form>
   </div>
 </template>
+<script setup lang="ts">
+import {dataLengthValidations} from "@/validations.js";
+</script>
