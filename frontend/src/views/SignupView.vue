@@ -9,6 +9,7 @@
         <span class="input-group-text">@</span>
         <div class="form-floating">
           <input type="text" 
+                 name="username"
                  :pattern="dataLengthValidations?.username?.regex"
                  :minlength="dataLengthValidations?.username?.minlength"
                  :maxlength="dataLengthValidations?.username?.maxlength"
@@ -20,6 +21,7 @@
       <!-- courriel -->
       <div class="form-floating mb-3">
         <input type="email"
+               name="email"
                :pattern="dataLengthValidations?.email?.regex"
                :minlength="dataLengthValidations?.email?.minlength"
                :maxlength="dataLengthValidations?.email?.maxlength"
@@ -30,6 +32,7 @@
       <!-- mdp -->
       <div class="form-floating mb-3">
         <input type="password"
+                name="password"
                :pattern="dataLengthValidations?.password?.regex"
                :minlength="dataLengthValidations?.password?.minlength"
                :maxlength="dataLengthValidations?.password?.maxlength"
@@ -41,6 +44,7 @@
       <!-- mdp confirmation -->
       <div class="form-floating mb-3">
         <input type="password"
+                name="passwordConfirmation"
                :minlength="dataLengthValidations?.password?.minlength"
                :maxlength="dataLengthValidations?.password?.maxlength"
                :pattern="dataLengthValidations?.password?.regex"
