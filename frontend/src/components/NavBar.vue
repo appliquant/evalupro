@@ -9,10 +9,14 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Connexion</a>
+            <a class="nav-link active" aria-current="page">
+              <RouterLink to="#" class="link-underline-opacity-0">Connexion</RouterLink>
+            </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Devenir membre</a>
+            <a class="nav-link active" aria-current="page">
+              <RouterLink to="/signup" class="link-underline-opacity-0">Devenir membre</RouterLink>
+            </a>
           </li>
         </ul>
       </div>
