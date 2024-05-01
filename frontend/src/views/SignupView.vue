@@ -16,7 +16,7 @@
       <!-- courriel -->
       <div class="form-floating mb-3">
         <input type="email" class="form-control" id="emailInput" placeholder="nom@example.com" required>
-        <label for="emailInput">Email address</label>
+        <label for="emailInput">Adresse courriel</label>
       </div>
 
       <!-- mdp -->
@@ -25,7 +25,9 @@
         <label for="passwdInput" class="form-label">Password</label>
       </div>
 
-      <button class="btn btn-primary">Créer</button>
-    </form>
+      <button class="btn btn-primary" style="margin-right: 2%;">Créer</button>
+      <a>
+        <RouterLink to="/signin" class="link-underline-opacity-0">Vous avez déja un compte?</RouterLink>
+      </a></form>
   </div>
 </template>

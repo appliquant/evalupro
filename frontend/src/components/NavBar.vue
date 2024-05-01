@@ -10,7 +10,7 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page">
-              <RouterLink to="#" class="link-underline-opacity-0">Connexion</RouterLink>
+              <RouterLink to="/signin" class="link-underline-opacity-0">Connexion</RouterLink>
             </a>
           </li>
           <li class="nav-item">
