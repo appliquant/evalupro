@@ -3,18 +3,23 @@
 
     <h1 class="mb-4">Créer un compte</h1>
 
-    <form action="">
+    <form @submit.prevent="login">
       <!-- pseudo -->
-      <div class="input-group mb-3">
-        <span class="input-group-text">@</span>
-        <div class="form-floating">
-          <input type="text" 
-                 name="username"
-                 :pattern="dataLengthValidations?.username?.regex"
-                 :minlength="dataLengthValidations?.username?.minlength"
-                 :maxlength="dataLengthValidations?.username?.maxlength"
-                 class="form-control" id="usernameInput" placeholder="Nom d'utilisateur" required>
-          <label for="usernameInput">Nom d'utilisateur</label>
+      <div class="mb-3">
+        <div class="input-group">
+          <span class="input-group-text">@</span>
+          <div class="form-floating">
+            <input type="text"
+                   name="username"
+                   :pattern="dataLengthValidations?.username?.regex"
+                   :minlength="dataLengthValidations?.username?.minlength"
+                   :maxlength="dataLengthValidations?.username?.maxlength"
+                   class="form-control" id="usernameInput" placeholder="Nom d'utilisateur" required>
+            <label for="usernameInput" aria-describedby="usernameHelp">Nom d'utilisateur</label>
+          </div>
+        </div>
+        <div id="usernameHelp" class="form-text">Entre 3 et 50 caractères alphabétiques plus le tiret et
+          l’espace
         </div>
       </div>
 
@@ -22,7 +27,6 @@
       <div class="form-floating mb-3">
         <input type="email"
                name="email"
-               :pattern="dataLengthValidations?.email?.regex"
                :minlength="dataLengthValidations?.email?.minlength"
                :maxlength="dataLengthValidations?.email?.maxlength"
                class="form-control" id="emailInput" placeholder="nom@example.com" required>
@@ -32,20 +36,23 @@
       <!-- mdp -->
       <div class="form-floating mb-3">
         <input type="password"
-                name="password"
+               name="password"
                :pattern="dataLengthValidations?.password?.regex"
                :minlength="dataLengthValidations?.password?.minlength"
                :maxlength="dataLengthValidations?.password?.maxlength"
                id="passwdInput" class="form-control"
                aria-describedby="passwordHelpBlock" required>
-        <label for="passwdInput" class="form-label">Mot de passe</label>
+        <label for="passwdInput" class="form-label" aria-describedby="passwdHelp">Mot de passe</label>
+        <div id="passwdHelp" class="form-text">Doit contenir au minimum 6 caractères, 1 majuscule, 1
+          chiffre et 1 des caractères spéciaux suivants : #?!@$ %^&*-
+        </div>
       </div>
 
       <!-- mdp confirmation -->
       <div class="form-floating mb-3">
         <input type="password"
-                name="passwordConfirmation"
                :minlength="dataLengthValidations?.password?.minlength"
+               name="passwordConfirmation"
                :maxlength="dataLengthValidations?.password?.maxlength"
                :pattern="dataLengthValidations?.password?.regex"
                id="passwdInput2" class="form-control" aria-describedby="passwordHelpBlock" required>
@@ -59,4 +66,9 @@
 </template>
 <script setup lang="ts">
 import {dataLengthValidations} from "@/validations.js";
+import {authService} from "@/services/authService";
+
+const login = () => {
+  authService.signup("username", "email", "123ojdakso")
+}
 </script>

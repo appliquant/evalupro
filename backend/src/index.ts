@@ -1,4 +1,5 @@
 import express from "express";
+import {authController} from "./controllers/auth.controller";
 
 const PORT = process.env.PORT ?? 3000;
 const app = express()
@@ -14,7 +15,7 @@ app.use((req, res, next) => {
 })
 
 // routes
-app.use("/api/auth", require("./controllers/auth.controller"))
+app.use("/api/auth", authController)
 
 app.get("/", (req, res) => {
     res.send("yooo")

@@ -7,7 +7,6 @@
       <!-- courriel -->
       <div class="form-floating mb-3">
         <input type="email" 
-               :pattern="dataLengthValidations?.email?.regex"
                :minlength="dataLengthValidations?.email?.minlength"
                :maxlength="dataLengthValidations?.email?.maxlength"
                class="form-control" id="emailInput" placeholder="nom@example.com" required>

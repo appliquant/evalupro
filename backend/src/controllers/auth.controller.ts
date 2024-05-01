@@ -2,9 +2,9 @@ import express from "express";
 import {ApiResponseType} from "../types";
 import {dataLengthValidations} from "../validations";
 
-const router = express.Router();
+const authController = express.Router();
 
-router.post("/signin", (req, res) => {
+authController.post("/signin", (req, res) => {
     // 1. Vérifier les données
 
     // 2. Vérifier si l'utilisateur existe
@@ -18,7 +18,7 @@ router.post("/signin", (req, res) => {
     res.json({message: "Signin"});
 })
 
-router.post("/signup", (req, res) => {
+authController.post("/signup", (req, res) => {
     // 1. Vérifier les données
     const {username, email, password} = req.body;
 
@@ -33,6 +33,7 @@ router.post("/signup", (req, res) => {
     }
 
     const errors = signupValidations(username, email, password);
+    console.log(errors)
     if (errors.length > 0) {
         return res.status(400).json(errors);
     }
@@ -68,17 +69,12 @@ function signupValidations(username: string, email: string, password: string): A
 
     // email
     if (email.trim().length < dataLengthValidations?.email?.minlength) {
-        const errorMessage: ApiResponseType = {message: `Email trop court`};
+        const errorMessage: ApiResponseType = {message: `Adresse courriel trop courte`};
         errors.push(errorMessage);
     }
 
     if (email.trim().length > dataLengthValidations?.email?.maxlength) {
-        const errorMessage: ApiResponseType = {message: `Email trop long`};
-        errors.push(errorMessage);
-    }
-
-    if (dataLengthValidations?.email?.regex && !email.match(dataLengthValidations?.email?.regex)) {
-        const errorMessage: ApiResponseType = {message: `Email invalide.`};
+        const errorMessage: ApiResponseType = {message: `Adresse courriel trop longue`};
         errors.push(errorMessage);
     }
 
@@ -93,7 +89,12 @@ function signupValidations(username: string, email: string, password: string): A
         errors.push(errorMessage);
     }
 
+    if (dataLengthValidations?.password?.regex && !password.match(dataLengthValidations?.password?.regex)) {
+        const errorMessage: ApiResponseType = {message: `Mot de passe invalide`};
+        errors.push(errorMessage);
+    }
+
     return errors;
 }
 
-export {router};
+export {authController};
