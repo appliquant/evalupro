@@ -8,3 +8,9 @@ export type ApiResponseType = {
     message: string
     errors?: ErrorType[]
 }
+
+export enum UserRoles {
+    ADMIN = "admin",
+    TESTER = "tester",
+    USER = "user"
+}

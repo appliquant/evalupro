@@ -1,6 +1,6 @@
 import express from "express";
 import {authController} from "./controllers/auth.controller";
-import {sequelize} from "./db";
+import {initDb, sequelize} from "./db";
 
 const PORT = process.env.PORT ?? 3000;
 const app = express()
@@ -24,12 +24,5 @@ app.get("/", (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`🔥 Serveur Express sur http://localhost:${PORT}`)
-
-    // Test de la connexion à la base de données
-    sequelize.authenticate().then(() => {
-            console.log("🗃️ Connexion à la base de données établie")
-        }
-    ).catch((error) => {
-        console.error("❌ Erreur de connexion à la base de données", error)
-    })
+    initDb()
 })
