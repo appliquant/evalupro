@@ -8,18 +8,41 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
+
+          <!-- /signup -->
+          <li v-if="route.name === 'signin' || route.name === 'signup'" class="nav-item">
             <a class="nav-link active" aria-current="page">
               <RouterLink to="/signin" class="link-underline-opacity-0">Connexion</RouterLink>
             </a>
           </li>
-          <li class="nav-item">
+
+          <!-- /signin -->
+          <li v-if="route.name === 'signin' || route.name === 'signup'" class="nav-item">
             <a class="nav-link active" aria-current="page">
               <RouterLink to="/signup" class="link-underline-opacity-0">Devenir membre</RouterLink>
             </a>
+          </li>
+
+          <!-- /logout -->
+          <li v-if="route.name !== 'signin' && route.name !== 'signup'" class="nav-item">
+            <button @click="logout" class="btn btn-link">Déconnexion</button>
           </li>
         </ul>
       </div>
     </div>
   </nav>
 </template>
+
+<script setup lang="ts">
+import {useRoute, useRouter} from "vue-router";
+import {useAuthStore} from "@/stores/authStore";
+
+const router = useRouter()
+const route = useRoute()
+const authStore = useAuthStore()
+
+const logout = () => {
+  authStore.deleteJwt()
+  router.push({name: 'signin'})
+}
+</script>
