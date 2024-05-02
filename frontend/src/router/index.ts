@@ -23,9 +23,19 @@ const router = createRouter({
         },
 
         {
-            path: "/categories",
-            name: "categories",
-            component: () => import("../views/CategoriesView.vue"),
+            path: "/manage-categories",
+            name: "manage-categories",
+            component: () => import("../views/ManageCategoriesView.vue"),
+            meta: {
+                requiresAuth: true
+            }
+        },
+
+
+        {
+            path: "/manage-products",
+            name: "manage-products",
+            component: () => import("../views/ManageProductsView.vue"),
             meta: {
                 requiresAuth: true
             }

@@ -2,11 +2,18 @@
   <div class="container mt-3">
     <h1>Panneau de contrôle</h1>
 
-    <ul class="nav">
+    <ul class="nav flex-column">
       <li class="nav-item">
         <a class="nav-link" aria-current="page">
-          <RouterLink to="/categories" style="margin-right: .5rem;" class="link-underline-opacity-0">Gérer les catégories</RouterLink>
-          <span class="badge rounded-pill text-bg-primary mb-3">{{ userData.role }}</span>
+          <RouterLink to="/manage-categories" style="margin-right: .5rem;" class="link-underline-opacity-0">Gérer les catégories</RouterLink>
+          <span class="badge rounded-pill text-bg-primary">{{ userData.role }}</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a class="nav-link" aria-current="page">
+          <RouterLink to="/manage-products" style="margin-right: .5rem;" class="link-underline-opacity-0">Gérer les produits</RouterLink>
+          <span class="badge rounded-pill text-bg-primary">{{ userData.role }}</span>
         </a>
       </li>
     </ul>
