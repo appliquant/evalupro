@@ -3,16 +3,20 @@
     <h1>Panneau de contrôle</h1>
 
     <ul class="nav flex-column">
-      <li class="nav-item">
+      <li class="nav-item" v-show="userData.role === UserRoles.ADMIN">
         <a class="nav-link" aria-current="page">
-          <RouterLink to="/manage-categories" style="margin-right: .5rem;" class="link-underline-opacity-0">Gérer les catégories</RouterLink>
+          <RouterLink to="/manage-categories" style="margin-right: .5rem;"
+                      class="link-underline-opacity-0">Gérer les catégories
+          </RouterLink>
           <span class="badge rounded-pill text-bg-primary">{{ userData.role }}</span>
         </a>
       </li>
-      
-      <li class="nav-item">
+
+      <li class="nav-item" v-show="userData.role === UserRoles.ADMIN">
         <a class="nav-link" aria-current="page">
-          <RouterLink to="/manage-products" style="margin-right: .5rem;" class="link-underline-opacity-0">Gérer les produits</RouterLink>
+          <RouterLink to="/manage-products" style="margin-right: .5rem;" class="link-underline-opacity-0">Gérer les
+            produits
+          </RouterLink>
           <span class="badge rounded-pill text-bg-primary">{{ userData.role }}</span>
         </a>
       </li>
