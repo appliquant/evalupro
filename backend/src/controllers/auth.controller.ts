@@ -34,7 +34,7 @@ const signin = async (req: express.Request, res: express.Response, next: express
             where: {
                 email: email
             },
-            attributes: ["email", "password"]
+            attributes: ["email", "password", "role"]
         })
 
         if (!userExists) {
@@ -73,7 +73,8 @@ const signin = async (req: express.Request, res: express.Response, next: express
             status: 200,
             message: `Connecté`,
             data: {
-                token
+                token,
+                role: userExists.dataValues.role
             }
         };
 

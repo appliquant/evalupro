@@ -1,4 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
+import {UserRoles} from "@/types";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,7 +28,8 @@ const router = createRouter({
             name: "manage-categories",
             component: () => import("../views/ManageCategoriesView.vue"),
             meta: {
-                requiresAuth: true
+                requiresAuth: true,
+                requiresRole: UserRoles.ADMIN
             }
         },
 
@@ -37,7 +39,8 @@ const router = createRouter({
             name: "manage-products",
             component: () => import("../views/ManageProductsView.vue"),
             meta: {
-                requiresAuth: true
+                requiresAuth: true,
+                requiresRole: UserRoles.ADMIN
             }
         }
     ]

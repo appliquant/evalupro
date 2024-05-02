@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap';
-import { createNotivue } from 'notivue'
-import 'notivue/notification.css' 
+import {createNotivue} from 'notivue'
+import 'notivue/notification.css'
 import 'notivue/animations.css'
 import {createApp} from 'vue'
 import {createPinia} from 'pinia'
@@ -9,6 +9,7 @@ import {createPinia} from 'pinia'
 import App from './App.vue'
 import router from './router'
 import {useAuthStore} from "@/stores/authStore";
+import {useCurrentUser} from "@/composables/useCurrentUser";
 
 const app = createApp(App)
 
@@ -21,15 +22,30 @@ const notivue = createNotivue({
 router.beforeEach((to, from) => {
     const requiresAuth = to.meta["requiresAuth"] ?? false
     if (!requiresAuth || requiresAuth === false) {
-       return true 
+        return true
     }
-    
+
     if (requiresAuth) {
         const authStore = useAuthStore()
         if (authStore.jwt === "") {
-            return {name: "signin"} 
+            return {name: "signin"}
         }
-        
+
+
+        // "requiresRole" va toujours avec "requiresAuth" 
+        const requiresRole = to.meta["requiresRole"]
+        if (!requiresRole) {
+            return true
+        }
+
+        const userRole = authStore.role
+
+        console.log(requiresRole)
+        console.log(userRole)
+        if (requiresRole !== userRole) {
+            return {name: "dashboard"}
+        }
+
         return true
     }
 })
