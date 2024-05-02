@@ -28,14 +28,24 @@ authController.post("/signup", (req, res) => {
         if (!email) missing.push("email");
         if (!password) missing.push("password");
 
-        const errorMessage: ApiResponseType = {message: `Champs manquant(s): ${missing.join(", ")}`};
-        return res.status(400).json(errorMessage);
+        const missingFieldsErrors: ApiResponseType = {
+            status: 400,
+            message: `Champs manquant(s)`,
+            errors: missing.map(field => {
+                    return {
+                        field,
+                        message: `${field} est manquant`
+                    }
+                }
+            )
+        };
+        return res.status(missingFieldsErrors.status).json(missingFieldsErrors);
     }
 
-    const errors = signupValidations(username, email, password);
-    console.log(errors)
-    if (errors.length > 0) {
-        return res.status(400).json(errors);
+    const validationErrors = signupValidations(username, email, password);
+    console.log(validationErrors)
+    if (validationErrors.errors !== undefined && validationErrors.errors.length > 0) {
+        return res.status(validationErrors.status).json(validationErrors);
     }
 
     // 2. Vérifier si l'utilisateur existe
@@ -44,57 +54,61 @@ authController.post("/signup", (req, res) => {
 
     // 4. Renvoyer réponse
 
-
-    res.json({message: "Signup"});
+    const response: ApiResponseType = {
+        status: 200,
+        message: `Utilisateur ${username} créé`
+    };
+    
+    res.json(response);
 })
 
-function signupValidations(username: string, email: string, password: string): ApiResponseType[] {
-    const errors = []
+function signupValidations(username: string, email: string, password: string): ApiResponseType {
+    const errorMessage: ApiResponseType = {
+        status: 400,
+        message: `Erreur de validation du formulaire de création de compte`,
+        errors: []
+    };
 
     // username
     if (username.trim().length < dataLengthValidations?.email?.minlength) {
-        const errorMessage: ApiResponseType = {message: `Nom d'utilisateur trop court`};
-        errors.push(errorMessage);
+        errorMessage.errors?.push({field: "username", message: `Nom d'utilisateur trop court`});
     }
 
     if (username.trim().length > dataLengthValidations?.email?.maxlength) {
-        const errorMessage: ApiResponseType = {message: `Nom d'utilisateur trop long`};
-        errors.push(errorMessage);
+        errorMessage.errors?.push({field: "username", message: `Nom d'utilisateur trop long`});
     }
 
     if (dataLengthValidations?.username?.regex && !username.match(dataLengthValidations?.username?.regex)) {
-        const errorMessage: ApiResponseType = {message: `Nom d'utilisateur invalide`};
-        errors.push(errorMessage);
+        errorMessage.errors?.push({field: "username", message: `Nom d'utilisateur invalide`});
     }
 
     // email
     if (email.trim().length < dataLengthValidations?.email?.minlength) {
-        const errorMessage: ApiResponseType = {message: `Adresse courriel trop courte`};
-        errors.push(errorMessage);
+        errorMessage.errors?.push({field: "email", message: `Adresse courriel trop courte`});
     }
 
     if (email.trim().length > dataLengthValidations?.email?.maxlength) {
-        const errorMessage: ApiResponseType = {message: `Adresse courriel trop longue`};
-        errors.push(errorMessage);
+        errorMessage.errors?.push({field: "email", message: `Adresse courriel trop longue`});
+    }
+    
+    if (dataLengthValidations?.email?.regex && !email.match(dataLengthValidations?.email?.regex)) {
+        errorMessage.errors?.push({field: "email", message: `Adresse courriel invalide`});
     }
 
     // password
     if (password.trim().length < dataLengthValidations?.password?.minlength) {
-        const errorMessage: ApiResponseType = {message: `Mot de passe trop court`};
-        errors.push(errorMessage);
+        errorMessage.errors?.push({field: "password", message: `Mot de passe trop court`});
     }
 
     if (password.trim().length > dataLengthValidations?.password?.maxlength) {
-        const errorMessage: ApiResponseType = {message: `Mot de passe trop long`};
-        errors.push(errorMessage);
+        errorMessage.errors?.push({field: "password", message: `Mot de passe trop long`});
     }
 
     if (dataLengthValidations?.password?.regex && !password.match(dataLengthValidations?.password?.regex)) {
-        const errorMessage: ApiResponseType = {message: `Mot de passe invalide`};
-        errors.push(errorMessage);
+        errorMessage.errors?.push({field: "password", message: `Mot de passe invalide`});
     }
 
-    return errors;
+    return errorMessage;
 }
 
 export {authController};
