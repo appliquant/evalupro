@@ -1,6 +1,8 @@
 import express from "express";
 import {ApiResponseType} from "../types";
 import {dataLengthValidations} from "../validations";
+import {User} from "../db";
+import {hash} from "bcrypt"
 
 const authController = express.Router();
 
@@ -18,48 +20,78 @@ authController.post("/signin", (req, res) => {
     res.json({message: "Signin"});
 })
 
-authController.post("/signup", (req, res) => {
-    // 1. Vérifier les données
-    const {username, email, password} = req.body;
+authController.post("/signup", async (req, res, next) => {
+    try {
+        // 1. Vérifier les données
+        const {username, email, password} = req.body;
 
-    if (!username || !email || !password) {
-        const missing = []
-        if (!username) missing.push("username");
-        if (!email) missing.push("email");
-        if (!password) missing.push("password");
+        if (!username || !email || !password) {
+            const missing = []
+            if (!username) missing.push("username");
+            if (!email) missing.push("email");
+            if (!password) missing.push("password");
 
-        const missingFieldsErrors: ApiResponseType = {
-            status: 400,
-            message: `Champs manquant(s)`,
-            errors: missing.map(field => {
-                    return {
-                        field,
-                        message: `${field} est manquant`
+            const missingFieldsErrors: ApiResponseType = {
+                status: 400,
+                message: `Champs manquant(s)`,
+                errors: missing.map(field => {
+                        return {
+                            field,
+                            message: `${field} est manquant`
+                        }
                     }
-                }
-            )
+                )
+            };
+            return res.status(missingFieldsErrors.status).json(missingFieldsErrors);
+        }
+
+        const validationErrors = signupValidations(username, email, password);
+        console.log(validationErrors)
+        if (validationErrors.errors !== undefined && validationErrors.errors.length > 0) {
+            return res.status(validationErrors.status).json(validationErrors);
+        }
+
+        // 2. Vérifier si l'utilisateur existe
+        const userExists = await User.findOne({
+            where: {
+                email: email
+            }
+        })
+        if (userExists) {
+            const userExistsError: ApiResponseType = {
+                status: 400,
+                message: `Utilisateur déjà existant`,
+                errors: [
+                    {
+                        field: "email",
+                        message: `Adresse courriel déjà utilisée`
+                    }
+                ]
+            }
+            return res.status(userExistsError.status).json(userExistsError);
+        }
+        
+        // Hash mdp
+        const hashedPassword = await hash(password, 10);
+
+        // 3. Créer un utilisateur
+        await User.create({
+            username,
+            email,
+            password: hashedPassword,
+        })
+
+
+        // 4. Renvoyer réponse
+        const response: ApiResponseType = {
+            status: 200,
+            message: `Utilisateur ${username} créé`
         };
-        return res.status(missingFieldsErrors.status).json(missingFieldsErrors);
+
+        res.status(response.status).json(response);
+    } catch (error) {
+        next(error);
     }
-
-    const validationErrors = signupValidations(username, email, password);
-    console.log(validationErrors)
-    if (validationErrors.errors !== undefined && validationErrors.errors.length > 0) {
-        return res.status(validationErrors.status).json(validationErrors);
-    }
-
-    // 2. Vérifier si l'utilisateur existe
-
-    // 3. Créer un utilisateur
-
-    // 4. Renvoyer réponse
-
-    const response: ApiResponseType = {
-        status: 200,
-        message: `Utilisateur ${username} créé`
-    };
-    
-    res.json(response);
 })
 
 function signupValidations(username: string, email: string, password: string): ApiResponseType {
@@ -90,7 +122,7 @@ function signupValidations(username: string, email: string, password: string): A
     if (email.trim().length > dataLengthValidations?.email?.maxlength) {
         errorMessage.errors?.push({field: "email", message: `Adresse courriel trop longue`});
     }
-    
+
     if (dataLengthValidations?.email?.regex && !email.match(dataLengthValidations?.email?.regex)) {
         errorMessage.errors?.push({field: "email", message: `Adresse courriel invalide`});
     }
