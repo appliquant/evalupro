@@ -39,6 +39,11 @@ import {ref} from "vue";
 import {authService} from "@/services/authService";
 import type {ApiResponseType} from "@/types";
 import {push} from "notivue";
+import {useAuthStore} from "@/stores/authStore";
+import {useRouter} from "vue-router";
+
+const authStore = useAuthStore()
+const router = useRouter()
 
 const payload = ref(
     {
@@ -55,14 +60,15 @@ const login = async () => {
     )
 
     if (res.status !== 200) {
-      console.log(res.message)
-      push.error({
+      return push.error({
         title: "Erreur",
         message: res.message,
         duration: 5000
       })
     }
-
+    
+    authStore.setJwt(res.data.jwt)
+    await router.push({name: "dashboard"})
   } catch (e) {
     const err = e as ApiResponseType
     push.error({

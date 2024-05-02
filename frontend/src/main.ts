@@ -8,6 +8,7 @@ import {createPinia} from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import {useAuthStore} from "@/stores/authStore";
 
 const app = createApp(App)
 
@@ -15,6 +16,22 @@ const notivue = createNotivue({
     pauseOnHover: true,
     pauseOnTabChange: true,
     position: "bottom-right",
+})
+
+router.beforeEach((to, from) => {
+    const requiresAuth = to.meta["requiresAuth"] ?? false
+    if (!requiresAuth || requiresAuth === false) {
+       return true 
+    }
+    
+    if (requiresAuth) {
+        const authStore = useAuthStore()
+        if (authStore.jwt === "") {
+            return {name: "signin"} 
+        }
+        
+        return true
+    }
 })
 
 app.use(createPinia())
