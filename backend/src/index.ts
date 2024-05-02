@@ -5,7 +5,7 @@ import {initDb} from "./db";
 import {ApiResponseType} from "./types";
 import {profileRoute} from "./routes/profile.route";
 
-const PORT = process.env.PORT ?? 3000;
+const PORT = 3000;
 const app = express()
 
 app.use(express.json())

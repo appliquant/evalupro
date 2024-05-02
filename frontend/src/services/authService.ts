@@ -1,5 +1,7 @@
 import type {ApiResponseType} from "@/types";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 async function handleApiResponse(response: Response): Promise<ApiResponseType> {
     try {
         return await response.json() as ApiResponseType;
@@ -17,7 +19,7 @@ async function handleApiResponse(response: Response): Promise<ApiResponseType> {
 
 async function signup(username: string, email: string, password: string) {
     try {
-        const res = await fetch("http://localhost:3000/api/auth/signup", {
+        const res = await fetch(`${BACKEND_URL}/api/auth/signup`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -40,7 +42,7 @@ async function signup(username: string, email: string, password: string) {
 
 async function signin(email: string, password: string) {
     try {
-        const res = await fetch("http://localhost:3000/api/auth/signin", {
+        const res = await fetch(`${BACKEND_URL}/api/auth/signin`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

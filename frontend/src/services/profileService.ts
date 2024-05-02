@@ -1,5 +1,7 @@
 import type {ApiResponseType} from "@/types";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
 async function handleApiResponse(response: Response): Promise<ApiResponseType> {
     try {
         return await response.json() as ApiResponseType;
@@ -17,7 +19,7 @@ async function handleApiResponse(response: Response): Promise<ApiResponseType> {
 
 const getProfile = async (token: string): Promise<ApiResponseType> => {
     try {
-        const res = await fetch("http://localhost:3000/api/profile", {
+        const res = await fetch(`${BACKEND_URL}/api/profile`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
