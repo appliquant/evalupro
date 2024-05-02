@@ -25,8 +25,7 @@ async function signup(username: string, email: string, password: string) {
             body: JSON.stringify({username, email, password})
         });
 
-        const data = await handleApiResponse(res);
-        return data;
+        return await handleApiResponse(res);
     } catch (e) {
         return {
             status: 500,
