@@ -51,13 +51,22 @@ authController.post("/signup", async (req, res, next) => {
             return res.status(validationErrors.status).json(validationErrors);
         }
 
-        // 2. Vérifier si l'utilisateur existe
-        const userExists = await User.findOne({
+        // 2. Vérifier si courriel existe & si username existe
+        const userExists = User.findOne({
             where: {
                 email: email
             }
         })
-        if (userExists) {
+        
+        const usernameExists = User.findOne({
+            where: {
+                username: username
+            }
+        })
+        
+        const exists = await Promise.all([userExists, usernameExists])
+        
+        if (exists[0]) {
             const userExistsError: ApiResponseType = {
                 status: 400,
                 message: `Utilisateur déjà existant`,
@@ -69,6 +78,20 @@ authController.post("/signup", async (req, res, next) => {
                 ]
             }
             return res.status(userExistsError.status).json(userExistsError);
+        }
+        
+        if (exists[1]) {
+            const usernameExistsError: ApiResponseType = {
+                status: 400,
+                message: `Utilisateur déjà existant`,
+                errors: [
+                    {
+                        field: "username",
+                        message: `Nom d'utilisateur déjà utilisé`
+                    }
+                ]
+            }
+            return res.status(usernameExistsError.status).json(usernameExistsError);
         }
         
         // Hash mdp

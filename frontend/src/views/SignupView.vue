@@ -1,7 +1,7 @@
 <template>
-  <div class="container text-left mt-5">
+  <div class="container text-left mt-3">
 
-    <h1 class="mb-4">Créer un compte</h1>
+    <h1 class="mb-2">Créer un compte</h1>
 
     <form @submit.prevent="login">
       <!-- pseudo -->
@@ -94,17 +94,6 @@
         </div>
       </div>
 
-      <!--      &lt;!&ndash; mdp confirmation &ndash;&gt;-->
-      <!--      <div class="form-floating mb-3">-->
-      <!--        <input type="password"-->
-      <!--               v-model="passwordConfirmation"-->
-      <!--               :minlength="dataLengthValidations?.password?.minlength"-->
-      <!--               name="passwordConfirmation"-->
-      <!--               :maxlength="dataLengthValidations?.password?.maxlength"-->
-      <!--               :pattern="dataLengthValidations?.password?.regex"-->
-      <!--               id="passwdInput2" class="form-control" aria-describedby="passwordHelpBlock" required>-->
-      <!--        <label for="passwdInput2" class="form-label">Confirmer mot de passe</label>-->
-      <!--      </div>-->
       <button class="btn btn-primary" style="margin-right: 2%;">Créer</button>
       <a>
         <RouterLink to="/signin" class="link-underline-opacity-0">Vous avez déja un compte?</RouterLink>
@@ -116,6 +105,7 @@ import {dataLengthValidations} from "@/validations.js";
 import {authService} from "@/services/authService";
 import type {ApiResponseType} from "@/types";
 import {onMounted, ref} from "vue";
+import {Notivue, push} from "notivue";
 
 const payload = ref({
   username: "",
@@ -168,9 +158,6 @@ const validatePasswordsMatch = (): boolean => {
 
 const login = async () => {
   try {
-    console.log(payload.value)
-    console.log(passwordConfirmation.value)
-
     if (!validatePasswordsMatch()) {
       showServerErrors({field: "passwordConfirmation", message: "Les mots de passe ne correspondent pas"})
       return
@@ -182,8 +169,6 @@ const login = async () => {
         payload.value.password,
     )
 
-    console.log(`res: ${JSON.stringify(res)}`)
-
     if (res.errors && res.errors.length > 0) {
       for (const error of res.errors) {
         showServerErrors(error)
@@ -191,8 +176,13 @@ const login = async () => {
       return
     }
 
-    // success
-    console.log("success")
+    if (res.status === 200) {
+      return push.success({
+        title: "Compte créé",
+        message: "Vous pouvez maintenant vous connecter",
+        duration: 3000
+      })
+    }
 
   } catch (e) {
     const err = e as ApiResponseType
@@ -203,12 +193,9 @@ const login = async () => {
 const showServerErrors = (error: { field: string, message: string }) => {
   switch (error.field) {
     case "username": {
-      console.log(username)
-      console.log(document.getElementById("usernameInput"))
       username?.classList.add("is-invalid")
       usernameContainer?.classList.add("is-invalid")
       if (usernameInvalidFeedback) usernameInvalidFeedback.innerText = error.message
-      console.log("username errr")
       break
     }
     case "email": {
@@ -230,7 +217,6 @@ const showServerErrors = (error: { field: string, message: string }) => {
       break
     }
     default:
-      console.log("default error")
   }
 }
 
