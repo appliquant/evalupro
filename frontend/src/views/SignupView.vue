@@ -35,6 +35,7 @@
         <div class="form-floating is-invalid" id="emailInputContainer">
           <input type="email"
                  v-model="payload.email"
+                 @input="removeServerErrors('email')"
                  name="email"
                  :minlength="dataLengthValidations?.email?.minlength"
                  :maxlength="dataLengthValidations?.email?.maxlength"
@@ -52,6 +53,7 @@
         <div class="form-floating" id="passwdInputContainer">
           <input type="password"
                  v-model="payload.password"
+                 @input="removeServerErrors('password')"
                  name="password"
                  :pattern="dataLengthValidations?.password?.regex"
                  :minlength="dataLengthValidations?.password?.minlength"
@@ -68,17 +70,41 @@
         </div>
       </div>
 
+
       <!-- mdp confirmation -->
-      <div class="form-floating mb-3">
-        <input type="password"
-               v-model="passwordConfirmation"
-               :minlength="dataLengthValidations?.password?.minlength"
-               name="passwordConfirmation"
-               :maxlength="dataLengthValidations?.password?.maxlength"
-               :pattern="dataLengthValidations?.password?.regex"
-               id="passwdInput2" class="form-control" aria-describedby="passwordHelpBlock" required>
-        <label for="passwdInput2" class="form-label">Confirmer mot de passe</label>
+      <div class="mb-3">
+        <div class="form-floating" id="passwdConfirmationInputContainer">
+          <input type="password"
+                 @input="showPasswordMatchError"
+                 v-model="passwordConfirmation"
+                 name="password"
+                 :pattern="dataLengthValidations?.password?.regex"
+                 :minlength="dataLengthValidations?.password?.minlength"
+                 :maxlength="dataLengthValidations?.password?.maxlength"
+                 id="passwdConfirmationInput"
+                 class="form-control"
+                 aria-describedby="passwordConfirmationHelp passwdConfirmationInputInvalidFeedback" required>
+          <label for="passwdInput" class="form-label" aria-describedby="passwdConfirmationHelp">Confimer votre mot de
+            passe</label>
+          <div id="passwdConfirmationHelp" class="form-text">Doit contenir au minimum 6 caractères, 1 majuscule, 1
+            chiffre et 1 des caractères spéciaux suivants : #?!@$ %^&*-
+          </div>
+        </div>
+        <div id="passwdConfirmationInputInvalidFeedback" class="invalid-feedback">
+        </div>
       </div>
+
+      <!--      &lt;!&ndash; mdp confirmation &ndash;&gt;-->
+      <!--      <div class="form-floating mb-3">-->
+      <!--        <input type="password"-->
+      <!--               v-model="passwordConfirmation"-->
+      <!--               :minlength="dataLengthValidations?.password?.minlength"-->
+      <!--               name="passwordConfirmation"-->
+      <!--               :maxlength="dataLengthValidations?.password?.maxlength"-->
+      <!--               :pattern="dataLengthValidations?.password?.regex"-->
+      <!--               id="passwdInput2" class="form-control" aria-describedby="passwordHelpBlock" required>-->
+      <!--        <label for="passwdInput2" class="form-label">Confirmer mot de passe</label>-->
+      <!--      </div>-->
       <button class="btn btn-primary" style="margin-right: 2%;">Créer</button>
       <a>
         <RouterLink to="/signin" class="link-underline-opacity-0">Vous avez déja un compte?</RouterLink>
@@ -106,6 +132,9 @@ let usernameInvalidFeedback: null | HTMLElement
 let password: null | HTMLElement
 let passwordContainer: null | HTMLElement
 let passwordInvalidFeedback: null | HTMLElement
+let passwdConfirmation: null | HTMLElement
+let passwdConfirmationContainer: null | HTMLElement
+let passwdConfirmationInvalidFeedback: null | HTMLElement
 let email: null | HTMLElement
 let emailContainer: null | HTMLElement
 let emailInvalidFeedback: null | HTMLElement
@@ -117,10 +146,21 @@ onMounted(() => {
   password = document.getElementById("passwdInput")
   passwordContainer = document.getElementById("passwdInputContainer")
   passwordInvalidFeedback = document.getElementById("passwdInputInvalidFeedback")
+  passwdConfirmation = document.getElementById("passwdConfirmationInput")
+  passwdConfirmationContainer = document.getElementById("passwdConfirmationInputContainer")
+  passwdConfirmationInvalidFeedback = document.getElementById("passwdConfirmationInputInvalidFeedback")
   email = document.getElementById("emailInput")
   emailContainer = document.getElementById("emailInputContainer")
   emailInvalidFeedback = document.getElementById("emailInputInvalidFeedback")
 })
+
+const showPasswordMatchError = () => {
+  if (!validatePasswordsMatch()) {
+    return showServerErrors({field: "passwordConfirmation", message: "Les mots de passe ne correspondent pas"})
+  }
+
+  return removeServerErrors("passwordConfirmation")
+}
 
 const validatePasswordsMatch = (): boolean => {
   return payload.value.password === passwordConfirmation.value
@@ -132,17 +172,14 @@ const login = async () => {
     console.log(passwordConfirmation.value)
 
     if (!validatePasswordsMatch()) {
-      console.log("Passwords do not match")
+      showServerErrors({field: "passwordConfirmation", message: "Les mots de passe ne correspondent pas"})
       return
     }
 
     const res = await authService.signup(
-        "fa123",
-        // payload.value.username,
-        // payload.value.email,
-        "fakeemail",
-        // payload.value.password,
-        "fakepas"
+        payload.value.username,
+        payload.value.email,
+        payload.value.password,
     )
 
     console.log(`res: ${JSON.stringify(res)}`)
@@ -186,12 +223,18 @@ const showServerErrors = (error: { field: string, message: string }) => {
       if (passwordInvalidFeedback) passwordInvalidFeedback.innerText = error.message
       break
     }
+    case "passwordConfirmation": {
+      passwdConfirmation?.classList.add("is-invalid")
+      passwdConfirmationContainer?.classList.add("is-invalid")
+      if (passwdConfirmationInvalidFeedback) passwdConfirmationInvalidFeedback.innerText = error.message
+      break
+    }
     default:
       console.log("default error")
   }
 }
 
-const removeServerErrors = (input: "username" | "email" | "password" | "confirmPassword") => {
+const removeServerErrors = (input: "username" | "email" | "password" | "passwordConfirmation") => {
   switch (input) {
     case "username": {
       username?.classList.remove("is-invalid")
@@ -209,6 +252,12 @@ const removeServerErrors = (input: "username" | "email" | "password" | "confirmP
       password?.classList.remove("is-invalid")
       passwordContainer?.classList.remove("is-invalid")
       if (passwordInvalidFeedback) passwordInvalidFeedback.innerText = ""
+      break
+    }
+    case "passwordConfirmation": {
+      passwdConfirmation?.classList.remove("is-invalid")
+      passwdConfirmationContainer?.classList.remove("is-invalid")
+      if (passwdConfirmationInvalidFeedback) passwdConfirmationInvalidFeedback.innerText = ""
       break
     }
     default:
