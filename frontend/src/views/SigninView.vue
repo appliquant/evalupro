@@ -67,7 +67,7 @@ const login = async () => {
       })
     }
     
-    authStore.setJwt(res.data.jwt)
+    authStore.setJwt(res.data.token)
     await router.push({name: "dashboard"})
   } catch (e) {
     const err = e as ApiResponseType

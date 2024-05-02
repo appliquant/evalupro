@@ -6,7 +6,7 @@ async function handleApiResponse(response: Response): Promise<ApiResponseType> {
     } catch (e) {
         return {
             status: response.status,
-            message: "Impossible de lire la réponse du serveur",
+            message: "(authService) Impossible de lire la réponse du serveur",
             errors: [{
                 field: "general",
                 message: e instanceof Error ? e.message : "Erreur lors de la lecture de la réponse du serveur"

@@ -3,6 +3,7 @@ import express from "express";
 import {authController} from "./controllers/auth.controller";
 import {initDb} from "./db";
 import {ApiResponseType} from "./types";
+import {profileController} from "./controllers/profile.controller";
 
 const PORT = process.env.PORT ?? 3000;
 const app = express()
@@ -18,6 +19,7 @@ app.use((req, res, next) => {
 
 // routes
 app.use("/api/auth", authController)
+app.use("/api/profile", profileController)
 
 app.get("/", (req, res) => {
     res.send("yooo")

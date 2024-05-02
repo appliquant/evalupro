@@ -9,3 +9,9 @@ export type ApiResponseType = {
     errors?: ErrorType[]
     data?: any
 }
+
+export enum UserRoles {
+    ADMIN = "admin",
+    TESTER = "tester",
+    USER = "user"
+}
