@@ -1,11 +1,13 @@
 <template>
   <div class="container mt-3">
-    <h1>dashboard</h1>
-    <span class="badge rounded-pill text-bg-primary mb-3">{{ userData.role }}</span>
+    <h1>Panneau de contrôle</h1>
 
-    <ul class="nav flex-wrap">
+    <ul class="nav">
       <li class="nav-item">
-        <a class="nav-link" aria-current="page">Géréer les catégorie</a>
+        <a class="nav-link" aria-current="page">
+          <RouterLink to="/categories" style="margin-right: .5rem;" class="link-underline-opacity-0">Gérer les catégories</RouterLink>
+          <span class="badge rounded-pill text-bg-primary mb-3">{{ userData.role }}</span>
+        </a>
       </li>
     </ul>
   </div>
