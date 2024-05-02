@@ -1,15 +1,14 @@
-import {DataTypes, Sequelize, Options, Model} from "sequelize";
+import {DataTypes, Sequelize, Options, Model, Dialect} from "sequelize";
 import {UserRoles} from "./types";
-import * as constants from "node:constants";
 
 // todo: utiliser .env pour les variables d'environnement
 const options: Options = {
-    host: "localhost",
-    dialect: "mariadb",
-    port: 3306,
+    host: process.env.DB_HOST ?? "localhost",
+    dialect: process.env.DB_DIALECT as Dialect ?? "mariadb",
+    port: parseInt(process.env.DB_PORT ?? "3306"),
 
 }
-const sequelize = new Sequelize("evalupro", "admin", "admin", options);
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, options);
 
 class User extends Model {
 }

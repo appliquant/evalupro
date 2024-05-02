@@ -1,9 +1,9 @@
 import 'dotenv/config'
 import express from "express";
-import {authController} from "./controllers/auth.controller";
+import {authRoute} from "./routes/auth.route";
 import {initDb} from "./db";
 import {ApiResponseType} from "./types";
-import {profileController} from "./controllers/profile.controller";
+import {profileRoute} from "./routes/profile.route";
 
 const PORT = process.env.PORT ?? 3000;
 const app = express()
@@ -18,8 +18,9 @@ app.use((req, res, next) => {
 })
 
 // routes
-app.use("/api/auth", authController)
-app.use("/api/profile", profileController)
+// app.use("/api/auth", authController)
+app.use("/api/auth", authRoute)
+app.use("/api/profile", profileRoute)
 
 app.get("/", (req, res) => {
     res.send("yooo")

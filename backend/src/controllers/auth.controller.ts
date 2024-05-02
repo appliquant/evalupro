@@ -5,9 +5,7 @@ import {User} from "../db";
 import {hash, compare} from "bcrypt"
 import * as jose from "jose"
 
-const authController = express.Router();
-
-authController.post("/signin", async (req, res, next) => {
+const signin = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
         // 1. Vérifier les données
         const {email, password} = req.body;
@@ -83,9 +81,9 @@ authController.post("/signin", async (req, res, next) => {
     } catch (err) {
         next(err)
     }
-})
+}
 
-authController.post("/signup", async (req, res, next) => {
+const signup = async (req: express.Request, res: express.Response, next:express.NextFunction) => {
     try {
         // 1. Vérifier les données
         const {username, email, password} = req.body;
@@ -178,7 +176,7 @@ authController.post("/signup", async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-})
+}
 
 function signupValidations(username: string, email: string, password: string): ApiResponseType {
     const errorMessage: ApiResponseType = {
@@ -229,4 +227,4 @@ function signupValidations(username: string, email: string, password: string): A
     return errorMessage;
 }
 
-export {authController};
+export {signin, signup};

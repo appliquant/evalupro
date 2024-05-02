@@ -1,11 +1,8 @@
 import express from "express";
-import {isSignedIn} from "../middlewares/isSignedIn";
 import {User} from "../db";
 import {ApiResponseType} from "../types";
 
-const profileController = express.Router();
-
-profileController.get("/", isSignedIn, async (req, res, next) => {
+const getProfile = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
         const user = await User.findOne({
             where: {
@@ -33,6 +30,6 @@ profileController.get("/", isSignedIn, async (req, res, next) => {
     } catch (err) {
         next(err)
     }
-})
+}
 
-export {profileController}
+export {getProfile}
