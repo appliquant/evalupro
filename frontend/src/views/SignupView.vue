@@ -3,7 +3,7 @@
 
     <h1 class="mb-2">Créer un compte</h1>
 
-    <form @submit.prevent="login">
+    <form @submit.prevent="signup">
       <!-- pseudo -->
       <div class="mb-3">
         <div class="input-group has-validation" id="usernameInputContainer">
@@ -156,7 +156,7 @@ const validatePasswordsMatch = (): boolean => {
   return payload.value.password === passwordConfirmation.value
 }
 
-const login = async () => {
+const signup = async () => {
   try {
     if (!validatePasswordsMatch()) {
       showServerErrors({field: "passwordConfirmation", message: "Les mots de passe ne correspondent pas"})
@@ -186,7 +186,11 @@ const login = async () => {
 
   } catch (e) {
     const err = e as ApiResponseType
-    console.log(err)
+    push.error({
+      title: "Erreur",
+      message: err.message,
+      duration: 13000
+    })
   }
 }
 

@@ -29,7 +29,30 @@ async function signup(username: string, email: string, password: string) {
     } catch (e) {
         return {
             status: 500,
-            message: `Impossible d'atteindre le serveur : ${e}`,
+            message: `Impossible d'atteindre le serveur lors de la création de compte : ${e}`,
+            errors: [{
+                field: "network",
+                message: e instanceof Error ? e.message : "Erreur lors de la communication avec le serveur"
+            }]
+        } as ApiResponseType
+    }
+}
+
+async function signin(email: string, password: string) {
+    try {
+        const res = await fetch("http://localhost:3000/api/auth/signin", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({email, password})
+        });
+
+        return await handleApiResponse(res);
+    } catch (e) {
+        return {
+            status: 500,
+            message: `Impossible d'atteindre le serveur lors de la connexion: ${e}`,
             errors: [{
                 field: "network",
                 message: e instanceof Error ? e.message : "Erreur lors de la communication avec le serveur"
@@ -39,7 +62,8 @@ async function signup(username: string, email: string, password: string) {
 }
 
 const authService = {
-    signup
+    signup,
+    signin
 }
 
 export {authService}

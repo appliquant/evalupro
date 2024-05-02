@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from "express";
 import {authController} from "./controllers/auth.controller";
 import {initDb} from "./db";

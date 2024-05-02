@@ -2,22 +2,87 @@ import express from "express";
 import {ApiResponseType} from "../types";
 import {dataLengthValidations} from "../validations";
 import {User} from "../db";
-import {hash} from "bcrypt"
+import {hash, compare} from "bcrypt"
+import * as jose from "jose"
 
 const authController = express.Router();
 
-authController.post("/signin", (req, res) => {
-    // 1. Vérifier les données
+authController.post("/signin", async (req, res, next) => {
+    try {
+        // 1. Vérifier les données
+        const {email, password} = req.body;
 
-    // 2. Vérifier si l'utilisateur existe
+        if (!email || !password) {
+            const missing = []
+            if (!email) missing.push("email");
+            if (!password) missing.push("password");
 
-    // 3. Vérifier si le mot de passe est correct
+            const missingFieldsErrors: ApiResponseType = {
+                status: 400,
+                message: `Champs manquant(s)`,
+                errors: missing.map(field => {
+                        return {
+                            field,
+                            message: `${field} est manquant`
+                        }
+                    }
+                )
+            };
+            return res.status(missingFieldsErrors.status).json(missingFieldsErrors);
+        }
 
-    // 4. Créer un token
+        // 2. Vérifier si l'utilisateur existe
+        const userExists = await User.findOne({
+            where: {
+                email: email
+            },
+            attributes: ["email", "password"]
+        })
 
-    // 5. Renvoyer le token
+        if (!userExists) {
+            const userExistsError: ApiResponseType = {
+                status: 400,
+                message: `Courriel et/ou mot de passe invalide`,
+            }
+            return res.status(userExistsError.status).json(userExistsError);
+        }
 
-    res.json({message: "Signin"});
+
+        // 3. Vérifier si le mot de passe est correct
+        const hashedPassword = userExists.dataValues.password
+        const passwordMatch = await compare(password, hashedPassword);
+        if (!passwordMatch) {
+            const passwordMatchError: ApiResponseType = {
+                status: 400,
+                message: `Courriel et/ou mot de passe invalide`,
+            }
+            return res.status(passwordMatchError.status).json(passwordMatchError);
+        }
+
+        // 4. Créer un token
+        const token = await new jose.SignJWT({
+            email: userExists.dataValues.email,
+        })
+            .setIssuedAt()
+            .setProtectedHeader({alg: "HS256"})
+            .setExpirationTime("2h")
+            .sign(new TextEncoder().encode(
+                process.env.JWT_SECRET
+            ))
+
+        // 5. Renvoyer le token
+        const response: ApiResponseType = {
+            status: 200,
+            message: `Connecté`,
+            data: {
+                token
+            }
+        };
+
+        res.status(response.status).json(response);
+    } catch (err) {
+        next(err)
+    }
 })
 
 authController.post("/signup", async (req, res, next) => {
@@ -46,7 +111,6 @@ authController.post("/signup", async (req, res, next) => {
         }
 
         const validationErrors = signupValidations(username, email, password);
-        console.log(validationErrors)
         if (validationErrors.errors !== undefined && validationErrors.errors.length > 0) {
             return res.status(validationErrors.status).json(validationErrors);
         }
@@ -57,15 +121,15 @@ authController.post("/signup", async (req, res, next) => {
                 email: email
             }
         })
-        
+
         const usernameExists = User.findOne({
             where: {
                 username: username
             }
         })
-        
+
         const exists = await Promise.all([userExists, usernameExists])
-        
+
         if (exists[0]) {
             const userExistsError: ApiResponseType = {
                 status: 400,
@@ -79,7 +143,7 @@ authController.post("/signup", async (req, res, next) => {
             }
             return res.status(userExistsError.status).json(userExistsError);
         }
-        
+
         if (exists[1]) {
             const usernameExistsError: ApiResponseType = {
                 status: 400,
@@ -93,7 +157,7 @@ authController.post("/signup", async (req, res, next) => {
             }
             return res.status(usernameExistsError.status).json(usernameExistsError);
         }
-        
+
         // Hash mdp
         const hashedPassword = await hash(password, 10);
 
@@ -103,7 +167,6 @@ authController.post("/signup", async (req, res, next) => {
             email,
             password: hashedPassword,
         })
-
 
         // 4. Renvoyer réponse
         const response: ApiResponseType = {

@@ -7,6 +7,7 @@ export type ApiResponseType = {
     status: number
     message: string
     errors?: ErrorType[]
+    data?: any
 }
 
 export enum UserRoles {
