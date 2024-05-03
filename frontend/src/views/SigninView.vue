@@ -70,7 +70,7 @@ const login = async () => {
       })
     }
 
-    authStore.login(res.data.jwt, res.data.user.role)
+    authStore.login(res.data.jwt, res.data.role)
 
     await router.push({ name: 'dashboard' })
   } catch (e) {
