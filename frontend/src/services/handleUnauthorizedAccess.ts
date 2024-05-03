@@ -1,5 +1,5 @@
-import router from "@/router";
+import router from '@/router'
 
 export const handleUnauthorizedAccess = () => {
-    return router.push({name: "signin"})
+  return router.push({ name: 'signin' })
 }

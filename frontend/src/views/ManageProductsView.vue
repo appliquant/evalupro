@@ -20,7 +20,7 @@
         <form>
           <div class="row mb-2">
             <div class="col">
-              <input type="text" class="form-control" placeholder="Nom" aria-label="First name">
+              <input type="text" class="form-control" placeholder="Nom" aria-label="First name" />
             </div>
             <div class="col">
               <select class="form-select" aria-label="Default select example">
@@ -32,28 +32,38 @@
             </div>
           </div>
 
-         <div class="row mb-2">
+          <div class="row mb-2">
             <div class="col">
-              <input type="text" class="form-control" placeholder="Marque" aria-label="First name">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Marque"
+                aria-label="First name"
+              />
             </div>
-           
-             <div class="col">
-              <input type="text" class="form-control" placeholder="Description" aria-label="First name">
+
+            <div class="col">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Description"
+                aria-label="First name"
+              />
             </div>
-          </div> 
-          
+          </div>
+
           <div class="row">
             <div class="col">
-              <input type="text" class="form-control" placeholder="Prix" aria-label="First name">
+              <input type="text" class="form-control" placeholder="Prix" aria-label="First name" />
             </div>
-           
-             <div class="col">
-               <input class="form-control" type="file" id="formFile">
-             </div>
-          </div> 
-          
+
+            <div class="col">
+              <input class="form-control" type="file" id="formFile" />
+            </div>
+          </div>
+
           <div>
-            <button style="margin-right: .5rem;" class="btn btn-primary mt-2">Modifier</button>
+            <button style="margin-right: 0.5rem" class="btn btn-primary mt-2">Modifier</button>
             <button class="btn btn-outline-danger mt-2">Supprimer</button>
           </div>
         </form>

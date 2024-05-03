@@ -1,13 +1,16 @@
 <template>
   <div class="container mt-3">
     <h1>Panneau de contrôle</h1>
-    <p>{{data}}</p>
-    <p>{{error}}</p>
+    <p>{{ data }}</p>
+    <p>{{ error }}</p>
     <ul class="nav flex-column">
       <li class="nav-item" v-show="userData.role === UserRoles.ADMIN">
         <a class="nav-link" aria-current="page">
-          <RouterLink to="/manage-categories" style="margin-right: .5rem;"
-                      class="link-underline-opacity-0">Gérer les catégories
+          <RouterLink
+            to="/manage-categories"
+            style="margin-right: 0.5rem"
+            class="link-underline-opacity-0"
+            >Gérer les catégories
           </RouterLink>
           <span class="badge rounded-pill text-bg-primary">{{ userData.role }}</span>
         </a>
@@ -15,8 +18,11 @@
 
       <li class="nav-item" v-show="userData.role === UserRoles.ADMIN">
         <a class="nav-link" aria-current="page">
-          <RouterLink to="/manage-products" style="margin-right: .5rem;" class="link-underline-opacity-0">Gérer les
-            produits
+          <RouterLink
+            to="/manage-products"
+            style="margin-right: 0.5rem"
+            class="link-underline-opacity-0"
+            >Gérer les produits
           </RouterLink>
           <span class="badge rounded-pill text-bg-primary">{{ userData.role }}</span>
         </a>
@@ -26,13 +32,13 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {UserRoles} from "@/types";
-import {useAuthStore} from "@/stores/authStore";
-import {useRouter} from "vue-router";
-import {useCurrentUser} from "@/composables/useCurrentUser";
+import { onMounted, ref } from 'vue'
+import { UserRoles } from '@/types'
+import { useAuthStore } from '@/stores/authStore'
+import { useRouter } from 'vue-router'
+import { useCurrentUser } from '@/composables/useCurrentUser'
 
-const {data, error} = useCurrentUser()
+const { data, error } = useCurrentUser()
 
 type UserData = {
   role: UserRoles
@@ -51,7 +57,7 @@ const userData = ref({
 //           title: "Erreur",
 //           message: "Vous n'êtes pas autorisé à accéder à cette page",
 //           duration: 13000
-//         }) 
+//         })
 //       break
 //     default:
 //       push.error({
@@ -83,7 +89,7 @@ onMounted(async () => {
 </script>
 
 <style scoped lang="scss">
-//ul.nav > 
+//ul.nav >
 .nav-link:first-child {
   padding-left: 0 !important;
 }

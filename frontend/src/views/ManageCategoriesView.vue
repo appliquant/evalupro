@@ -20,7 +20,7 @@
         <form>
           <div class="row">
             <div class="col">
-              <input type="text" class="form-control" placeholder="Titre" aria-label="First name">
+              <input type="text" class="form-control" placeholder="Titre" aria-label="First name" />
             </div>
             <div class="col">
               <select class="form-select" aria-label="Default select example">
@@ -33,7 +33,7 @@
           </div>
 
           <div>
-            <button style="margin-right: .5rem;" class="btn btn-primary mt-2">Modifier</button>
+            <button style="margin-right: 0.5rem" class="btn btn-primary mt-2">Modifier</button>
             <button class="btn btn-outline-danger mt-2">Supprimer</button>
           </div>
         </form>
