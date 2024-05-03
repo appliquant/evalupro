@@ -42,7 +42,7 @@ const route = useRoute()
 const authStore = useAuthStore()
 
 const logout = () => {
-  authStore.deleteJwt()
+  authStore.logout()
   router.push({name: 'signin'})
 }
 </script>

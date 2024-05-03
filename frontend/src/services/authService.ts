@@ -1,21 +1,7 @@
 import type {ApiResponseType} from "@/types";
+import {handleApiResponse} from "@/services/handleApiResponse";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-
-async function handleApiResponse(response: Response): Promise<ApiResponseType> {
-    try {
-        return await response.json() as ApiResponseType;
-    } catch (e) {
-        return {
-            status: response.status,
-            message: "(authService) Impossible de lire la réponse du serveur",
-            errors: [{
-                field: "general",
-                message: e instanceof Error ? e.message : "Erreur lors de la lecture de la réponse du serveur"
-            }]
-        }
-    }
-}
 
 async function signup(username: string, email: string, password: string) {
     try {

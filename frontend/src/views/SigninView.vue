@@ -37,7 +37,7 @@
 import {dataLengthValidations} from "@/validations.js";
 import {ref} from "vue";
 import {authService} from "@/services/authService";
-import {type ApiResponseType, UserRoles} from "@/types";
+import {type ApiResponseType } from "@/types";
 import {push} from "notivue";
 import {useAuthStore} from "@/stores/authStore";
 import {useRouter} from "vue-router";
@@ -66,9 +66,9 @@ const login = async () => {
         duration: 5000
       })
     }
-   
-    authStore.setJwt(res.data.token)
-    authStore.setRole(res.data.role)
+
+    authStore.login(res.data.jwt, res.data.user.role)
+
     await router.push({name: "dashboard"})
   } catch (e) {
     const err = e as ApiResponseType

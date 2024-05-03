@@ -1,7 +1,8 @@
 <template>
   <div class="container mt-3">
     <h1>Panneau de contrôle</h1>
-
+    <p>{{data}}</p>
+    <p>{{error}}</p>
     <ul class="nav flex-column">
       <li class="nav-item" v-show="userData.role === UserRoles.ADMIN">
         <a class="nav-link" aria-current="page">
@@ -26,14 +27,12 @@
 
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import {push} from "notivue";
-import {type ApiResponseType, UserRoles} from "@/types";
-import {profileService} from "@/services/profileService";
+import {UserRoles} from "@/types";
 import {useAuthStore} from "@/stores/authStore";
 import {useRouter} from "vue-router";
+import {useCurrentUser} from "@/composables/useCurrentUser";
 
-const authStore = useAuthStore()
-const router = useRouter()
+const {data, error} = useCurrentUser()
 
 type UserData = {
   role: UserRoles
@@ -42,6 +41,26 @@ type UserData = {
 const userData = ref({
   role: UserRoles.USER
 })
+
+// if (error.value !== null) {
+//   switch (error.value.status) {
+//     case 401:
+//       authStore.logout()
+//       router.push({name: 'signin'})
+//         push.error({
+//           title: "Erreur",
+//           message: "Vous n'êtes pas autorisé à accéder à cette page",
+//           duration: 13000
+//         }) 
+//       break
+//     default:
+//       push.error({
+//         title: "Erreur",
+//         message: error.value.message,
+//         duration: 13000
+//       })
+//   }
+// }
 
 onMounted(async () => {
   // try {

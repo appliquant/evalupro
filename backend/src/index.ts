@@ -4,6 +4,7 @@ import {authRoute} from "./routes/auth.route";
 import {initDb} from "./db";
 import {ApiResponseType} from "./types";
 import {profileRoute} from "./routes/profile.route";
+import {errors} from "jose";
 
 const PORT = 3000;
 const app = express()
@@ -34,11 +35,16 @@ app.listen(PORT, () => {
 
 // Error handling
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error(err)
     const errResponse: ApiResponseType = {
         status: 500,
-        message: "Erreur interne" + err,
+        message: "Erreur interne :" + err,
     }
 
+    if (err instanceof errors.JOSEError) {
+        errResponse.status = 401
+        errResponse.message = "Signature JWT invalide"
+    }
+
+    console.error(`Erreur interne : ${err}`)
     res.status(errResponse.status).json(errResponse)
 })

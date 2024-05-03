@@ -6,14 +6,19 @@ export const useAuthStore = defineStore("userdata", () => {
     const jwt = ref(localStorage.getItem('jwt') ?? '');
     const role = ref<UserRoles | null>(localStorage.getItem("role") as UserRoles ?? null);
 
-    function setJwt(newJwt: string) {
-        jwt.value = newJwt;
-        localStorage.setItem('jwt', newJwt);
+    function setJwt(_jwt: string) {
+        jwt.value = _jwt;
+        localStorage.setItem('jwt', _jwt);
     }
 
-    function setRole(r: UserRoles) {
-        role.value = r;
-        localStorage.setItem('role', r);
+    function setRole(_role: UserRoles) {
+        role.value = _role;
+        localStorage.setItem('role', _role);
+    }
+
+    const login = (_jwt: string, _role: UserRoles) => {
+        setJwt(_jwt)
+        setRole(_role)
     }
 
     const logout = () => {
@@ -23,5 +28,5 @@ export const useAuthStore = defineStore("userdata", () => {
         localStorage.removeItem('role');
     }
 
-    return {jwt, setJwt, deleteJwt: logout, setRole, role}
+    return {jwt, login, logout, role}
 })
