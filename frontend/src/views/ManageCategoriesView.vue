@@ -9,49 +9,21 @@
         <div class="d-flex justify-content-between w-100 mb-3">
           <h2>Liste des catégories</h2>
           <button class="btn btn-primary btn-sm"
-                  data-bs-toggle="modal" data-bs-target="#addCategoryModal"
-          >Ajouter
+                  data-bs-toggle="modal"
+                  data-bs-target="#addCategoryModal">Ajouter
           </button>
 
         </div>
-        <ul class="list-group" id="content">
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
-          </li>
-          <li>
-            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+
+        <ul v-if="categories?.data?.categories?.length > 0" class="list-group" id="list-container">
+          <li v-for="category in categories?.data?.categories" :key="category.id"
+              class="list-group-item list-group-item-action" style="cursor:pointer;">
+            {{ category.title }}
           </li>
         </ul>
+        <p v-else-if="loadingCategories" class="text-center">Chargement...</p>
+        <p v-else-if="categoriesError" class="text-center text-danger">{{ categoriesError }}</p>
+        <p v-if="categories?.data?.categories?.length <= 0">Aucune catégorie disponible</p>
 
       </div>
 
@@ -153,7 +125,9 @@ import type { ApiResponseType, ValidationError } from '@/types'
 import { categoriesService } from '@/services/categoriesService'
 import { useAuthStore } from '@/stores/authStore'
 import { push } from 'notivue'
+import { useCategories } from '@/composables/useCategories'
 
+const { data: categories, loading: loadingCategories, error: categoriesError } = useCategories()
 const authStore = useAuthStore()
 const newCategoryPayload = ref({
   title: '',
@@ -263,7 +237,7 @@ const removeErrors = (input: 'newCategoryTitle') => {
 </script>
 
 <style lang="scss">
-#content {
+#list-container {
   max-height: 50dvh;
   overflow-y: auto;
 }
