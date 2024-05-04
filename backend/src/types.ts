@@ -1,4 +1,4 @@
-type ErrorType = {
+type ValidationError = {
     field: string
     message: string
 }
@@ -6,7 +6,7 @@ type ErrorType = {
 export type ApiResponseType = {
     status: number
     message: string
-    errors?: ErrorType[]
+    errors?: ValidationError[]
     data?: any
 }
 

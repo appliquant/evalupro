@@ -118,7 +118,7 @@
 <script setup lang="ts">
 import { dataLengthValidations } from '@/validations.js'
 import { authService } from '@/services/authService'
-import type { ApiResponseType } from '@/types'
+import type { ApiResponseType, ValidationError } from '@/types'
 import { onMounted, ref } from 'vue'
 import { Notivue, push } from 'notivue'
 
@@ -216,7 +216,7 @@ const signup = async () => {
   }
 }
 
-const showServerErrors = (error: { field: string; message: string }) => {
+const showServerErrors = (error: ValidationError) => {
   switch (error.field) {
     case 'username': {
       username?.classList.add('is-invalid')

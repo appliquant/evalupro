@@ -14,7 +14,7 @@
             class="link-underline-opacity-0"
           >Gérer les catégories
           </RouterLink>
-          <span class="badge rounded-pill text-bg-primary">{{ userData.role }}</span>
+          <span class="badge rounded-pill text-bg-primary">{{ data?.data.role }}</span>
         </a>
       </li>
 
@@ -26,7 +26,7 @@
             class="link-underline-opacity-0"
           >Gérer les produits
           </RouterLink>
-          <span class="badge rounded-pill text-bg-primary">{{ userData.role }}</span>
+          <span class="badge rounded-pill text-bg-primary">{{ data?.data.role }}</span>
         </a>
       </li>
     </ul>
@@ -34,22 +34,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
 import { UserRoles } from '@/types'
 import { useCurrentUser } from '@/composables/useCurrentUser'
 
 const { data, loading, error } = useCurrentUser()
 
-const userData = ref({
-  role: UserRoles.USER
-})
-
-onMounted(async () => {
-})
 </script>
 
 <style scoped lang="scss">
-//ul.nav >
 .nav-link:first-child {
   padding-left: 0 !important;
 }

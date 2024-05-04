@@ -1,21 +1,63 @@
 <template>
   <div class="container mt-3">
+
     <h1>Gérer les catégories</h1>
 
-    <div class="row mt-5">
+    <div class="row row-cols-1 row-cols-sm-2">
+
       <div class="col">
-        <h2>Liste des catégories</h2>
-        <ul class="list-group">
-          <li class="list-group-item">Catégorie 1</li>
-          <li class="list-group-item">Catégorie 2</li>
-          <li class="list-group-item">Catégorie 3</li>
-          <li class="list-group-item">Catégorie 4</li>
+        <div class="d-flex justify-content-between w-100 mb-3">
+          <h2>Liste des catégories</h2>
+          <button class="btn btn-primary btn-sm"
+                  data-bs-toggle="modal" data-bs-target="#addCategoryModal"
+          >Ajouter
+          </button>
+
+        </div>
+        <ul class="list-group" id="content">
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
+          <li>
+            <a href="#" class="list-group-item list-group-item-action">Catégorie 2</a>
+          </li>
         </ul>
 
-        <button class="btn btn-primary mt-2">Ajouter</button>
       </div>
-      <div class="col align-items-start align-content-start justify-content-start">
-        <h2>Catégorie séléctionnée</h2>
+
+      <div class="col">
+
+        <h2>Catégorie sélectionnée</h2>
 
         <form>
           <div class="row">
@@ -37,7 +79,179 @@
             <button class="btn btn-outline-danger mt-2">Supprimer</button>
           </div>
         </form>
+
       </div>
     </div>
+
+    <!-- Modal ajout catégorie -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="modalAddCategoryLabel"
+         aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalAddCategoryLabel">Ajouter catégorie</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form class="needs-validation" novalidate>
+
+              <!-- Titre -->
+              <div>
+                <label for="newCategoryTitleInput" class="form-label">Titre</label>
+                <input v-model="newCategoryPaylaod.title"
+                       @input="removeErrors('newCategoryTitle')"
+                       :minlength="dataLengthValidations?.categoryTitle?.minlength"
+                       :maxlength="dataLengthValidations?.categoryTitle?.maxlength"
+                       type="text"
+                       class="form-control"
+                       aria-describedby="newCategoryTitleInvalidFeedback newCategoryTitleHelpBlock"
+                       id="newCategoryTitleInput" required>
+                <div id="newCategoryTitleInvalidFeedback" class="invalid-feedback">
+                </div>
+                <div id="newCategoryTitleHelpBlock" class="form-text">
+                  Entre 3 et 25 caractères
+                </div>
+              </div>
+
+              <!-- Catégorie parente -->
+              <div class="mt-3">
+                <label for="newCategoryParentSelect">Catégorie parente</label>
+                <select id="newCategoryParentSelect" class="form-select" v-model="newCategoryPaylaod.parentCategoryName"
+                        aria-describedby="newCategoryParentHelpBlock"
+                        aria-label="Sélectionner catégorie parente">
+                  <option value="1">One</option>
+                  <option value="2">Two</option>
+                  <option value="3">Three</option>
+                </select>
+                <div id="newCategoryParentHelpBlock" class="form-text">
+                  Sélectionner une catégorie parente
+                </div>
+              </div>
+            </form>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="emptyNewCategoryPayload" data-bs-dismiss="modal">
+              Close
+            </button>
+            <button type="button" class="btn btn-primary" @click.prevent="addCategory">Ajouter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
+
+<script setup lang="ts">
+
+import { onMounted, ref } from 'vue'
+import { dataLengthValidations } from '@/validations'
+import type { ApiResponseType, ValidationError } from '@/types'
+import { categoriesService } from '@/services/categoriesService'
+import { useAuthStore } from '@/stores/authStore'
+import { push } from 'notivue'
+
+const authStore = useAuthStore()
+const newCategoryPaylaod = ref({
+  title: '',
+  parentCategoryName: ''
+})
+
+let newCategoryTitle: null | HTMLElement
+let newCategoryTitleInvalidFeedback: null | HTMLElement
+
+onMounted(() => {
+  newCategoryTitle = document.getElementById('newCategoryTitleInput')
+  newCategoryTitleInvalidFeedback = document.getElementById('newCategoryTitleInvalidFeedback')
+})
+
+const addCategory = async () => {
+  const validationErrors = validations()
+  if (validationErrors.length > 0) {
+    for (const validationError of validationErrors) {
+      showErrors(validationError)
+    }
+    return
+  }
+
+
+  try {
+    const res = await categoriesService.createCategory(
+      authStore.jwt,
+      newCategoryPaylaod.value.title,
+      newCategoryPaylaod.value.parentCategoryName
+    )
+
+    if (res.errors && res.errors.length > 0) {
+      for (const error of res.errors) {
+        showErrors(error)
+      }
+      return
+    }
+
+    if (res.status === 200) {
+      return push.success({
+        title: 'Catégorie créée',
+        message: 'Catégorie créée avec succès',
+        duration: 3000
+      })
+
+    }
+
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 13000
+    })
+
+  }
+}
+
+const validations = (): ValidationError[] => {
+  const errors: ValidationError[] = []
+
+  const newCategoryTitle = newCategoryPaylaod.value.title.trim()
+  if (newCategoryTitle.length < dataLengthValidations?.categoryTitle?.minlength) {
+    errors.push({ field: 'newCategoryTitle', message: 'Titre de catégorie trop court' })
+  }
+
+  if (newCategoryTitle.length > dataLengthValidations?.categoryTitle?.maxlength) {
+    errors.push({ field: 'newCategoryTitle', message: 'Titre de catégorie trop long' })
+  }
+
+  return errors
+}
+
+const emptyNewCategoryPayload = () => {
+  newCategoryPaylaod.value.title = ''
+  newCategoryPaylaod.value.parentCategoryName = ''
+}
+
+const showErrors = (error: ValidationError) => {
+  switch (error.field) {
+    case 'newCategoryTitle':
+      newCategoryTitle?.classList.add('is-invalid')
+      if (newCategoryTitleInvalidFeedback) newCategoryTitleInvalidFeedback.innerText = error.message
+      break
+    default:
+  }
+}
+
+const removeErrors = (input: 'newCategoryTitle') => {
+  switch (input) {
+    case 'newCategoryTitle':
+      newCategoryTitle?.classList.remove('is-invalid')
+      if (newCategoryTitleInvalidFeedback) newCategoryTitleInvalidFeedback.innerText = ''
+  }
+}
+</script>
+
+<style lang="scss">
+#content {
+  max-height: 50dvh;
+  overflow-y: auto;
+}
+</style>

@@ -22,6 +22,11 @@ const dataLengthValidations: { [key: string]: DataLengthValidations } = {
     minlength: 3,
     maxlength: 50,
     regex: `^[a-zA-Z\\s\\-]+$`
+  },
+  
+  categoryTitle: {
+    minlength: 3,
+    maxlength: 25
   }
 }
 

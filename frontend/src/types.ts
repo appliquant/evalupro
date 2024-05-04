@@ -1,4 +1,4 @@
-type ErrorType = {
+export type ValidationError = {
   field: string
   message: string
 }
@@ -6,7 +6,7 @@ type ErrorType = {
 export type ApiResponseType = {
   status: number
   message: string
-  errors?: ErrorType[]
+  errors?: ValidationError[]
   data?: any
 }
 
@@ -14,4 +14,9 @@ export enum UserRoles {
   ADMIN = 'admin',
   TESTER = 'tester',
   USER = 'user'
+}
+
+export type Category = {
+  title: string
+  parent: Category
 }

@@ -9,7 +9,6 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import { useAuthStore } from '@/stores/authStore'
-import { useCurrentUser } from '@/composables/useCurrentUser'
 
 const app = createApp(App)
 
@@ -38,9 +37,6 @@ router.beforeEach((to, from) => {
     }
 
     const userRole = authStore.role
-
-    console.log(requiresRole)
-    console.log(userRole)
     if (requiresRole !== userRole) {
       return { name: 'dashboard' }
     }
