@@ -1,12 +1,6 @@
 import express from 'express'
 import { Category } from '../db'
 
-const getCategories = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  try {
-  } catch (err) {
-    next(err)
-  }
-}
 
 const createCategory = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
@@ -93,6 +87,26 @@ const createCategory = async (req: express.Request, res: express.Response, next:
 
     // Location header
     res.setHeader('Location', `/api/categories/${newCategory.dataValues.id}`)
+    return res.status(response.status).json(response)
+  } catch (err) {
+    next(err)
+  }
+}
+
+const getCategories = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // 1. Trouver les catégories
+    const categories = await Category.findAll()
+
+    // 2. Répondre
+    const response = {
+      status: 200,
+      message: 'Catégories trouvées',
+      data: {
+        categories
+      }
+    }
+
     return res.status(response.status).json(response)
   } catch (err) {
     next(err)

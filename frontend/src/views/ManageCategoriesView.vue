@@ -98,7 +98,7 @@
               <!-- Titre -->
               <div>
                 <label for="newCategoryTitleInput" class="form-label">Titre</label>
-                <input v-model="newCategoryPaylaod.title"
+                <input v-model="newCategoryPayload.title"
                        @input="removeErrors('newCategoryTitle')"
                        :minlength="dataLengthValidations?.categoryTitle?.minlength"
                        :maxlength="dataLengthValidations?.categoryTitle?.maxlength"
@@ -116,7 +116,7 @@
               <!-- Catégorie parente -->
               <div class="mt-3">
                 <label for="newCategoryParentSelect">Catégorie parente</label>
-                <select id="newCategoryParentSelect" class="form-select" v-model="newCategoryPaylaod.parentCategoryName"
+                <select id="newCategoryParentSelect" class="form-select" v-model="newCategoryPayload.parentCategoryName"
                         aria-describedby="newCategoryParentHelpBlock"
                         aria-label="Sélectionner catégorie parente">
                   <option value="1">One</option>
@@ -155,7 +155,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { push } from 'notivue'
 
 const authStore = useAuthStore()
-const newCategoryPaylaod = ref({
+const newCategoryPayload = ref({
   title: '',
   parentCategoryName: ''
 })
@@ -196,8 +196,8 @@ const addCategory = async () => {
   try {
     const res = await categoriesService.createCategory(
       authStore.jwt,
-      newCategoryPaylaod.value.title,
-      newCategoryPaylaod.value.parentCategoryName
+      newCategoryPayload.value.title,
+      newCategoryPayload.value.parentCategoryName
     )
 
     if (res.errors && res.errors.length > 0) {
@@ -225,7 +225,7 @@ const addCategory = async () => {
 const validations = (): ValidationError[] => {
   const errors: ValidationError[] = []
 
-  const newCategoryTitle = newCategoryPaylaod.value.title.trim()
+  const newCategoryTitle = newCategoryPayload.value.title.trim()
   if (newCategoryTitle.length < dataLengthValidations?.categoryTitle?.minlength) {
     errors.push({ field: 'newCategoryTitle', message: 'Titre de catégorie trop court' })
   }
@@ -238,8 +238,8 @@ const validations = (): ValidationError[] => {
 }
 
 const emptyNewCategoryData = () => {
-  newCategoryPaylaod.value.title = ''
-  newCategoryPaylaod.value.parentCategoryName = ''
+  newCategoryPayload.value.title = ''
+  newCategoryPayload.value.parentCategoryName = ''
   if (newCategorySuccessMessage) newCategorySuccessMessage.innerText = ''
 }
 
