@@ -127,11 +127,13 @@
                   Sélectionner une catégorie parente
                 </div>
               </div>
+
+              <p class="mt-3 text-success" id="newCategorySuccessMessage"></p>
             </form>
 
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" @click="emptyNewCategoryPayload" data-bs-dismiss="modal">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               Close
             </button>
             <button type="button" class="btn btn-primary" @click.prevent="addCategory">Ajouter</button>
@@ -145,7 +147,7 @@
 
 <script setup lang="ts">
 
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { dataLengthValidations } from '@/validations'
 import type { ApiResponseType, ValidationError } from '@/types'
 import { categoriesService } from '@/services/categoriesService'
@@ -160,13 +162,29 @@ const newCategoryPaylaod = ref({
 
 let newCategoryTitle: null | HTMLElement
 let newCategoryTitleInvalidFeedback: null | HTMLElement
+let newCategorySuccessMessage: null | HTMLElement
 
 onMounted(() => {
   newCategoryTitle = document.getElementById('newCategoryTitleInput')
   newCategoryTitleInvalidFeedback = document.getElementById('newCategoryTitleInvalidFeedback')
+  newCategorySuccessMessage = document.getElementById('newCategorySuccessMessage')
+
+  // Événement de fermeture du modal de bootstrap
+  document.addEventListener('hidden.bs.modal', () => {
+    emptyNewCategoryData()
+  })
+})
+
+onUnmounted(() => {
+  // Événement de fermeture du modal de bootstrap
+  document.removeEventListener('hidden.bs.modal', () => {
+    emptyNewCategoryData()
+  })
 })
 
 const addCategory = async () => {
+  if (newCategorySuccessMessage) newCategorySuccessMessage.innerText = ''
+
   const validationErrors = validations()
   if (validationErrors.length > 0) {
     for (const validationError of validationErrors) {
@@ -174,7 +192,6 @@ const addCategory = async () => {
     }
     return
   }
-
 
   try {
     const res = await categoriesService.createCategory(
@@ -190,13 +207,8 @@ const addCategory = async () => {
       return
     }
 
-    if (res.status === 200) {
-      return push.success({
-        title: 'Catégorie créée',
-        message: 'Catégorie créée avec succès',
-        duration: 3000
-      })
-
+    if (res.status === 201) {
+      if (newCategorySuccessMessage) newCategorySuccessMessage.innerText = res.message
     }
 
   } catch (e) {
@@ -225,9 +237,10 @@ const validations = (): ValidationError[] => {
   return errors
 }
 
-const emptyNewCategoryPayload = () => {
+const emptyNewCategoryData = () => {
   newCategoryPaylaod.value.title = ''
   newCategoryPaylaod.value.parentCategoryName = ''
+  if (newCategorySuccessMessage) newCategorySuccessMessage.innerText = ''
 }
 
 const showErrors = (error: ValidationError) => {
