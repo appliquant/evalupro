@@ -17,7 +17,8 @@
 
         <ul v-if="categories?.data?.categories?.length > 0" class="list-group" id="list-container">
           <li v-for="category in categories?.data?.categories" :key="category.id"
-              class="list-group-item list-group-item-action" style="cursor:pointer;">
+              :class="`list-group-item list-group-item-action ${selectedCategory?.title === category?.title && 'active'}`"
+              style="cursor:pointer;user-select: none" @click="selectCategory(category)">
             {{ category.title }}
           </li>
         </ul>
@@ -34,7 +35,8 @@
         <form>
           <div class="row">
             <div class="col">
-              <input type="text" class="form-control" placeholder="Titre" aria-label="First name" />
+              <input type="text" :value="selectedCategory?.title" class="form-control" placeholder="Titre"
+                     aria-label="First name" />
             </div>
             <div class="col">
               <select class="form-select" aria-label="Default select example">
@@ -121,14 +123,21 @@
 
 import { onMounted, onUnmounted, ref } from 'vue'
 import { dataLengthValidations } from '@/validations'
-import type { ApiResponseType, ValidationError } from '@/types'
+import type { ApiResponseType, Category, ValidationError } from '@/types'
 import { categoriesService } from '@/services/categoriesService'
 import { useAuthStore } from '@/stores/authStore'
 import { push } from 'notivue'
 import { useCategories } from '@/composables/useCategories'
 
-const { data: categories, loading: loadingCategories, error: categoriesError } = useCategories()
+const {
+  data: categories,
+  loading: loadingCategories,
+  error: categoriesError,
+  reload: reloadCategories
+} = useCategories()
 const authStore = useAuthStore()
+
+const selectedCategory = ref<Category | null>(null)
 const newCategoryPayload = ref({
   title: '',
   parentCategoryName: ''
@@ -146,6 +155,7 @@ onMounted(() => {
   // Événement de fermeture du modal de bootstrap
   document.addEventListener('hidden.bs.modal', () => {
     emptyNewCategoryData()
+    reloadCategories()
   })
 })
 
@@ -155,6 +165,18 @@ onUnmounted(() => {
     emptyNewCategoryData()
   })
 })
+
+const selectCategory = (category: Category) => {
+  if (selectedCategory.value === category) {
+    return unSelectCategory()
+  }
+
+  selectedCategory.value = category
+}
+
+const unSelectCategory = () => {
+  selectedCategory.value = null
+}
 
 const addCategory = async () => {
   if (newCategorySuccessMessage) newCategorySuccessMessage.innerText = ''

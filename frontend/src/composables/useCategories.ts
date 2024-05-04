@@ -9,11 +9,15 @@ export const useCategories = () => {
   const loading = ref(true)
   const error = ref<ApiResponseType | null>(null)
 
-  categoriesService
-    .getCategories(authStore.jwt)
-    .then((res) => (data.value = res))
-    .catch((err) => (error.value = err))
-    .finally(() => (loading.value = false))
+  const reload = () => {
+    categoriesService
+      .getCategories(authStore.jwt)
+      .then((res) => (data.value = res))
+      .catch((err) => (error.value = err))
+      .finally(() => (loading.value = false))
+  }
 
-  return { data, loading, error }
+  reload()
+
+  return { data, loading, error, reload }
 }
