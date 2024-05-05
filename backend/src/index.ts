@@ -6,6 +6,7 @@ import { ApiResponseType } from './types'
 import { profileRoute } from './routes/profile.route'
 import { errors } from 'jose'
 import { categoriesRoute } from './routes/categories.route'
+import { productsRoute } from './routes/products.route'
 
 const PORT = 3000
 const app = express()
@@ -20,10 +21,10 @@ app.use((req, res, next) => {
 })
 
 // routes
-// app.use("/api/auth", authController)
 app.use('/api/auth', authRoute)
 app.use('/api/profile', profileRoute)
 app.use('/api/categories', categoriesRoute)
+app.use('/api/products', productsRoute)
 
 app.get('/', (req, res) => {
   res.send('yooo')

@@ -15,6 +15,9 @@ class User extends Model {
 class Category extends Model {
 }
 
+class Product extends Model {
+}
+
 User.init({
   id: {
     type: DataTypes.INTEGER,
@@ -75,6 +78,62 @@ Category.init({
 Category.hasMany(Category, { as: 'children', foreignKey: 'parentId' })
 Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' })
 
+Product.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+
+  brand: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+
+  categoryId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Categories',
+      key: 'id'
+    }
+  },
+
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+
+  price: {
+    type: DataTypes.DECIMAL,
+    allowNull: false
+  },
+
+  image: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+
+  averageScore: {
+    type: DataTypes.DECIMAL,
+    allowNull: true,
+    defaultValue: 0
+  }
+}, {
+  sequelize,
+  timestamps: true
+})
+
+// Relation Product -> Category
+Product.belongsTo(Category, { as: 'category', foreignKey: 'categoryId' })
+Category.hasMany(Product, { as: 'products', foreignKey: 'categoryId' })
+
 const initDb = () => {
   sequelize.authenticate().then(() => {
     sequelize.sync({
@@ -86,4 +145,4 @@ const initDb = () => {
   })
 }
 
-export { sequelize, initDb, User, Category }
+export { sequelize, initDb, User, Category, Product }

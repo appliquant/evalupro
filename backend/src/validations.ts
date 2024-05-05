@@ -26,7 +26,22 @@ const dataLengthValidations: { [key: string]: DataLengthValidations } = {
   categoryTitle: {
     minlength: 3,
     maxlength: 25
-  }
+  },
+  
+  productName: {
+    minlength: 3,
+    maxlength: 25 
+  },
+  
+  productBrand: {
+    minlength: 3,
+    maxlength: 200
+  },
+  
+  productPrice: {
+    minlength: 0,
+    maxlength: Number.MAX_SAFE_INTEGER
+  } 
 }
 
 export { dataLengthValidations }
