@@ -17,7 +17,7 @@
 
         <ul v-if="categories?.data?.categories?.length > 0" class="list-group" id="list-container">
           <li v-for="category in categories?.data?.categories" :key="category.id"
-              :class="`list-group-item list-group-item-action ${selectedCategory?.title === category?.title && 'active'}`"
+              :class="`list-group-item list-group-item-action ${selectedCategory?.id === category?.id && 'active'}`"
               style="cursor:pointer;user-select: none" @click="selectCategory(category)">
             {{ category.title }}
           </li>
@@ -32,26 +32,46 @@
 
         <h2>Catégorie sélectionnée</h2>
 
-        <form>
-          <div class="row">
-            <div class="col">
-              <input type="text" :value="selectedCategory?.title" class="form-control" placeholder="Titre"
-                     aria-label="First name" />
+        <form novalidate class="needs-validation">
+          <fieldset :disabled="selectedCategory === null">
+            <div class="row">
+              <div class="col">
+                <!-- Pas possible d'utiliser 'v-model' car 'selectedCategory' peut-être null -->
+                <input type="text"
+                       id="selectedCategoryTitleInput"
+                       :value="selectedCategory?.title"
+                       v-on:input=
+                         "e => { if (selectedCategory) selectedCategory.title = ((e.target) as HTMLInputElement).value;
+                       removeErrors('selectedCategoryTitle') }"
+                       :minlength="dataLengthValidations?.categoryTitle?.minlength"
+                       :maxlength="dataLengthValidations?.categoryTitle?.maxlength"
+                       class="form-control"
+                       placeholder="Titre de la catégorie"
+                       aria-describedby="selectedCategoryTitleInvalidFeedback selectedCategoryTitleHelpBlock"
+                       aria-label="First name" />
+                <div id="selectedCategoryTitleInvalidFeedback" class="invalid-feedback">
+                </div>
+                <div id="selectedCategoryTitleHelpBlock" class="form-text">
+                  Entre 3 et 25 caractères
+                </div>
+              </div>
+              <div class="col">
+                <select class="form-select" aria-label="Default select example">
+                  <option selected>Catégorie parente</option>
+                  <option value="1">One</option>
+                  <option value="2">Two</option>
+                  <option value="3">Three</option>
+                </select>
+              </div>
             </div>
-            <div class="col">
-              <select class="form-select" aria-label="Default select example">
-                <option selected>Catégorie parente</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-              </select>
-            </div>
-          </div>
 
-          <div>
-            <button style="margin-right: 0.5rem" class="btn btn-primary mt-2">Modifier</button>
-            <button class="btn btn-outline-danger mt-2">Supprimer</button>
-          </div>
+            <div>
+              <button style="margin-right: 0.5rem" class="btn btn-primary mt-2" @click.prevent="updateCategory">
+                Modifier
+              </button>
+              <button class="btn btn-outline-danger mt-2">Supprimer</button>
+            </div>
+          </fieldset>
         </form>
 
       </div>
@@ -110,7 +130,7 @@
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
               Close
             </button>
-            <button type="button" class="btn btn-primary" @click.prevent="addCategory">Ajouter</button>
+            <button type="button" class="btn btn-primary" @click.prevent="createCategory">Ajouter</button>
           </div>
         </div>
       </div>
@@ -135,9 +155,11 @@ const {
   error: categoriesError,
   reload: reloadCategories
 } = useCategories()
+
 const authStore = useAuthStore()
 
 const selectedCategory = ref<Category | null>(null)
+
 const newCategoryPayload = ref({
   title: '',
   parentCategoryName: ''
@@ -146,16 +168,19 @@ const newCategoryPayload = ref({
 let newCategoryTitle: null | HTMLElement
 let newCategoryTitleInvalidFeedback: null | HTMLElement
 let newCategorySuccessMessage: null | HTMLElement
+let selectedCategoryTitle: null | HTMLElement
+let selectedCategoryTitleInvalidFeedback: null | HTMLElement
 
 onMounted(() => {
   newCategoryTitle = document.getElementById('newCategoryTitleInput')
   newCategoryTitleInvalidFeedback = document.getElementById('newCategoryTitleInvalidFeedback')
   newCategorySuccessMessage = document.getElementById('newCategorySuccessMessage')
+  selectedCategoryTitle = document.getElementById('selectedCategoryTitleInput')
+  selectedCategoryTitleInvalidFeedback = document.getElementById('selectedCategoryTitleInvalidFeedback')
 
   // Événement de fermeture du modal de bootstrap
   document.addEventListener('hidden.bs.modal', () => {
     emptyNewCategoryData()
-    reloadCategories()
   })
 })
 
@@ -167,21 +192,22 @@ onUnmounted(() => {
 })
 
 const selectCategory = (category: Category) => {
-  if (selectedCategory.value === category) {
+  if (selectedCategory.value?.id === category.id) {
     return unSelectCategory()
   }
 
-  selectedCategory.value = category
+  // On clone la catégorie pour éviter de modifier la catégorie directement
+  selectedCategory.value = { ...category }
 }
 
 const unSelectCategory = () => {
   selectedCategory.value = null
 }
 
-const addCategory = async () => {
+const createCategory = async () => {
   if (newCategorySuccessMessage) newCategorySuccessMessage.innerText = ''
 
-  const validationErrors = validations()
+  const validationErrors = validations('createCategory')
   if (validationErrors.length > 0) {
     for (const validationError of validationErrors) {
       showErrors(validationError)
@@ -205,6 +231,7 @@ const addCategory = async () => {
 
     if (res.status === 201) {
       if (newCategorySuccessMessage) newCategorySuccessMessage.innerText = res.message
+      reloadCategories()
     }
 
   } catch (e) {
@@ -218,16 +245,73 @@ const addCategory = async () => {
   }
 }
 
-const validations = (): ValidationError[] => {
+const updateCategory = async () => {
+  try {
+    if (!selectedCategory.value) {
+      return
+    }
+    const validationErrors = validations('updateCategory')
+    if (validationErrors.length > 0) {
+      for (const validationError of validationErrors) {
+        showErrors(validationError)
+      }
+      return
+    }
+
+    const res = await categoriesService.updateCategory(
+      authStore.jwt,
+      selectedCategory.value
+    )
+
+    if (res.errors && res.errors.length > 0) {
+      for (const error of res.errors) {
+        showErrors(error)
+      }
+      return
+    }
+
+    if (res.status === 200) {
+      push.success({
+        title: 'Succès',
+        message: res.message,
+        duration: 3000
+      })
+
+      reloadCategories()
+    }
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 13000
+    })
+  }
+}
+
+const validations = (partToValidate: 'createCategory' | 'updateCategory'): ValidationError[] => {
   const errors: ValidationError[] = []
 
-  const newCategoryTitle = newCategoryPayload.value.title.trim()
-  if (newCategoryTitle.length < dataLengthValidations?.categoryTitle?.minlength) {
-    errors.push({ field: 'newCategoryTitle', message: 'Titre de catégorie trop court' })
+  if (partToValidate === 'createCategory') {
+    const newCategoryTitle = newCategoryPayload.value.title
+    if (newCategoryTitle.trim().length < dataLengthValidations?.categoryTitle?.minlength) {
+      errors.push({ field: 'newCategoryTitle', message: 'Titre de catégorie trop court' })
+    }
+
+    if (newCategoryTitle.trim().length > dataLengthValidations?.categoryTitle?.maxlength) {
+      errors.push({ field: 'newCategoryTitle', message: 'Titre de catégorie trop long' })
+    }
   }
 
-  if (newCategoryTitle.length > dataLengthValidations?.categoryTitle?.maxlength) {
-    errors.push({ field: 'newCategoryTitle', message: 'Titre de catégorie trop long' })
+  if (partToValidate === 'updateCategory') {
+    const selectedCategoryTitle = selectedCategory?.value?.title
+    if (selectedCategoryTitle && selectedCategoryTitle.trim().length < dataLengthValidations?.categoryTitle?.minlength) {
+      errors.push({ field: 'selectedCategoryTitle', message: 'Titre de catégorie trop court' })
+    }
+
+    if (selectedCategoryTitle && selectedCategoryTitle.trim().length > dataLengthValidations?.categoryTitle?.maxlength) {
+      errors.push({ field: 'selectedCategoryTitle', message: 'Titre de catégorie trop long' })
+    }
   }
 
   return errors
@@ -245,15 +329,24 @@ const showErrors = (error: ValidationError) => {
       newCategoryTitle?.classList.add('is-invalid')
       if (newCategoryTitleInvalidFeedback) newCategoryTitleInvalidFeedback.innerText = error.message
       break
+    case 'selectedCategoryTitle':
+      selectedCategoryTitle?.classList.add('is-invalid')
+      if (selectedCategoryTitleInvalidFeedback) selectedCategoryTitleInvalidFeedback.innerText = error.message
+      break
     default:
   }
 }
 
-const removeErrors = (input: 'newCategoryTitle') => {
+const removeErrors = (input: 'newCategoryTitle' | 'selectedCategoryTitle') => {
   switch (input) {
     case 'newCategoryTitle':
       newCategoryTitle?.classList.remove('is-invalid')
       if (newCategoryTitleInvalidFeedback) newCategoryTitleInvalidFeedback.innerText = ''
+      break
+    case 'selectedCategoryTitle':
+      selectedCategoryTitle?.classList.remove('is-invalid')
+      if (selectedCategoryTitleInvalidFeedback) selectedCategoryTitleInvalidFeedback.innerText = ''
+      break
   }
 }
 </script>

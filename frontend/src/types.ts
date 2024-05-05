@@ -17,6 +17,7 @@ export enum UserRoles {
 }
 
 export type Category = {
+  id: string
   title: string
-  parent: Category
+  parentId: string | null
 }

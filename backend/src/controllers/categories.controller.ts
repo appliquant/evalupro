@@ -1,5 +1,6 @@
 import express from 'express'
 import { Category } from '../db'
+import { ApiResponseType } from '../types'
 
 
 const createCategory = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -113,4 +114,108 @@ const getCategories = async (req: express.Request, res: express.Response, next: 
   }
 }
 
-export { getCategories, createCategory }
+const updateCategory = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // 1. Vérifier les données
+    const { id, title, parentId } = req.body
+    if (!id || !title) {
+      const missing = []
+      if (!id) missing.push('selectedCategoryId')
+      if (!title) missing.push('selectedCategoryTitle')
+
+      const missingFieldsErrors = {
+        status: 400,
+        message: 'Champs manquant(s)',
+        errors: missing.map(field => ({
+          field,
+          message: `Champ ${field} manquant`
+        }))
+      }
+
+      return res.status(missingFieldsErrors.status).json(missingFieldsErrors)
+    }
+
+    // 2. Vérifier si la catégorie existe
+    const category = await Category.findByPk(id)
+    if (!category) {
+      const categoryNotFoundError = {
+        status: 404,
+        message: 'Catégorie non trouvée',
+        errors: [
+          {
+            field: 'selectedCategoryTitle',
+            message: 'Cette catégorie n\'existe pas'
+          }
+        ]
+      }
+
+      return res.status(categoryNotFoundError.status).json(categoryNotFoundError)
+    }
+
+    // 3. Vérifier si la catégorie parente existe
+    let parentCategory
+    if (parentId) {
+      parentCategory = await Category.findByPk(parentId)
+      if (!parentCategory) {
+        const parentCategoryNotFoundError = {
+          status: 404,
+          message: 'Catégorie parente non trouvée',
+          errors: [
+            {
+              field: 'selectedCategoryParent',
+              message: 'Catégorie parente non trouvée'
+            }
+          ]
+        }
+
+        return res.status(parentCategoryNotFoundError.status).json(parentCategoryNotFoundError)
+      }
+    }
+
+    // 4. Vérifier si une catégorie avec le même nom existe (sauf si c'est la catégorie actuelle)
+    if (category.dataValues.title !== title) {
+      const categoryExists = await Category.findOne({
+        where: {
+          title
+        }
+      })
+
+      if (categoryExists) {
+        const categoryExistsError = {
+          status: 400,
+          message: 'Catégorie avec le même titre existe déjà',
+          errors: [
+            {
+              field: 'selectedCategoryTitle',
+              message: 'Catégorie avec ce nom existe déjà'
+            }
+          ]
+        }
+
+        return res.status(categoryExistsError.status).json(categoryExistsError)
+      }
+    }
+
+    // 5. Mettre à jour la catégorie
+    await category.update({
+      title,
+      parentId
+    })
+
+    // 6. Répondre
+    const response: ApiResponseType = {
+      status: 200,
+      message: 'Catégorie mise à jour',
+      data: {
+        id: '1'
+      }
+    }
+
+    res.setHeader('Location', `/api/categories/${response.data.id}`)
+    return res.status(response.status).json(response)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export { getCategories, createCategory, updateCategory }
