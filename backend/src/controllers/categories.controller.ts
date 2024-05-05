@@ -2,14 +2,13 @@ import express from 'express'
 import { Category } from '../db'
 import { ApiResponseType } from '../types'
 
-
 const createCategory = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // 1. Vérifier les données
     const { newCategoryTitle, newParentCategoryTitle } = req.body
 
     if (!newCategoryTitle) {
-      const missingFieldsErrors = {
+      const missingFieldsErrors: ApiResponseType = {
         status: 400,
         message: 'Champs manquant(s)',
         errors: [
@@ -31,7 +30,7 @@ const createCategory = async (req: express.Request, res: express.Response, next:
     })
 
     if (categoryExists) {
-      const categoryExistsError = {
+      const categoryExistsError: ApiResponseType = {
         status: 400,
         message: 'Catégorie existe déjà',
         errors: [
@@ -56,7 +55,7 @@ const createCategory = async (req: express.Request, res: express.Response, next:
       })
 
       if (!parentCategory) {
-        const parentCategoryNotFoundError = {
+        const parentCategoryNotFoundError: ApiResponseType = {
           status: 404,
           message: 'Catégorie parente non trouvée',
           errors: [
@@ -78,7 +77,7 @@ const createCategory = async (req: express.Request, res: express.Response, next:
     })
 
     // 5. Répondre
-    const response = {
+    const response: ApiResponseType = {
       status: 201,
       message: 'Catégorie créée',
       data: {
@@ -100,7 +99,7 @@ const getCategories = async (req: express.Request, res: express.Response, next: 
     const categories = await Category.findAll()
 
     // 2. Répondre
-    const response = {
+    const response: ApiResponseType = {
       status: 200,
       message: 'Catégories trouvées',
       data: {
@@ -123,7 +122,7 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
       if (!id) missing.push('selectedCategoryId')
       if (!title) missing.push('selectedCategoryTitle')
 
-      const missingFieldsErrors = {
+      const missingFieldsErrors: ApiResponseType = {
         status: 400,
         message: 'Champs manquant(s)',
         errors: missing.map(field => ({
@@ -138,7 +137,7 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
     // 2. Vérifier si la catégorie existe
     const category = await Category.findByPk(id)
     if (!category) {
-      const categoryNotFoundError = {
+      const categoryNotFoundError: ApiResponseType = {
         status: 404,
         message: 'Catégorie non trouvée',
         errors: [
@@ -157,7 +156,7 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
     if (parentId) {
       parentCategory = await Category.findByPk(parentId)
       if (!parentCategory) {
-        const parentCategoryNotFoundError = {
+        const parentCategoryNotFoundError: ApiResponseType = {
           status: 404,
           message: 'Catégorie parente non trouvée',
           errors: [
@@ -181,7 +180,7 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
       })
 
       if (categoryExists) {
-        const categoryExistsError = {
+        const categoryExistsError: ApiResponseType = {
           status: 400,
           message: 'Catégorie avec le même titre existe déjà',
           errors: [
@@ -218,4 +217,57 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
   }
 }
 
-export { getCategories, createCategory, updateCategory }
+const deleteCategory = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // 1. Vérifier les données
+    const { id } = req.params
+    if (!id) {
+      const missingFieldsErrors: ApiResponseType = {
+        status: 400,
+        message: 'Champs manquant(s)',
+        errors: [
+          {
+            field: 'deleteCategory',
+            message: 'Id de la catégorie manquant'
+          }
+        ]
+      }
+
+      return res.status(missingFieldsErrors.status).json(missingFieldsErrors)
+    }
+
+    // 2. Vérifier si la catégorie existe
+    const category = await Category.findByPk(id)
+    if (!category) {
+      const categoryNotFoundError = {
+        status: 404,
+        message: 'Catégorie non trouvée',
+        errors: [
+          {
+            field: 'deleteCategory',
+            message: 'Catégorie non trouvée'
+          }
+        ]
+      }
+
+      return res.status(categoryNotFoundError.status).json(categoryNotFoundError)
+    }
+
+    // 3. todo: Vérifier si la catégorie n'est pas associée à des produits ou caractériques
+
+    // 4. Supprimer la catégorie
+    await category.destroy()
+
+    // 5. Répondre
+    const response: ApiResponseType = {
+      status: 200,
+      message: 'Catégorie supprimée'
+    }
+
+    return res.status(response.status).json(response)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export { getCategories, createCategory, updateCategory, deleteCategory }

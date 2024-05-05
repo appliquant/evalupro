@@ -83,5 +83,31 @@ const updateCategory = async (jwt: string, category: Category) => {
   }
 }
 
-const categoriesService = { createCategory, getCategories, updateCategory }
+const deleteCategory = async (jwt: string, categoryId: string) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/categories/${categoryId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`
+      }
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la suppression de la catégorie',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+const categoriesService = { createCategory, getCategories, updateCategory, deleteCategory }
 export { categoriesService }

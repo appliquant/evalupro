@@ -18,8 +18,6 @@ export function requireRole(requiredRole: UserRoles) {
           return res.status(missingEmailError.status).json(missingEmailError)
         }
 
-        console.log('email >> ', email)
-
         const user = await User.findOne({
           where: {
             email

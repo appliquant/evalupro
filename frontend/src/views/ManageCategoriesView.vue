@@ -69,7 +69,7 @@
               <button style="margin-right: 0.5rem" class="btn btn-primary mt-2" @click.prevent="updateCategory">
                 Modifier
               </button>
-              <button class="btn btn-outline-danger mt-2">Supprimer</button>
+              <button class="btn btn-outline-danger mt-2" @click.prevent="deleteCategory">Supprimer</button>
             </div>
           </fieldset>
         </form>
@@ -246,18 +246,19 @@ const createCategory = async () => {
 }
 
 const updateCategory = async () => {
-  try {
-    if (!selectedCategory.value) {
-      return
-    }
-    const validationErrors = validations('updateCategory')
-    if (validationErrors.length > 0) {
-      for (const validationError of validationErrors) {
-        showErrors(validationError)
-      }
-      return
-    }
+  if (!selectedCategory.value) {
+    return
+  }
 
+  const validationErrors = validations('updateCategory')
+  if (validationErrors.length > 0) {
+    for (const validationError of validationErrors) {
+      showErrors(validationError)
+    }
+    return
+  }
+
+  try {
     const res = await categoriesService.updateCategory(
       authStore.jwt,
       selectedCategory.value
@@ -278,6 +279,49 @@ const updateCategory = async () => {
       })
 
       reloadCategories()
+    }
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 13000
+    })
+  }
+}
+
+const deleteCategory = async () => {
+  if (!selectedCategory.value) {
+    return
+  }
+
+  const confirmation = confirm('Voulez-vous vraiment supprimer cette catégorie ?')
+  if (!confirmation) {
+    return
+  }
+
+  try {
+    const res = await categoriesService.deleteCategory(
+      authStore.jwt,
+      selectedCategory.value.id
+    )
+
+    if (res.errors && res.errors.length > 0) {
+      for (const error of res.errors) {
+        showErrors(error)
+      }
+      return
+    }
+
+    if (res.status === 200) {
+      push.success({
+        title: 'Succès',
+        message: res.message,
+        duration: 3000
+      })
+
+      reloadCategories()
+      unSelectCategory()
     }
   } catch (e) {
     const err = e as ApiResponseType
@@ -333,6 +377,13 @@ const showErrors = (error: ValidationError) => {
     case 'selectedCategoryTitle':
       selectedCategoryTitle?.classList.add('is-invalid')
       if (selectedCategoryTitleInvalidFeedback) selectedCategoryTitleInvalidFeedback.innerText = error.message
+      break
+    case 'deleteCategory':
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 13000
+      })
       break
     default:
   }
