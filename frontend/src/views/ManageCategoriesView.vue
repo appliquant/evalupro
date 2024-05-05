@@ -321,6 +321,7 @@ const emptyNewCategoryData = () => {
   newCategoryPayload.value.title = ''
   newCategoryPayload.value.parentCategoryName = ''
   if (newCategorySuccessMessage) newCategorySuccessMessage.innerText = ''
+  removeErrors('newCategoryTitle')
 }
 
 const showErrors = (error: ValidationError) => {
