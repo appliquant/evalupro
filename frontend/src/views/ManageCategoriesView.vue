@@ -98,11 +98,11 @@
                        :maxlength="dataLengthValidations?.categoryTitle?.maxlength"
                        type="text"
                        class="form-control"
-                       aria-describedby="newCategoryTitleInvalidFeedback newCategoryTitleHelpBlock"
+                       aria-describedby="newCategoryTitleInputInvalidFeedback newCategoryTitleInputHelpBlock"
                        id="newCategoryTitleInput" required>
-                <div id="newCategoryTitleInvalidFeedback" class="invalid-feedback">
+                <div id="newCategoryTitleInputInvalidFeedback" class="invalid-feedback">
                 </div>
-                <div id="newCategoryTitleHelpBlock" class="form-text">
+                <div id="newCategoryTitleInputHelpBlock" class="form-text">
                   Entre 3 et 25 caractères
                 </div>
               </div>
@@ -165,18 +165,18 @@ const newCategoryPayload = ref({
   parentCategoryName: ''
 })
 
-let newCategoryTitle: null | HTMLElement
-let newCategoryTitleInvalidFeedback: null | HTMLElement
+let newCategoryTitleInput: null | HTMLElement
+let newCategoryTitleInputInvalidFeedback: null | HTMLElement
+let selectedCategoryTitleInput: null | HTMLElement
+let selectedCategoryTitleInputInvalidFeedback: null | HTMLElement
 let newCategorySuccessMessage: null | HTMLElement
-let selectedCategoryTitle: null | HTMLElement
-let selectedCategoryTitleInvalidFeedback: null | HTMLElement
 
 onMounted(() => {
-  newCategoryTitle = document.getElementById('newCategoryTitleInput')
-  newCategoryTitleInvalidFeedback = document.getElementById('newCategoryTitleInvalidFeedback')
+  newCategoryTitleInput = document.getElementById('newCategoryTitleInput')
+  newCategoryTitleInputInvalidFeedback = document.getElementById('newCategoryTitleInputInvalidFeedback')
+  selectedCategoryTitleInput = document.getElementById('selectedCategoryTitleInput')
+  selectedCategoryTitleInputInvalidFeedback = document.getElementById('selectedCategoryTitleInvalidFeedback')
   newCategorySuccessMessage = document.getElementById('newCategorySuccessMessage')
-  selectedCategoryTitle = document.getElementById('selectedCategoryTitleInput')
-  selectedCategoryTitleInvalidFeedback = document.getElementById('selectedCategoryTitleInvalidFeedback')
 
   // Événement de fermeture du modal de bootstrap
   document.addEventListener('hidden.bs.modal', () => {
@@ -371,12 +371,12 @@ const emptyNewCategoryData = () => {
 const showErrors = (error: ValidationError) => {
   switch (error.field) {
     case 'newCategoryTitle':
-      newCategoryTitle?.classList.add('is-invalid')
-      if (newCategoryTitleInvalidFeedback) newCategoryTitleInvalidFeedback.innerText = error.message
+      newCategoryTitleInput?.classList.add('is-invalid')
+      if (newCategoryTitleInputInvalidFeedback) newCategoryTitleInputInvalidFeedback.innerText = error.message
       break
     case 'selectedCategoryTitle':
-      selectedCategoryTitle?.classList.add('is-invalid')
-      if (selectedCategoryTitleInvalidFeedback) selectedCategoryTitleInvalidFeedback.innerText = error.message
+      selectedCategoryTitleInput?.classList.add('is-invalid')
+      if (selectedCategoryTitleInputInvalidFeedback) selectedCategoryTitleInputInvalidFeedback.innerText = error.message
       break
     case 'deleteCategory':
       push.error({
@@ -392,12 +392,12 @@ const showErrors = (error: ValidationError) => {
 const removeErrors = (input: 'newCategoryTitle' | 'selectedCategoryTitle') => {
   switch (input) {
     case 'newCategoryTitle':
-      newCategoryTitle?.classList.remove('is-invalid')
-      if (newCategoryTitleInvalidFeedback) newCategoryTitleInvalidFeedback.innerText = ''
+      newCategoryTitleInput?.classList.remove('is-invalid')
+      if (newCategoryTitleInputInvalidFeedback) newCategoryTitleInputInvalidFeedback.innerText = ''
       break
     case 'selectedCategoryTitle':
-      selectedCategoryTitle?.classList.remove('is-invalid')
-      if (selectedCategoryTitleInvalidFeedback) selectedCategoryTitleInvalidFeedback.innerText = ''
+      selectedCategoryTitleInput?.classList.remove('is-invalid')
+      if (selectedCategoryTitleInputInvalidFeedback) selectedCategoryTitleInputInvalidFeedback.innerText = ''
       break
   }
 }

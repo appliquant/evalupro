@@ -29,6 +29,34 @@ const getProducts = async (jwt: string): Promise<ApiResponseType> => {
   }
 }
 
+const createProduct = async (jwt: string, newProduct: FormData): Promise<ApiResponseType> => {
+  try {
 
-const productsService = { getProducts }
+    const res = await fetch(`${BACKEND_URL}/api/products`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+        // Ne PAS spécifier Content-Type pour les uploads de fichiers
+      },
+      body: newProduct
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors d\'ajout de produits',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+
+const productsService = { getProducts, createProduct }
 export { productsService }

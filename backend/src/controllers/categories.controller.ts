@@ -21,6 +21,9 @@ const createCategory = async (req: express.Request, res: express.Response, next:
 
       return res.status(missingFieldsErrors.status).json(missingFieldsErrors)
     }
+    
+    
+    // todo: validation des données (longueur, caractères spéciaux, etc.)
 
     // 2. Vérifier si la catégorie existe
     const categoryExists = await Category.findOne({

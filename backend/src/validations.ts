@@ -22,26 +22,31 @@ const dataLengthValidations: { [key: string]: DataLengthValidations } = {
     maxlength: 50,
     regex: `^[a-zA-Z\\s\\-]+$`
   },
-   
+
   categoryTitle: {
     minlength: 3,
     maxlength: 25
   },
-  
+
   productName: {
     minlength: 3,
-    maxlength: 25 
+    maxlength: 25
   },
-  
+
   productBrand: {
     minlength: 3,
-    maxlength: 200
+    maxlength: 25
   },
-  
+
+  productDescription: {
+    minlength: 3,
+    maxlength: 25
+  },
+
   productPrice: {
     minlength: 0,
     maxlength: Number.MAX_SAFE_INTEGER
-  } 
+  }
 }
 
 export { dataLengthValidations }

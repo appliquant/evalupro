@@ -36,6 +36,11 @@ const dataLengthValidations: { [key: string]: DataLengthValidations } = {
 
   productBrand: {
     minlength: 3,
+    maxlength: 25
+  },
+
+  productDescription: {
+    minlength: 3,
     maxlength: 200
   },
 

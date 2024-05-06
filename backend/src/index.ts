@@ -7,11 +7,13 @@ import { profileRoute } from './routes/profile.route'
 import { errors } from 'jose'
 import { categoriesRoute } from './routes/categories.route'
 import { productsRoute } from './routes/products.route'
+import * as path from 'node:path'
 
 const PORT = 3000
 const app = express()
 
 app.use(express.json())
+app.use('/public', express.static(path.join(__dirname, 'public')))
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -25,10 +27,6 @@ app.use('/api/auth', authRoute)
 app.use('/api/profile', profileRoute)
 app.use('/api/categories', categoriesRoute)
 app.use('/api/products', productsRoute)
-
-app.get('/', (req, res) => {
-  res.send('yooo')
-})
 
 // port
 app.listen(PORT, () => {
