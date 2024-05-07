@@ -3,7 +3,6 @@ import { requireIsSignedin } from '../middlewares/requireIsSignedin'
 import {
   createProduct,
   deleteProduct,
-  getProduct,
   getProducts,
   updateProduct
 } from '../controllers/products.controller'
@@ -13,7 +12,6 @@ import { UserRoles } from '../types'
 const productsRoute = express.Router()
 
 productsRoute.get('/', getProducts)
-productsRoute.get('/search', getProduct)
 productsRoute.post('/', requireIsSignedin, requireRole(UserRoles.ADMIN), createProduct)
 productsRoute.put('/:id', requireIsSignedin, requireRole(UserRoles.ADMIN), updateProduct)
 productsRoute.delete('/:id', requireIsSignedin, requireRole(UserRoles.ADMIN), deleteProduct)

@@ -3,10 +3,11 @@ import { handleApiResponse } from '@/services/handleApiResponse'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-const getProducts = async (jwt: string, productNameFilter?: string): Promise<ApiResponseType> => {
+const getProducts = async (jwt: string, productNameFilter?: string, productCategoryFilterId?: string): Promise<ApiResponseType> => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/products?` + new URLSearchParams({
-      ...(productNameFilter && { productNameFilter })
+      ...(productNameFilter && { productNameFilter }),
+      ...(productCategoryFilterId && { productCategoryFilterId })
     }), {
       method: 'GET',
       headers: {

@@ -14,21 +14,42 @@ const formidableOpt: formidable.Options = {
 const getProducts = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // 1. Extraire les données de la requête
-    const { productNameFilter } = req.query
+    const { productNameFilter, productCategoryFilterId } = req.query
 
-    // 2. Trouver tous les produits
+    // 2. Trouver tous les produits (avec ou sans filtres)
+    // les filtres sont facultatifs
+    // les filtres s'additionnent
+    // si les deux filtres sont présents, les produits doivent correspondre aux deux filtres
+    // si un seul filtre est présent, les produits doivent correspondre à ce filtre
+    // si aucun filtre n'est présent, tous les produits sont retournés
     let products = []
-    if (productNameFilter) {
+    if (productNameFilter && productCategoryFilterId) {
       products = await Product.findAll({
         where: {
           name: {
-            [Op.substring]: productNameFilter
+            [Op.substring]: productNameFilter.toString()
+          },
+          categoryId: productCategoryFilterId.toString()
+        }
+      })
+    } else if (productNameFilter) {
+      products = await Product.findAll({
+        where: {
+          name: {
+            [Op.substring]: productNameFilter.toString()
           }
+        }
+      })
+    } else if (productCategoryFilterId) {
+      products = await Product.findAll({
+        where: {
+          categoryId: productCategoryFilterId.toString()
         }
       })
     } else {
       products = await Product.findAll()
     }
+
 
     // 3. Retourner les produits
     const successResponse: ApiResponseType = {
@@ -40,15 +61,6 @@ const getProducts = async (req: express.Request, res: express.Response, next: ex
     return res.status(successResponse.status).json(successResponse)
   } catch
     (error) {
-    next(error)
-  }
-}
-
-const getProduct = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  try {
-
-
-  } catch (error) {
     next(error)
   }
 }
@@ -372,4 +384,4 @@ const deleteProduct = async (req: express.Request, res: express.Response, next: 
   }
 }
 
-export { getProducts, getProduct, createProduct, updateProduct, deleteProduct }
+export { getProducts, createProduct, updateProduct, deleteProduct }
