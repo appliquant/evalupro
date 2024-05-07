@@ -6,7 +6,7 @@ import { UserRoles } from '../types'
 
 const productsRoute = express.Router()
 
-productsRoute.get('/', requireIsSignedin, getProducts)
+productsRoute.get('/', getProducts)
 productsRoute.post('/', requireIsSignedin, requireRole(UserRoles.ADMIN), createProduct)
 productsRoute.put('/:id', requireIsSignedin, requireRole(UserRoles.ADMIN), updateProduct)
 productsRoute.delete('/:id', requireIsSignedin, requireRole(UserRoles.ADMIN), deleteProduct)
