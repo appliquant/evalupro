@@ -11,6 +11,75 @@ const formidableOpt: formidable.Options = {
   keepExtensions: true
 }
 
+const getProduct = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // 1. Extraire les données de la requête
+    const { id } = req.params
+    if (!id) {
+      const missingIdError: ApiResponseType = {
+        status: 400,
+        message: 'ID manquant',
+        errors: [
+          {
+            field: 'id',
+            message: 'ID manquant'
+          }
+        ]
+      }
+
+      return res.status(missingIdError.status).json(missingIdError)
+    }
+
+    // 2. Trouver le produit
+    const product = await Product.findByPk(id)
+    if (!product) {
+      const productNotFoundError: ApiResponseType = {
+        status: 404,
+        message: 'Produit non trouvé',
+        errors: [
+          {
+            field: 'id',
+            message: 'Produit non trouvé'
+          }
+        ]
+      }
+
+      return res.status(productNotFoundError.status).json(productNotFoundError)
+    }
+
+    // 3. Trouver catégorie du produit
+    const category = await Category.findByPk(product.dataValues.categoryId)
+    if (!category) {
+      const categoryNotFoundError: ApiResponseType = {
+        status: 404,
+        message: 'Catégorie non trouvée',
+        errors: [
+          {
+            field: 'category',
+            message: 'Catégorie non trouvée'
+          }
+        ]
+      }
+
+      return res.status(categoryNotFoundError.status).json(categoryNotFoundError)
+    }
+
+    // 3. Retourner le produit
+    const successResponse: ApiResponseType = {
+      status: 200,
+      message: 'Produit trouvé',
+      data: {
+        product,
+        category
+      }
+    }
+
+    return res.status(successResponse.status).json(successResponse)
+  } catch (err) {
+    next(err)
+  }
+}
+
 const getProducts = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // 1. Extraire les données de la requête
@@ -384,4 +453,4 @@ const deleteProduct = async (req: express.Request, res: express.Response, next: 
   }
 }
 
-export { getProducts, createProduct, updateProduct, deleteProduct }
+export { getProducts, getProduct, createProduct, updateProduct, deleteProduct }

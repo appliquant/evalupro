@@ -117,5 +117,31 @@ const deleteProduct = async (jwt: string, productId: string): Promise<ApiRespons
   }
 }
 
-const productsService = { getProducts, createProduct, updateProduct, deleteProduct }
+const getProduct = async (jwt: string, productId: string): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/products/${productId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`
+      }
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la récupération du produit',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+const productsService = { getProducts, getProduct, createProduct, updateProduct, deleteProduct }
 export { productsService }
