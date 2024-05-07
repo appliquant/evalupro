@@ -4,6 +4,12 @@ import { Category, Product } from '../db'
 import formidable from 'formidable'
 import { dataLengthValidations } from '../validations'
 
+const formidableOpt: formidable.Options = {
+  uploadDir: `${__dirname}/../public/uploads`,
+  maxFiles: 1,
+  keepExtensions: true
+}
+
 const getProducts = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // 1. Trouver tous les produits
@@ -24,14 +30,7 @@ const getProducts = async (req: express.Request, res: express.Response, next: ex
 
 const createProduct = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    // 1. Extraire les données de la requête
-    // const { name, brand, categoryId, description, price } = req.body
-    // console.log(name, brand, categoryId, description, price)
-    const form = formidable({
-      uploadDir: `${__dirname}/../public/uploads`,
-      maxFiles: 1,
-      keepExtensions: true
-    })
+    const form = formidable(formidableOpt)
 
     const [fields, file] = await form.parse(req)
     const { name, brand, category: categoryId, description, price } = fields
@@ -88,6 +87,7 @@ const createProduct = async (req: express.Request, res: express.Response, next: 
         ]
       }
 
+      res.setHeader('Location', `/api/products/${productExists.dataValues.id}`)
       return res.status(productExistsError.status).json(productExistsError)
     }
 
@@ -192,4 +192,105 @@ const createProductValidations = (name: string, brand: string, description: stri
   return errors
 }
 
-export { getProducts, createProduct }
+const updateProduct = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // 1. Extraire données de la requête
+    const form = formidable(formidableOpt)
+    const [fields, file] = await form.parse(req)
+    const { id, name, brand, description, price } = fields
+    const imageFileName = file?.image?.[0]?.newFilename
+
+    // 2. Vérifier les données
+    if (!id || !name || !brand || !description || !price) {
+      const missing = []
+      if (!id) missing.push('id')
+      if (!name) missing.push('name')
+      if (!brand) missing.push('brand')
+      if (!description) missing.push('description')
+      if (!price) missing.push('price')
+
+      const missingFieldsResponse: ApiResponseType = {
+        status: 400,
+        message: 'Champs manquants',
+        errors: missing.map(field => ({
+          field,
+          message: `Champ ${field} manquant`
+        }))
+      }
+
+      return res.status(missingFieldsResponse.status).json(missingFieldsResponse)
+    }
+
+    // 3. Vérifier si le produit existe
+    const product = await Product.findByPk(id.toString())
+    if (!product) {
+      const productNotFoundError: ApiResponseType = {
+        status: 404,
+        message: 'Produit non trouvé',
+        errors: [
+          {
+            field: 'selectedProductNameInput',
+            message: 'Produit non trouvé'
+          }
+        ]
+      }
+
+      return res.status(productNotFoundError.status).json(productNotFoundError)
+    }
+
+    // 4. Vérifier si un produit avec le même nom existe déjà (sauf si c'est le produit actuel)
+    if (product.dataValues.name !== name.toString()) {
+      const productExists = await Product.findOne({
+        where: {
+          name: name.toString()
+        }
+      })
+
+      if (productExists) {
+        const productExistsError: ApiResponseType = {
+          status: 400,
+          message: 'Produit existe déjà',
+          errors: [
+            {
+              field: 'selectedProductNameInput',
+              message: 'Un produit avec ce nom existe déjà'
+            }
+          ]
+        }
+
+        res.setHeader('Location', `/api/products/${productExists.dataValues.id}`)
+        return res.status(productExistsError.status).json(productExistsError)
+      }
+    }
+
+    // 4. Vérifier si une nouvelle image a été envoyée
+    const image = imageFileName ? imageFileName : product.dataValues.image
+
+    // 5. Mettre à jour le produit
+    await Product.update({
+      name: name.toString(),
+      brand: brand.toString(),
+      description: description.toString(),
+      price: parseFloat(price.toString()),
+      image
+    }, {
+      where: {
+        id: id.toString()
+      }
+    })
+
+    // 6. Répondre
+    const response: ApiResponseType = {
+      status: 200,
+      message: 'Produit mis à jour'
+    }
+
+    res.setHeader('Location', `/api/products/${id}`)
+    return res.status(response.status).json(response)
+  } catch
+    (e) {
+    next(e)
+  }
+}
+
+export { getProducts, createProduct, updateProduct }

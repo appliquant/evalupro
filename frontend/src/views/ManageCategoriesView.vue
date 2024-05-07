@@ -265,9 +265,7 @@ const updateCategory = async () => {
     )
 
     if (res.errors && res.errors.length > 0) {
-      for (const error of res.errors) {
-        showErrors(error)
-      }
+      res.errors.forEach(error => showErrors(error))
       return
     }
 

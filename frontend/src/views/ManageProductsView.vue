@@ -16,8 +16,9 @@
 
         <ul v-if="products?.data?.products?.length > 0" class="list-group" id="list-container">
           <li v-for="product in products?.data?.products" :key="product.id"
-              :class="'list-group-item list-group-item-action'"
-          >
+              style="cursor: pointer;user-select: none"
+              :class="`list-group-item list-group-item-action ${selectedProduct?.id === product.id && 'active'}`"
+              @click="selectProduct(product)">
             <h5 class="mb-1">{{ product.name }}</h5>
             <p class="mb-1">{{ product.description }}</p>
             <small>{{ product.brand }}</small>
@@ -29,7 +30,158 @@
 
       </div>
 
-      <div class="col"></div>
+      <div class="col">
+
+        <h2>Produit sélectionné</h2>
+
+        <form novalidate class="needs-validation">
+          <fieldset :disabled="selectedProduct === null">
+
+            <div class="row">
+              <div class="col">
+
+                <!-- Name -->
+                <div>
+                  <label for="selectedProductNameInput" class="form-label">Nom</label>
+                  <input type="text"
+                         :value="selectedProduct?.name"
+                         v-on:input="
+                          e => {if (selectedProduct) selectedProduct.name = ((e.target) as HTMLInputElement).value;
+                            removeErrors('selectedProductNameInput')}"
+                         :minlength="dataLengthValidations?.productName?.minlength"
+                         :maxlength="dataLengthValidations?.productName?.maxlength"
+                         class="form-control"
+                         id="selectedProductNameInput"
+                         aria-describedby="selectedProductNameHelpBlock selectedProductNameInputInvalidFeedback"
+                         required>
+
+                  <div id="selectedProductNameInputInvalidFeedback" class="invalid-feedback">
+                  </div>
+                  <div id="selectedProductNameHelpBlock" class="form-text">
+                    Entre {{ dataLengthValidations?.productName?.minlength }} et
+                    {{ dataLengthValidations?.productName?.maxlength }} caractères
+                  </div>
+                </div>
+
+                <!-- Category -->
+                <div>
+                  <label for="selectedProductCategorySelect">Catégorie</label>
+                  <select id="selectedProductCategorySelect"
+                          :value="selectedProduct?.categoryId"
+                          class="form-select"
+                          aria-describedby="selectedProductCategorySelectHelpBlock selectedProductCategorySelectInvalidFeedback"
+                          aria-label="Sélectionner catégorie parente"
+                          disabled
+                  >
+                    <option
+                      v-for="category in categories?.data?.categories"
+                      :key="category.id"
+                      :value="category.id"
+                      :selected="category.id === selectedProduct?.categoryId"
+                    >{{ category.title }}
+                    </option>
+                  </select>
+                  <div id="selectedProductCategorySelectHelpBlock" class="form-text text-warning-emphasis">
+                    La catégorie ne peut pas être modifiée
+                  </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                  <label for="selectedProductDescriptionTextarea" class="form-label">Description</label>
+                  <textarea class="form-control"
+                            :value="selectedProduct?.description"
+                            v-on:input="
+                              e => {if (selectedProduct) selectedProduct.description = ((e.target) as HTMLTextAreaElement).value;
+                                removeErrors('selectedProductDescriptionTextarea')}"
+                            :minlength="dataLengthValidations?.productDescription?.minlength"
+                            :maxlength="dataLengthValidations?.productDescription?.maxlength"
+                            id="selectedProductDescriptionTextarea"
+                            aria-describedby="selectedProductDescriptionHelpBlock selectedProductDescriptionTextAreaInvalidFeedback"
+                            required></textarea>
+
+                  <div id="selectedProductDescriptionTextAreaInvalidFeedback" class="invalid-feedback">
+                  </div>
+                  <div id="selectedProductDescriptionHelpBlock" class="form-text">
+                    Entre {{ dataLengthValidations?.productDescription?.minlength }} et
+                    {{ dataLengthValidations?.productDescription?.maxlength }} caractères
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <!-- Brand -->
+                <div>
+                  <label for="selectedProductBrandInput" class="form-label">Marque</label>
+                  <input type="text"
+                         :value="selectedProduct?.brand"
+                         v-on:input="
+                          e => {if (selectedProduct) selectedProduct.brand = ((e.target) as HTMLInputElement).value;
+                            removeErrors('selectedProductBrandInput')}"
+                         :minlength="dataLengthValidations?.productBrand?.minlength"
+                         :maxlength="dataLengthValidations?.productBrand?.maxlength"
+                         class="form-control"
+                         id="selectedProductBrandInput"
+                         aria-describedby="selectedProductBrandHelpBlock selectedProductBrandInputInvalidFeedback"
+                         required>
+
+                  <div id="selectedProductBrandInputInvalidFeedback" class="invalid-feedback">
+                  </div>
+                  <div id="selectedProductBrandHelpBlock" class="form-text">
+                    Entre {{ dataLengthValidations?.productBrand?.minlength }} et
+                    {{ dataLengthValidations?.productBrand?.maxlength }} caractères
+                  </div>
+                </div>
+
+                <!-- Price -->
+                <div>
+                  <label for="selectedProductPriceInput" class="form-label">Prix</label>
+                  <input type="number"
+                         :value="selectedProduct?.price"
+                         v-on:input="
+                          e => {if (selectedProduct) selectedProduct.price = parseFloat(((e.target) as HTMLInputElement).value);
+                            removeErrors('selectedProductPriceInput')}"
+                         :min="dataLengthValidations?.productPrice?.minlength"
+                         :max="dataLengthValidations?.productPrice?.maxlength"
+                         class="form-control"
+                         id="selectedProductPriceInput"
+                         aria-describedby="selectedProductPriceHelpBlock selectedProductPriceInputInvalidFeedback"
+                         required>
+
+                  <div id="selectedProductPriceInputInvalidFeedback" class="invalid-feedback">
+                  </div>
+                  <div id="selectedProductPriceHelpBlock" class="form-text">
+                    Prix du produit en dollar (ex : 1200.99)
+                  </div>
+                </div>
+
+                <!-- Image -->
+                <div>
+                  <label for="selectedProductImageInput" class="form-label">Image</label>
+                  <input type="file"
+                         @change="event => {onImageSelected(event, 'updateProduct');removeErrors('selectedProductImageInput')}"
+                         class="form-control"
+                         id="selectedProductImageInput"
+                         accept="image/*"
+                         capture="environment"
+                         aria-describedby="selectedProductImageHelpBlock selectedProductImageInputInvalidFeedback"
+                  >
+
+                  <div id="selectedProductImageInputInvalidFeedback" class="invalid-feedback">
+                  </div>
+                  <div id="selectedProductImageHelpBlock" class="form-text">
+                    Image du produit
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-start gap-2">
+              <button class="btn btn-primary mt-2" @click.prevent="updateProduct">Modifier</button>
+              <button class="btn btn-outline-danger mt-2">Supprimer</button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
     </div>
 
     <!-- Modal ajout produit -->
@@ -199,7 +351,7 @@
 import { useProducts } from '@/composables/useProducts'
 import { dataLengthValidations } from '@/validations'
 import { onMounted, onUnmounted, ref } from 'vue'
-import type { ApiResponseType, ValidationError } from '@/types'
+import type { ApiResponseType, Product, ValidationError } from '@/types'
 import { useCategories } from '@/composables/useCategories'
 import { push } from 'notivue'
 import { productsService } from '@/services/productsService'
@@ -216,10 +368,12 @@ const {
 
 const {
   data: categories,
-  loading: categoriesLoading,
   error: categoriesError,
   reload: categoriesReload
 } = useCategories()
+
+const selectedProduct = ref<Product | null>(null)
+const selectedImageFile = ref<null | File>(null)
 
 const newProductPayload = ref({
   name: '',
@@ -244,6 +398,17 @@ let newProductImageInput: null | HTMLInputElement
 let newProductImageInputInvalidFeedback: null | HTMLDivElement
 let newProductSuccessMessage: null | HTMLParagraphElement
 
+let selectedProductNameInput: null | HTMLInputElement
+let selectedProductNameInputInvalidFeedback: null | HTMLDivElement
+let selectedProductBrandInput: null | HTMLInputElement
+let selectedProductBrandInputInvalidFeedback: null | HTMLDivElement
+let selectedProductDescriptionTextarea: null | HTMLTextAreaElement
+let selectedProductDescriptionTextAreaInvalidFeedback: null | HTMLDivElement
+let selectedProductPriceInput: null | HTMLInputElement
+let selectedProductPriceInputInvalidFeedback: null | HTMLDivElement
+let selectedProductImageInput: null | HTMLInputElement
+let selectedProductImageInputInvalidFeedback: null | HTMLDivElement
+
 onMounted(() => {
   newProductNameInput = document.getElementById('newProductNameInput') as HTMLInputElement
   newProductNameInputInvalidFeedback = document.getElementById('newProductNameInputInvalidFeedback') as HTMLDivElement
@@ -259,6 +424,17 @@ onMounted(() => {
   newProductImageInputInvalidFeedback = document.getElementById('newProductImageInputInvalidFeedback') as HTMLDivElement
   newProductSuccessMessage = document.getElementById('newProductSuccessMessage') as HTMLParagraphElement
 
+  selectedProductNameInput = document.getElementById('selectedProductNameInput') as HTMLInputElement
+  selectedProductNameInputInvalidFeedback = document.getElementById('selectedProductNameInputInvalidFeedback') as HTMLDivElement
+  selectedProductBrandInput = document.getElementById('selectedProductBrandInput') as HTMLInputElement
+  selectedProductBrandInputInvalidFeedback = document.getElementById('selectedProductBrandInputInvalidFeedback') as HTMLDivElement
+  selectedProductDescriptionTextarea = document.getElementById('selectedProductDescriptionTextarea') as HTMLTextAreaElement
+  selectedProductDescriptionTextAreaInvalidFeedback = document.getElementById('selectedProductDescriptionTextAreaInvalidFeedback') as HTMLDivElement
+  selectedProductPriceInput = document.getElementById('selectedProductPriceInput') as HTMLInputElement
+  selectedProductPriceInputInvalidFeedback = document.getElementById('selectedProductPriceInputInvalidFeedback') as HTMLDivElement
+  selectedProductImageInput = document.getElementById('selectedProductImageInput') as HTMLInputElement
+  selectedProductImageInputInvalidFeedback = document.getElementById('selectedProductImageInputInvalidFeedback') as HTMLDivElement
+
   document.addEventListener('hidden.bs.modal', () => {
     emptyNewProductData()
   })
@@ -271,11 +447,29 @@ onUnmounted(() => {
   })
 })
 
+const selectProduct = (product: Product) => {
+  if (selectedProduct.value?.id === product.id) {
+    return unSelectProduct()
+  }
+
+  // On clone le produit pour éviter de modifier directement le produit
+  selectedProduct.value = { ...product }
+}
+
+const unSelectProduct = () => {
+  selectedProduct.value = null
+}
+
 const onImageSelected = (event: Event, action: 'createProduct' | 'updateProduct') => {
   if (action === 'createProduct') {
     const file = ((event?.target) as HTMLInputElement)?.files?.[0]
     if (file) {
       newProductPayload.value.image = file
+    }
+  } else {
+    const file = ((event?.target) as HTMLInputElement)?.files?.[0]
+    if (file) {
+      selectedImageFile.value = file
     }
   }
 }
@@ -309,6 +503,54 @@ const createProduct = async () => {
 
     if (res.status === 201) {
       if (newProductSuccessMessage) newProductSuccessMessage.innerText = res.message
+      productsReload()
+    }
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
+const updateProduct = async () => {
+  if (!selectedProduct.value) return
+
+  const validationErrors = validations('updateProduct')
+  if (validationErrors.length > 0) {
+    validationErrors.forEach(error => showErrors(error))
+    return
+  }
+
+  try {
+    const formData: FormData = new FormData()
+    formData.append('id', selectedProduct.value.id)
+    formData.append('name', selectedProduct.value.name)
+    formData.append('brand', selectedProduct.value.brand)
+    formData.append('description', selectedProduct.value.description)
+    formData.append('price', selectedProduct.value.price.toString())
+    if (selectedImageFile.value) {
+      formData.append('image', selectedImageFile.value)
+    }
+
+    const res = await productsService.updateProduct(
+      authStore.jwt,
+      formData)
+
+    if (res.errors && res.errors.length > 0) {
+      res.errors.forEach((error: ValidationError) => showErrors(error))
+      return
+    }
+
+    if (res.status === 200) {
+      push.success({
+        title: 'Succès',
+        message: res.message,
+        duration: 3000
+      })
+
       productsReload()
     }
   } catch (e) {
@@ -384,7 +626,44 @@ const validations = (partToValidate: 'createProduct' | 'updateProduct'): Validat
   }
 
   if (partToValidate === 'updateProduct') {
-    // @ts-ignore
+    const selectedProductName = selectedProduct.value?.name
+    if (selectedProductName && (selectedProductName.trim().length < dataLengthValidations.productName.minlength || selectedProductName.length > dataLengthValidations.productName.maxlength)) {
+      errors.push({
+        field: 'selectedProductNameInput',
+        message: `Le nom doit contenir entre ${dataLengthValidations.productName.minlength} et ${dataLengthValidations.productName.maxlength} caractères`
+      })
+    }
+
+    const selectedProductBrand = selectedProduct.value?.brand
+    if (selectedProductBrand && (selectedProductBrand.trim().length < dataLengthValidations.productBrand.minlength || selectedProductBrand.length > dataLengthValidations.productBrand.maxlength)) {
+      errors.push({
+        field: 'selectedProductBrandInput',
+        message: `La marque doit contenir entre ${dataLengthValidations.productBrand.minlength} et ${dataLengthValidations.productBrand.maxlength} caractères`
+      })
+    }
+
+    const selectedProductDescription = selectedProduct.value?.description
+    if (selectedProductDescription && (selectedProductDescription.trim().length < dataLengthValidations.productDescription.minlength || selectedProductDescription.length > dataLengthValidations.productDescription.maxlength)) {
+      errors.push({
+        field: 'selectedProductDescriptionTextarea',
+        message: `La description doit contenir entre ${dataLengthValidations.productDescription.minlength} et ${dataLengthValidations.productDescription.maxlength} caractères`
+      })
+    }
+
+    const selectedProductPrice = selectedProduct.value?.price
+    if (selectedProductPrice && isNaN(parseFloat(selectedProductPrice.toString()))) {
+      errors.push({
+        field: 'selectedProductPriceInput',
+        message: 'Le prix doit être un nombre'
+      })
+    }
+
+    if (selectedProductPrice && !isNaN(parseFloat(selectedProductPrice.toString())) && (parseFloat(selectedProductPrice.toString()) < dataLengthValidations.productPrice.minlength || parseFloat(selectedProductPrice.toString()) > dataLengthValidations.productPrice.maxlength)) {
+      errors.push({
+        field: 'selectedProductPriceInput',
+        message: `Le prix doit être compris entre ${dataLengthValidations.productPrice.minlength} et ${dataLengthValidations.productPrice.maxlength}`
+      })
+    }
   }
 
   return errors
@@ -405,6 +684,11 @@ const emptyNewProductData = () => {
   removeErrors('newProductDescriptionTextarea')
   removeErrors('newProductPriceInput')
   removeErrors('newProductImageInput')
+  removeErrors('selectedProductNameInput')
+  removeErrors('selectedProductBrandInput')
+  removeErrors('selectedProductDescriptionTextarea')
+  removeErrors('selectedProductPriceInput')
+  removeErrors('selectedProductImageInput')
 }
 
 const showErrors = (error: ValidationError) => {
@@ -433,10 +717,31 @@ const showErrors = (error: ValidationError) => {
       newProductImageInput?.classList.add('is-invalid')
       newProductImageInputInvalidFeedback!.textContent = error.message
       break
+    case 'selectedProductNameInput':
+      selectedProductNameInput?.classList.add('is-invalid')
+      selectedProductNameInputInvalidFeedback!.textContent = error.message
+      break
+    case 'selectedProductBrandInput':
+      selectedProductBrandInput?.classList.add('is-invalid')
+      selectedProductBrandInputInvalidFeedback!.textContent = error.message
+      break
+    case 'selectedProductDescriptionTextarea':
+      selectedProductDescriptionTextarea?.classList.add('is-invalid')
+      selectedProductDescriptionTextAreaInvalidFeedback!.textContent = error.message
+      break
+    case 'selectedProductPriceInput':
+      selectedProductPriceInput?.classList.add('is-invalid')
+      selectedProductPriceInputInvalidFeedback!.textContent = error.message
+      break
+    case 'selectedProductImageInput':
+      selectedProductImageInput?.classList.add('is-invalid')
+      selectedProductImageInputInvalidFeedback!.textContent = error.message
+      break
   }
 }
 
-const removeErrors = (input: 'newProductNameInput' | 'newProductBrandInput' | 'newProductCategorySelect' | 'newProductDescriptionTextarea' | 'newProductPriceInput' | 'newProductImageInput') => {
+const removeErrors = (input: 'newProductNameInput' | 'newProductBrandInput' | 'newProductCategorySelect' | 'newProductDescriptionTextarea' | 'newProductPriceInput' | 'newProductImageInput' |
+  'selectedProductNameInput' | 'selectedProductBrandInput' | 'selectedProductDescriptionTextarea' | 'selectedProductPriceInput' | 'selectedProductImageInput') => {
   switch (input) {
     case 'newProductNameInput':
       newProductNameInput?.classList.remove('is-invalid')
@@ -461,6 +766,26 @@ const removeErrors = (input: 'newProductNameInput' | 'newProductBrandInput' | 'n
     case 'newProductImageInput':
       newProductImageInput?.classList.remove('is-invalid')
       newProductImageInputInvalidFeedback!.textContent = ''
+      break
+    case 'selectedProductNameInput':
+      selectedProductNameInput?.classList.remove('is-invalid')
+      selectedProductNameInputInvalidFeedback!.textContent = ''
+      break
+    case 'selectedProductBrandInput':
+      selectedProductBrandInput?.classList.remove('is-invalid')
+      selectedProductBrandInputInvalidFeedback!.textContent = ''
+      break
+    case 'selectedProductDescriptionTextarea':
+      selectedProductDescriptionTextarea?.classList.remove('is-invalid')
+      selectedProductDescriptionTextAreaInvalidFeedback!.textContent = ''
+      break
+    case 'selectedProductPriceInput':
+      selectedProductPriceInput?.classList.remove('is-invalid')
+      selectedProductPriceInputInvalidFeedback!.textContent = ''
+      break
+    case 'selectedProductImageInput':
+      selectedProductImageInput?.classList.remove('is-invalid')
+      selectedProductImageInputInvalidFeedback!.textContent = ''
       break
   }
 }

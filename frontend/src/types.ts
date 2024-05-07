@@ -21,3 +21,13 @@ export type Category = {
   title: string
   parentId: string | null
 }
+
+export type Product = {
+  id: string,
+  name: string,
+  brand: string,
+  categoryId: string,
+  description: string,
+  price: number,
+  image: string
+}

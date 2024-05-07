@@ -21,8 +21,8 @@ const createCategory = async (req: express.Request, res: express.Response, next:
 
       return res.status(missingFieldsErrors.status).json(missingFieldsErrors)
     }
-    
-    
+
+
     // todo: validation des données (longueur, caractères spéciaux, etc.)
 
     // 2. Vérifier si la catégorie existe
@@ -207,10 +207,7 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
     // 6. Répondre
     const response: ApiResponseType = {
       status: 200,
-      message: 'Catégorie mise à jour',
-      data: {
-        id: '1'
-      }
+      message: 'Catégorie mise à jour'
     }
 
     res.setHeader('Location', `/api/categories/${response.data.id}`)
