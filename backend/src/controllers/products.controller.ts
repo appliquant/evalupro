@@ -293,4 +293,58 @@ const updateProduct = async (req: express.Request, res: express.Response, next: 
   }
 }
 
-export { getProducts, createProduct, updateProduct }
+const deleteProduct = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // 1. Vérifier les données
+    const { id } = req.params
+
+    if (!id) {
+      const missingIdError: ApiResponseType = {
+        status: 400,
+        message: 'ID manquant',
+        errors: [
+          {
+            field: 'id',
+            message: 'ID manquant'
+          }
+        ]
+      }
+
+      return res.status(missingIdError.status).json(missingIdError)
+    }
+
+    // 2. Vérifier si le produit existe
+    const product = await Product.findByPk(id)
+    if (!product) {
+      const productNotFoundError: ApiResponseType = {
+        status: 404,
+        message: 'Produit non trouvé',
+        errors: [
+          {
+            field: 'deleteProduct',
+            message: 'Produit non trouvé'
+          }
+        ]
+      }
+
+      return res.status(productNotFoundError.status).json(productNotFoundError)
+    }
+
+    // 3. todo: Vérifer si le produit n'est pas associé à des évaluations
+
+    // 4. Supprimer le produit
+    await product.destroy()
+
+    // 5. Répondre
+    const response: ApiResponseType = {
+      status: 200,
+      message: 'Produit supprimé'
+    }
+
+    return res.status(response.status).json(response)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export { getProducts, createProduct, updateProduct, deleteProduct }

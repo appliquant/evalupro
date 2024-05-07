@@ -177,7 +177,7 @@
 
             <div class="d-flex align-items-start gap-2">
               <button class="btn btn-primary mt-2" @click.prevent="updateProduct">Modifier</button>
-              <button class="btn btn-outline-danger mt-2">Supprimer</button>
+              <button class="btn btn-outline-danger mt-2" @click.prevent="deleteProduct">Supprimer</button>
             </div>
           </fieldset>
         </form>
@@ -563,6 +563,48 @@ const updateProduct = async () => {
   }
 }
 
+const deleteProduct = async () => {
+  if (!selectedProduct.value) {
+    return
+  }
+
+  const confirmDelete = confirm('Voulez-vous vraiment supprimer ce produit ?')
+  if (!confirmDelete) {
+    return
+  }
+
+  try {
+
+    const res = await productsService.deleteProduct(
+      authStore.jwt,
+      selectedProduct.value.id)
+
+    if (res.errors && res.errors.length > 0) {
+      res.errors.forEach((error: ValidationError) => showErrors(error))
+      return
+    }
+
+    if (res.status === 200) {
+      push.success({
+        title: 'Succès',
+        message: res.message,
+        duration: 3000
+      })
+
+      productsReload()
+      unSelectProduct()
+    }
+
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
 const validations = (partToValidate: 'createProduct' | 'updateProduct'): ValidationError[] => {
   const errors: ValidationError[] = []
 
@@ -737,6 +779,12 @@ const showErrors = (error: ValidationError) => {
       selectedProductImageInput?.classList.add('is-invalid')
       selectedProductImageInputInvalidFeedback!.textContent = error.message
       break
+    case 'deleteProduct':
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 5000
+      })
   }
 }
 

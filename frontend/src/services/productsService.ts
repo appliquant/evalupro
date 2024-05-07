@@ -84,5 +84,31 @@ const updateProduct = async (jwt: string, updatedProduct: FormData): Promise<Api
   }
 }
 
-const productsService = { getProducts, createProduct, updateProduct }
+const deleteProduct = async (jwt: string, productId: string): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/products/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`
+      }
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la suppression du produit',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+const productsService = { getProducts, createProduct, updateProduct, deleteProduct }
 export { productsService }
