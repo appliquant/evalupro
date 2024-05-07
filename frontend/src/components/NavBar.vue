@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">💰💸 Evalupro</a>
+      <RouterLink to="/" class="navbar-brand">💰💸 Evalupro</RouterLink>
       <button
         class="navbar-toggler"
         type="button"
@@ -15,24 +15,46 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <!-- /signup -->
-          <li v-if="route.name === 'signin' || route.name === 'signup'" class="nav-item">
+
+          <!-- / -->
+          <li v-if="route.name !== 'home'" class="nav-item">
             <a class="nav-link active" aria-current="page">
-              <RouterLink to="/signin" class="link-underline-opacity-0">Connexion</RouterLink>
+              <RouterLink to="/" class="link-underline-opacity-0">Recherche</RouterLink>
             </a>
           </li>
 
-          <!-- /signin -->
-          <li v-if="route.name === 'signin' || route.name === 'signup'" class="nav-item">
-            <a class="nav-link active" aria-current="page">
-              <RouterLink to="/signup" class="link-underline-opacity-0">Devenir membre</RouterLink>
-            </a>
-          </li>
+          <template v-if="authStore.jwt !== ''">
 
-          <!-- /logout -->
-          <li v-if="route.name !== 'signin' && route.name !== 'signup'" class="nav-item">
-            <button @click="logout" class="btn btn-link">Déconnexion</button>
-          </li>
+            <!-- dashboard -->
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page">
+                <RouterLink to="/dashboard" class="link-underline-opacity-0">Panneau de contrôle</RouterLink>
+              </a>
+            </li>
+
+            <!-- /logout -->
+            <li class="nav-item">
+              <button @click="logout" class="btn btn-link">Déconnexion</button>
+            </li>
+          </template>
+
+          <template v-else>
+
+            <!-- /signup -->
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page">
+                <RouterLink to="/signin" class="link-underline-opacity-0">Connexion</RouterLink>
+              </a>
+            </li>
+
+            <!-- /signin -->
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page">
+                <RouterLink to="/signup" class="link-underline-opacity-0">Devenir membre</RouterLink>
+              </a>
+            </li>
+
+          </template>
         </ul>
       </div>
     </div>
