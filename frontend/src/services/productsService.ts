@@ -3,14 +3,19 @@ import { handleApiResponse } from '@/services/handleApiResponse'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-const getProducts = async (jwt: string): Promise<ApiResponseType> => {
+const getProducts = async (jwt: string, productNameFilter?: string): Promise<ApiResponseType> => {
   try {
-    const res = await fetch(`${BACKEND_URL}/api/products`, {
+    const res = await fetch(`${BACKEND_URL}/api/products?` + new URLSearchParams({
+      ...(productNameFilter && { productNameFilter })
+    }), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`
       }
+
+      // Ajouter un paramètre de requête pour filtrer les produits par nom
+      // ...(productNameFilter && { search: new URLSearchParams({ name: productNameFilter }) })
     })
 
     return await handleApiResponse(res)

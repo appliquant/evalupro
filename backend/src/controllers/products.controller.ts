@@ -3,6 +3,7 @@ import { ApiResponseType } from '../types'
 import { Category, Product } from '../db'
 import formidable from 'formidable'
 import { dataLengthValidations } from '../validations'
+import { Op } from 'sequelize'
 
 const formidableOpt: formidable.Options = {
   uploadDir: `${__dirname}/../public/uploads`,
@@ -12,10 +13,24 @@ const formidableOpt: formidable.Options = {
 
 const getProducts = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    // 1. Trouver tous les produits
-    const products = await Product.findAll()
+    // 1. Extraire les données de la requête
+    const { productNameFilter } = req.query
 
-    // 2. Retourner les produits
+    // 2. Trouver tous les produits
+    let products = []
+    if (productNameFilter) {
+      products = await Product.findAll({
+        where: {
+          name: {
+            [Op.substring]: productNameFilter
+          }
+        }
+      })
+    } else {
+      products = await Product.findAll()
+    }
+
+    // 3. Retourner les produits
     const successResponse: ApiResponseType = {
       status: 200,
       message: 'Produits trouvés',
@@ -23,6 +38,16 @@ const getProducts = async (req: express.Request, res: express.Response, next: ex
     }
 
     return res.status(successResponse.status).json(successResponse)
+  } catch
+    (error) {
+    next(error)
+  }
+}
+
+const getProduct = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+
+
   } catch (error) {
     next(error)
   }
@@ -347,4 +372,4 @@ const deleteProduct = async (req: express.Request, res: express.Response, next: 
   }
 }
 
-export { getProducts, createProduct, updateProduct, deleteProduct }
+export { getProducts, getProduct, createProduct, updateProduct, deleteProduct }
