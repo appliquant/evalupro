@@ -155,6 +155,8 @@ const debounceSortSelect = (event: Event) => {
     const sort = (event.target as HTMLSelectElement).value
     if (sort === 'name' || sort === 'averageScore') {
       productResultsSort.value = sort
+    } else {
+      productResultsSort.value = null
     }
   }, 300)
 }
