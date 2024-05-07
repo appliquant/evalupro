@@ -6,7 +6,7 @@ import { UserRoles } from '../types'
 
 const categoriesRoute = express.Router()
 
-categoriesRoute.get('/', requireIsSignedin, getCategories)
+categoriesRoute.get('/', getCategories)
 categoriesRoute.post('/', requireIsSignedin, requireRole(UserRoles.ADMIN), createCategory)
 categoriesRoute.put('/:id', requireIsSignedin, requireRole(UserRoles.ADMIN), updateCategory)
 categoriesRoute.delete('/:id', requireIsSignedin, requireRole(UserRoles.ADMIN), deleteCategory)

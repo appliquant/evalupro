@@ -14,7 +14,7 @@ const formidableOpt: formidable.Options = {
 const getProducts = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // 1. Extraire les données de la requête
-    const { productNameFilter, productCategoryFilterId } = req.query
+    const { productNameFilter, productCategoryFilterId, productResultSort } = req.query
 
     // 2. Trouver tous les produits (avec ou sans filtres)
     // les filtres sont facultatifs
@@ -22,34 +22,34 @@ const getProducts = async (req: express.Request, res: express.Response, next: ex
     // si les deux filtres sont présents, les produits doivent correspondre aux deux filtres
     // si un seul filtre est présent, les produits doivent correspondre à ce filtre
     // si aucun filtre n'est présent, tous les produits sont retournés
-    let products = []
-    if (productNameFilter && productCategoryFilterId) {
-      products = await Product.findAll({
-        where: {
-          name: {
-            [Op.substring]: productNameFilter.toString()
-          },
-          categoryId: productCategoryFilterId.toString()
-        }
-      })
-    } else if (productNameFilter) {
-      products = await Product.findAll({
-        where: {
-          name: {
-            [Op.substring]: productNameFilter.toString()
-          }
-        }
-      })
-    } else if (productCategoryFilterId) {
-      products = await Product.findAll({
-        where: {
-          categoryId: productCategoryFilterId.toString()
-        }
-      })
-    } else {
-      products = await Product.findAll()
+    // productResultSort = 'name-asc' | 'averageScore-desc'
+    const whereClause: { [key: string]: any } = {}
+
+    if (productNameFilter) {
+      whereClause.name = {
+        [Op.substring]: productNameFilter.toString()
+      }
     }
 
+    if (productCategoryFilterId) {
+      whereClause.categoryId = productCategoryFilterId.toString()
+    }
+
+    const queryOptions: { [key: string]: any } = {
+      where: whereClause
+    }
+
+    if (productResultSort) {
+      const [field, order] = (productResultSort as string).split('-')
+      if (!field || !order) {
+        return
+      }
+
+      queryOptions.order = [[field, order.toUpperCase()]] // Sequelize expects the order array
+    }
+
+    // 2. Trouver les produits
+    const products = await Product.findAll(queryOptions)
 
     // 3. Retourner les produits
     const successResponse: ApiResponseType = {

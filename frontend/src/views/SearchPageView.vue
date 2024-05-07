@@ -1,43 +1,63 @@
 <template>
   <div class="container mt-3">
-    <h1>Rechercher</h1>
+    {{ productResultsSort }}
+    <div>
+      <p>Filtres & Triage</p>
 
-    <!-- Recherche de produits -->
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-      <div class="col">
+      <!-- Filtres recherche de produits -->
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+        <div class="col">
 
-        <!-- Filtre par nom de produit -->
-        <div>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Rechercher un produit..."
-            :value="productNameFilter"
-            @input="debounceSearchInput"
-            aria-placeholder="Rechercher un produit..."
-          />
+          <!-- Filtre par nom de produit -->
+          <div>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Rechercher un produit..."
+              :value="productNameFilter"
+              @input="debounceSearchInput"
+              aria-placeholder="Rechercher un produit..."
+            />
+          </div>
+        </div>
+
+        <div class=" col">
+
+          <!-- Filtre par catégorie -->
+          <div>
+            <select
+              class="form-select"
+              aria-label="Filtrer par catégorie"
+              @change="debounceCategorySelect"
+            >
+              <option selected>Filtrer par catégorie (tous)</option>
+              <option
+                v-for="category in categories?.data?.categories"
+                :key="category.id"
+                :value="category.id"
+              >{{ category.title }}
+              </option>
+            </select>
+          </div>
+
         </div>
       </div>
 
-      <div class=" col">
-
-        <!-- Filtre par catégorie -->
-        <div>
-          <select
-            class="form-select"
-            aria-label="Filtrer par catégorie"
-            @change="debounceCategorySelect"
-          >
-            <option selected>Filtrer par catégorie (tous)</option>
-            <option
-              v-for="category in categories?.data?.categories"
-              :key="category.id"
-              :value="category.id"
-            >{{ category.title }}
-            </option>
-          </select>
+      <!-- Triage des produits -->
+      <div class="row row-cols-1 row-cols-md-2 g-4 mt-1">
+        <div class="col">
+          <div>
+            <select
+              class="form-select"
+              aria-label="Trier par"
+              @change="debounceSortSelect"
+            >
+              <option selected>Trier par</option>
+              <option value="name-desc">Par nom</option>
+              <option value="averageScore-desc">Pointage</option>
+            </select>
+          </div>
         </div>
-
       </div>
     </div>
 
@@ -49,9 +69,13 @@
     <div v-if="products?.data?.products.length > 0" class="row row-cols-1 row-cols-md-3 g-4 mt-3">
       <div class="col" v-for="product in products?.data?.products" :key="product.id">
         <div class="card h-100">
+          <!-- aligner images -->
           <img
             :src="`${BACKEND_URL}/public/uploads/${product.image}`"
             class="card-img-top"
+            style=" width: 100%;
+    height: 50%;
+    object-fit: cover;"
             alt="Image du produit"
           />
 
@@ -79,12 +103,12 @@ import { useCategories } from '@/composables/useCategories'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-const productNameFilter = ref('')
+const productNameFilter = ref<null | string>()
 const productCategoryFilterId = ref<null | number>(null)
+const productResultsSort = ref<null | string>(null)
 
 const {
   data: categories,
-  loading: categoriesLoading,
   error: categoriesError
 } = useCategories()
 
@@ -92,7 +116,7 @@ const {
   data: products,
   loading: productsLoading,
   error: productsError
-} = useProducts(productNameFilter, productCategoryFilterId)
+} = useProducts(productNameFilter, productCategoryFilterId, productResultsSort)
 
 
 let timeoutId: number | null = null
@@ -113,7 +137,25 @@ const debounceCategorySelect = (event: Event) => {
   }
 
   timeoutId = setTimeout(() => {
-    productCategoryFilterId.value = Number((event.target as HTMLSelectElement).value)
+    const categoryId = (event.target as HTMLSelectElement).value
+    if (!isNaN(categoryId)) {
+      productCategoryFilterId.value = categoryId
+    } else {
+      productCategoryFilterId.value = null
+    }
+  }, 300)
+}
+
+const debounceSortSelect = (event: Event) => {
+  if (timeoutId !== null) {
+    clearTimeout(timeoutId)
+  }
+
+  timeoutId = setTimeout(() => {
+    const sort = (event.target as HTMLSelectElement).value
+    if (sort === 'name' || sort === 'averageScore') {
+      productResultsSort.value = sort
+    }
   }, 300)
 }
 
