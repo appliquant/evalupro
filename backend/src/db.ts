@@ -18,6 +18,9 @@ class Category extends Model {
 class Product extends Model {
 }
 
+class Criteria extends Model {
+}
+
 User.init({
   id: {
     type: DataTypes.INTEGER,
@@ -134,6 +137,28 @@ Product.init({
 // Relation Product -> Category
 Product.belongsTo(Category, { as: 'category', foreignKey: 'categoryId' })
 Category.hasMany(Product, { as: 'products', foreignKey: 'categoryId' })
+
+Criteria.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+
+  coefficient: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  }
+}, {
+  sequelize,
+  timestamps: true
+})
 
 const initDb = () => {
   sequelize.authenticate().then(() => {
