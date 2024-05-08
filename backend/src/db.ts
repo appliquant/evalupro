@@ -24,6 +24,9 @@ class Criteria extends Model {
 class CriteriaEvaluation extends Model {
 }
 
+class Favorite extends Model {
+}
+
 User.init({
   id: {
     type: DataTypes.INTEGER,
@@ -162,9 +165,40 @@ Criteria.init({
   timestamps: true
 })
 
+Favorite.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users',
+      key: 'id'
+    }
+  },
+
+  productId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Products',
+      key: 'id'
+    }
+  }
+}, { sequelize, timestamps: true })
+
+User.belongsToMany(Product, { through: Favorite, as: 'FavoriteProducts', foreignKey: 'userId' })
+Product.belongsToMany(User, { through: Favorite, as: 'FavoritedByUsers', foreignKey: 'productId' })
+
 const initDb = () => {
   sequelize.authenticate().then(() => {
-    sequelize.sync({}).then(() => {
+    sequelize.sync({
+      // alter: true
+    }).then(() => {
     })
   }).catch((error) => {
     console.error('❌ Erreur de connexion à la base de données', error)
