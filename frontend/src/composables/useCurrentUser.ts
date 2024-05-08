@@ -15,5 +15,5 @@ export const useCurrentUser = () => {
     .catch((err) => (error.value = err))
     .finally(() => (loading.value = false))
 
-  return { data, loading, error}
+  return { data, loading, error }
 }

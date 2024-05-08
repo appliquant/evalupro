@@ -15,7 +15,6 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
           <!-- / -->
           <li v-if="route.name !== 'home'" class="nav-item">
             <a class="nav-link active" aria-current="page">
@@ -24,11 +23,12 @@
           </li>
 
           <template v-if="authStore.jwt !== ''">
-
             <!-- dashboard -->
             <li class="nav-item">
               <a class="nav-link active" aria-current="page">
-                <RouterLink to="/dashboard" class="link-underline-opacity-0">Panneau de contrôle</RouterLink>
+                <RouterLink to="/dashboard" class="link-underline-opacity-0"
+                  >Panneau de contrôle</RouterLink
+                >
               </a>
             </li>
 
@@ -39,7 +39,6 @@
           </template>
 
           <template v-else>
-
             <!-- /signup -->
             <li class="nav-item">
               <a class="nav-link active" aria-current="page">
@@ -50,10 +49,11 @@
             <!-- /signin -->
             <li class="nav-item">
               <a class="nav-link active" aria-current="page">
-                <RouterLink to="/signup" class="link-underline-opacity-0">Devenir membre</RouterLink>
+                <RouterLink to="/signup" class="link-underline-opacity-0"
+                  >Devenir membre</RouterLink
+                >
               </a>
             </li>
-
           </template>
         </ul>
       </div>

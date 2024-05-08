@@ -23,11 +23,11 @@ export type Category = {
 }
 
 export type Product = {
-  id: string,
-  name: string,
-  brand: string,
-  categoryId: string,
-  description: string,
-  price: number,
+  id: string
+  name: string
+  brand: string
+  categoryId: string
+  description: string
+  price: number
   image: string
 }

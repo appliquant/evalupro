@@ -7,11 +7,10 @@
       <div class="col">
         <img
           :src="`${BACKEND_URL}/public/uploads/${product.data.product.image}`"
-          style=" width: 100%;"
+          style="width: 100%"
           class="card-img-top"
           alt="Image du produit"
         />
-
       </div>
 
       <div class="col h-100">
@@ -24,8 +23,7 @@
 
         <div class="d-flex gap-2 align-items-start">
           <p class="fw-bolder">{{ product.data.product.price }} $</p>
-          <p>pointage : {{ product.data.product.averageScore }}
-          </p>
+          <p>pointage : {{ product.data.product.averageScore }}</p>
         </div>
 
         <p class="">{{ product.data.product.description }}</p>
@@ -50,7 +48,6 @@
     <!--        />-->
     <!--      </div>-->
   </div>
-
 </template>
 
 <script lang="ts" setup>
@@ -71,11 +68,5 @@ watchEffect(() => {
   }
 })
 
-
-const {
-  data: product,
-  loading: productLoading,
-  error: productError
-} = useProduct(productId)
-
+const { data: product, loading: productLoading, error: productError } = useProduct(productId)
 </script>

@@ -3,7 +3,11 @@ import { handleApiResponse } from '@/services/handleApiResponse'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-const createCategory = async (jwt: string, newCategoryTitle: string, newParentCategoryTitle: string): Promise<ApiResponseType> => {
+const createCategory = async (
+  jwt: string,
+  newCategoryTitle: string,
+  newParentCategoryTitle: string
+): Promise<ApiResponseType> => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/categories`, {
       method: 'POST',
@@ -18,7 +22,7 @@ const createCategory = async (jwt: string, newCategoryTitle: string, newParentCa
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors d\'ajout de catégories',
+      message: "Impossible d'attendre le serveur lors d'ajout de catégories",
       errors: [
         {
           field: 'network',
@@ -44,7 +48,7 @@ const getCategories = async (jwt: string): Promise<ApiResponseType> => {
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la récupérations des catégories',
+      message: "Impossible d'attendre le serveur lors de la récupérations des catégories",
       errors: [
         {
           field: 'network',
@@ -71,7 +75,7 @@ const updateCategory = async (jwt: string, category: Category) => {
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la mise à jour de la catégorie',
+      message: "Impossible d'attendre le serveur lors de la mise à jour de la catégorie",
       errors: [
         {
           field: 'network',
@@ -97,7 +101,7 @@ const deleteCategory = async (jwt: string, categoryId: string) => {
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la suppression de la catégorie',
+      message: "Impossible d'attendre le serveur lors de la suppression de la catégorie",
       errors: [
         {
           field: 'network',

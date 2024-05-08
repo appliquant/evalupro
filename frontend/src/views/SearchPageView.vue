@@ -7,7 +7,6 @@
       <!-- Filtres recherche de produits -->
       <div class="row row-cols-1 row-cols-md-2 g-4">
         <div class="col">
-
           <!-- Filtre par nom de produit -->
           <div>
             <input
@@ -21,8 +20,7 @@
           </div>
         </div>
 
-        <div class=" col">
-
+        <div class="col">
           <!-- Filtre par catégorie -->
           <div>
             <select
@@ -35,11 +33,11 @@
                 v-for="category in categories?.data?.categories"
                 :key="category.id"
                 :value="category.id"
-              >{{ category.title }}
+              >
+                {{ category.title }}
               </option>
             </select>
           </div>
-
         </div>
       </div>
 
@@ -47,11 +45,7 @@
       <div class="row row-cols-1 row-cols-md-2 g-4 mt-1">
         <div class="col">
           <div>
-            <select
-              class="form-select"
-              aria-label="Trier par"
-              @change="debounceSortSelect"
-            >
+            <select class="form-select" aria-label="Trier par" @change="debounceSortSelect">
               <option selected>Trier par</option>
               <option value="name-desc">Par nom</option>
               <option value="averageScore-desc">Pointage</option>
@@ -73,18 +67,17 @@
           <img
             :src="`${BACKEND_URL}/public/uploads/${product.image}`"
             class="card-img-top"
-            style=" width: 100%;
-    height: 50%;
-    object-fit: cover;"
+            style="width: 100%; height: 50%; object-fit: cover"
             alt="Image du produit"
           />
 
           <div class="card-body">
-            <h5 class="card-title
-            ">{{ product.name }}</h5>
+            <h5 class="card-title">{{ product.name }}</h5>
             <p class="card-text">{{ product.description }}</p>
             <p class="card-text">{{ product.price }} $</p>
-            <RouterLink :to="`/product/${product.id}`" class="btn btn-primary">Voir le produit</RouterLink>
+            <RouterLink :to="`/product/${product.id}`" class="btn btn-primary"
+              >Voir le produit</RouterLink
+            >
           </div>
         </div>
       </div>
@@ -103,17 +96,13 @@ const productNameFilter = ref<null | string>()
 const productCategoryFilterId = ref<null | number>(null)
 const productResultsSort = ref<null | string>(null)
 
-const {
-  data: categories,
-  error: categoriesError
-} = useCategories()
+const { data: categories, error: categoriesError } = useCategories()
 
 const {
   data: products,
   loading: productsLoading,
   error: productsError
 } = useProducts(productNameFilter, productCategoryFilterId, productResultsSort)
-
 
 let timeoutId: number | null = null
 
@@ -156,6 +145,4 @@ const debounceSortSelect = (event: Event) => {
     }
   }, 300)
 }
-
-
 </script>
