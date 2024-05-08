@@ -84,5 +84,30 @@ const updateCriteria = async (jwt: string, updatedCriteria: Criteria): Promise<A
 
 }
 
-const criteriasService = { getCriterias, createCriteria, updateCriteria }
+const deleteCriteria = async (jwt: string, criteriaId: string): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/criterias/${criteriaId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      }
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la suppression du critère',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+const criteriasService = { getCriterias, createCriteria, updateCriteria, deleteCriteria }
 export { criteriasService }

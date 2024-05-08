@@ -83,8 +83,9 @@ const updateCriteria = async (req: express.Request, res: express.Response, next:
 
     // 1. Extraire les données
     const { name, coefficient } = req.body
+    const { id } = req.params
 
-    if (!name || !coefficient) {
+    if (!id || !name || !coefficient) {
       const missing = []
       if (!name) missing.push('name')
       if (!coefficient) missing.push('coefficient')
@@ -135,7 +136,7 @@ const updateCriteria = async (req: express.Request, res: express.Response, next:
       coefficient
     }, {
       where: {
-        id: req.params.id
+        id: id
       }
     })
 
@@ -143,6 +144,63 @@ const updateCriteria = async (req: express.Request, res: express.Response, next:
     const response: ApiResponseType = {
       status: 200,
       message: 'Critère mis à jour'
+    }
+
+    return res.status(response.status).json(response)
+  } catch (err) {
+    next(err)
+  }
+}
+
+const deleteCriteria = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // todo: ne pas supprimer un critere deja evalué/utilisé
+    // 1. Vérifier les données
+    const { id } = req.params
+
+    if (!id) {
+      const missingFieldsResponse: ApiResponseType = {
+        status: 400,
+        message: 'Champ manquant',
+        errors: [
+          {
+            field: 'id',
+            message: 'L\'id est manquant'
+          }
+        ]
+      }
+
+      return res.status(missingFieldsResponse.status).json(missingFieldsResponse)
+    }
+
+    // 2. Vérifier si le critère existe
+    const criteria = await Criteria.findByPk(req.params.id)
+    if (!criteria) {
+      const notFoundResponse: ApiResponseType = {
+        status: 404,
+        message: 'Critère non trouvé',
+        errors: [
+          {
+            field: 'deleteCriteria',
+            message: 'Le critère n\'existe pas'
+          }
+        ]
+      }
+
+      return res.status(notFoundResponse.status).json(notFoundResponse)
+    }
+
+    // 3. Supprimer le critère
+    await Criteria.destroy({
+      where: {
+        id: id
+      }
+    })
+
+    // 4. Répondre
+    const response: ApiResponseType = {
+      status: 200,
+      message: 'Critère supprimé'
     }
 
     return res.status(response.status).json(response)
@@ -189,4 +247,4 @@ const validations = (name: string, coefficient: number, partToValidate: 'createC
   return errors
 }
 
-export { getCriterias, createCriteria, updateCriteria }
+export { getCriterias, createCriteria, updateCriteria, deleteCriteria }

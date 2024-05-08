@@ -109,7 +109,7 @@
 
             <div class="d-flex gap-2 mt-2">
               <button class="btn btn-primary" @click.prevent="updateCriteria">Modifier</button>
-              <button class="btn btn-outline-danger">Supprimer</button>
+              <button class="btn btn-outline-danger" @click.prevent="deleteCriteria">Supprimer</button>
             </div>
           </fieldset>
         </form>
@@ -333,6 +333,44 @@ const updateCriteria = async () => {
   }
 }
 
+const deleteCriteria = async () => {
+  if (!selectedCriteria.value) return
+
+  const confirmDelete = confirm('Voulez-vous vraiment supprimer ce critère ?')
+  if (!confirmDelete) return
+
+  try {
+    const res = await criteriasService.deleteCriteria(
+      authStore.jwt,
+      selectedCriteria.value.id
+    )
+
+    if (res.errors && res.errors.length > 0) {
+      res.errors.forEach((error: ValidationError) => showErrors(error))
+      return
+    }
+
+    if (res.status === 200) {
+      push.success({
+        title: 'Succès',
+        message: res.message,
+        duration: 5000
+      })
+
+      criteriasReload()
+      unSelectCriteria()
+    }
+
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
 const selectCriteria = (criteria: Criteria) => {
   if (selectedCriteria.value?.id === criteria.id) {
     return unSelectCriteria()
@@ -442,6 +480,12 @@ const showErrors = (error: ValidationError) => {
       selectedCriteriaCoefficientInput?.classList.add('is-invalid')
       if (selectedCriteriaCoefficientInputInvalidFeedback) selectedCriteriaCoefficientInputInvalidFeedback.innerText = error.message
       break
+    case 'deleteCriteria':
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 5000
+      })
   }
 }
 
