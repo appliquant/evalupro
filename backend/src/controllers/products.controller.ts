@@ -136,6 +136,7 @@ const getProducts = async (req: express.Request, res: express.Response, next: ex
 
 const createProduct = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
+    // 1. Extraire les données de la requête
     const form = formidable(formidableOpt)
 
     const [fields, file] = await form.parse(req)

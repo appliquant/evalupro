@@ -25,8 +25,8 @@
             {{ criteria.name }}
           </li>
         </ul>
-        <p v-if="criteriasLoading" class="text-center">Chargement</p>
-        <p v-if="criteriasError" class="text-center text-danger">{{ criteriasError }}</p>
+        <p v-if="criteriasLoading">Chargement</p>
+        <p v-if="criteriasError" class="text-danger">{{ criteriasError }}</p>
         <p v-if="criterias?.data?.length === 0">Aucun critère</p>
       </div>
 
@@ -108,7 +108,7 @@
 
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-            <button type="button" class="btn btn-primary">Ajouter</button>
+            <button type="button" class="btn btn-primary" @click.prevent="createCriteria">Ajouter</button>
           </div>
         </div>
       </div>
@@ -120,12 +120,16 @@ import { dataLengthValidations } from '@/validations.js'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useCriterias } from '@/composables/useCriterias'
+import type { ApiResponseType, ValidationError } from '@/types'
+import { push } from 'notivue'
+import { criteriasService } from '@/services/criteriasService'
 
 const authStore = useAuthStore()
 const {
   data: criterias,
   loading: criteriasLoading,
-  error: criteriasError
+  error: criteriasError,
+  reload: criteriasReload
 } = useCriterias()
 
 const newCriteriaPayload = ref({
@@ -153,10 +157,82 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  // Événement de fermeture du modal bootstrap
   document.removeEventListener('hidden.bs.modal', () => {
     emptyNewCriteriaPayload()
   })
 })
+
+const createCriteria = async () => {
+  if (newCriteriaSuccessMessage) newCriteriaSuccessMessage.innerText = ''
+
+  const validationErrors = validations('createCriteria')
+  if (validationErrors.length > 0) {
+    validationErrors.forEach((error) => showErrors(error))
+    return
+  }
+
+  try {
+
+    const res = await criteriasService.createCriteria(
+      authStore.jwt,
+      newCriteriaPayload.value
+    )
+
+    if (res.errors && res.errors.length > 0) {
+      res.errors.forEach((error: ValidationError) => showErrors(error))
+      return
+    }
+
+    if (res.status === 201) {
+      if (newCriteriaSuccessMessage) newCriteriaSuccessMessage.innerText = 'Critère ajouté avec succès.'
+      criteriasReload()
+    }
+
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
+const validations = (partToValidate: 'createCriteria' | 'updateCriteria'): ValidationError[] => {
+  const errors: ValidationError[] = []
+
+  if (partToValidate === 'createCriteria') {
+    const newCriteriaName = newCriteriaPayload.value.name.trim()
+    if (newCriteriaName.length < dataLengthValidations.criteriaName.minlength || newCriteriaName.length > dataLengthValidations.criteriaName.maxlength) {
+      errors.push({
+        field: 'newCriteriaNameInput',
+        message: `Le nom du critère doit contenir entre ${dataLengthValidations.criteriaName.minlength} et ${dataLengthValidations.criteriaName.maxlength} caractères.`
+      })
+    }
+
+    const newCriteriaCoefficient = newCriteriaPayload.value.coefficient
+    const parsedCoefficient = parseFloat(newCriteriaCoefficient.toString())
+
+    if (isNaN(parsedCoefficient)) {
+      errors.push(({ field: 'newCriteriaCoefficientInput', message: 'Le coefficient du critère doit être un nombre.' }))
+    }
+
+    if (!isNaN(parsedCoefficient) && (
+      parsedCoefficient < dataLengthValidations.criteriaCoefficient.minlength ||
+      parsedCoefficient > dataLengthValidations.criteriaCoefficient.maxlength
+    )
+    ) {
+      errors.push({
+        field: 'newCriteriaCoefficientInput',
+        message: `Le coefficient du critère doit être compris entre ${dataLengthValidations.criteriaCoefficient.minlength} et ${dataLengthValidations.criteriaCoefficient.maxlength} (incluant les bornes).`
+      })
+    }
+  }
+
+
+  return errors
+}
 
 const emptyNewCriteriaPayload = () => {
   newCriteriaPayload.value.name = ''
@@ -164,6 +240,19 @@ const emptyNewCriteriaPayload = () => {
   if (newCriteriaSuccessMessage) newCriteriaSuccessMessage.innerText = ''
   removeErrors('newCriteriaNameInput')
   removeErrors('newCriteriaCoefficientInput')
+}
+
+const showErrors = (error: ValidationError) => {
+  switch (error.field) {
+    case 'newCriteriaNameInput':
+      newCriteriaNameInput?.classList.add('is-invalid')
+      if (newCriteriaNameInputInvalidFeedback) newCriteriaNameInputInvalidFeedback.innerText = error.message
+      break
+    case 'newCriteriaCoefficientInput':
+      newCriteriaCoefficientInput?.classList.add('is-invalid')
+      if (newCriteriaCoefficientInputInvalidFeedback) newCriteriaCoefficientInputInvalidFeedback.innerText = error.message
+      break
+  }
 }
 
 const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInput') => {

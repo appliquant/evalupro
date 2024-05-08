@@ -29,5 +29,32 @@ const getCriterias = async (jwt: string): Promise<ApiResponseType> => {
   }
 }
 
-const criteriasService = { getCriterias }
+const createCriteria = async (jwt: string, newCriteria: object): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/criterias`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newCriteria)
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la création du critère',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+const criteriasService = { getCriterias, createCriteria }
 export { criteriasService }
