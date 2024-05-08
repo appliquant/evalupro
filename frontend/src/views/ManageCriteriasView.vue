@@ -23,7 +23,7 @@
             style="cursor: pointer; user-select: none;"
             @click="selectCriteria(criteria)"
           >
-            {{ criteria.name }}
+            {{ criteria.name }} - c.f {{ criteria.coefficient }}
           </li>
         </ul>
         <p v-if="criteriasLoading">Chargement</p>
