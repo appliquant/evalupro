@@ -118,7 +118,6 @@ Product.init({
 
   price: {
     type: DataTypes.DECIMAL(10, 2),
-    // type: DataTypes.DOUBLE(2),
     allowNull: false
   },
 
@@ -165,13 +164,11 @@ Criteria.init({
 
 const initDb = () => {
   sequelize.authenticate().then(() => {
-    sequelize.sync({
-      // alter: true
-    }).then(() => {
+    sequelize.sync({}).then(() => {
     })
   }).catch((error) => {
     console.error('❌ Erreur de connexion à la base de données', error)
   })
 }
 
-export { sequelize, initDb, User, Category, Product }
+export { sequelize, initDb, User, Category, Product, Criteria }

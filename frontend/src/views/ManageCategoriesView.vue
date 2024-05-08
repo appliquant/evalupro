@@ -27,8 +27,7 @@
           </li>
         </ul>
         <p v-else-if="loadingCategories" class="text-center">Chargement...</p>
-        <p v-else-if="categoriesError" class="text-center text-danger">{{ categoriesError }}</p>
-        <p v-if="categories?.data?.categories?.length <= 0">Aucune catégorie disponible</p>
+        <p v-else-if="categoriesError" class="text-center text-danger">{{ categoriesError }}</p> <p v-if="categories?.data?.categories?.length <= 0">Aucune catégorie disponible</p>
       </div>
 
       <div class="col">

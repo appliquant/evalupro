@@ -8,6 +8,7 @@ import { errors } from 'jose'
 import { categoriesRoute } from './routes/categories.route'
 import { productsRoute } from './routes/products.route'
 import * as path from 'node:path'
+import { criteriasRoute } from './routes/criterias.route'
 
 const PORT = 3000
 const app = express()
@@ -27,6 +28,7 @@ app.use('/api/auth', authRoute)
 app.use('/api/profile', profileRoute)
 app.use('/api/categories', categoriesRoute)
 app.use('/api/products', productsRoute)
+app.use('/api/criterias', criteriasRoute)
 
 // port
 app.listen(PORT, () => {

@@ -4,7 +4,20 @@ type DataLengthValidations = {
   regex?: string
 }
 
-const dataLengthValidations: { [key: string]: DataLengthValidations } = {
+type Keys = {
+  email: DataLengthValidations
+  password: DataLengthValidations
+  username: DataLengthValidations
+  categoryTitle: DataLengthValidations
+  productName: DataLengthValidations
+  productBrand: DataLengthValidations
+  productDescription: DataLengthValidations
+  productPrice: DataLengthValidations
+  criteriaName: DataLengthValidations
+  criteriaCoefficient: DataLengthValidations
+}
+
+const dataLengthValidations: Keys = {
   email: {
     minlength: 1,
     maxlength: 50,
@@ -46,6 +59,23 @@ const dataLengthValidations: { [key: string]: DataLengthValidations } = {
   productPrice: {
     minlength: 0,
     maxlength: Number.MAX_SAFE_INTEGER
+  },
+
+  criteriaName: {
+    minlength: 3,
+    maxlength: 50
+  },
+
+  criteriaCoefficient: {
+    /**
+     * Valeur inclusive
+     */
+    minlength: 1,
+   
+    /**
+     * Valeur inclusive
+     */
+    maxlength: 10
   }
 }
 
