@@ -21,6 +21,9 @@ class Product extends Model {
 class Criteria extends Model {
 }
 
+class CriteriaEvaluation extends Model {
+}
+
 User.init({
   id: {
     type: DataTypes.INTEGER,

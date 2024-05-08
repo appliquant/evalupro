@@ -54,6 +54,16 @@ const router = createRouter({
         requiresAuth: true,
         requiresRole: UserRoles.ADMIN
       }
+    },
+
+    {
+      path: '/manage-criterias',
+      name: 'manage-criterias',
+      component: () => import('../views/ManageCriteriasView.vue'),
+      meta: {
+        requiresAuth: true,
+        requiresRole: UserRoles.ADMIN
+      }
     }
   ]
 })
