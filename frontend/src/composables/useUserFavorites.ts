@@ -1,27 +1,23 @@
 import { useAuthStore } from '@/stores/authStore'
-import { type Ref, ref, toValue, watchEffect } from 'vue'
 import type { ApiResponseType } from '@/types'
-import { productsService } from '@/services/productsService'
+import { ref } from 'vue'
+import { favoritesService } from '@/services/favoritesService'
 
-export const useProduct = (id: Ref<null | string>) => {
+export const useUserFavorites = () => {
   const authStore = useAuthStore()
   const data = ref<ApiResponseType | null>(null)
   const loading = ref(true)
   const error = ref<ApiResponseType | null>(null)
 
   const reload = () => {
-    productsService
-      .getProduct(authStore.jwt, toValue(id)!)
+    favoritesService
+      .getFavorites(authStore.jwt, authStore.userId)
       .then((res) => (data.value = res))
       .catch((err) => (error.value = err))
       .finally(() => (loading.value = false))
   }
 
-  watchEffect(() => {
-    if (id.value) {
-      reload()
-    }
-  })
+  reload()
 
-  return { data, loading, error }
+  return { data, loading, error, reload }
 }

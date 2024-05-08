@@ -1,9 +1,9 @@
 <template>
   <div class="container mt-3">
     <p v-if="productLoading" class="text-info">Chargement...</p>
-    <p v-if="productError" class="text-danger">{{ error }}</p>
+    <p v-if="productError" class="text-danger">{{ productError }}</p>
 
-    <div v-if="product" class="row row-cols-1 row-cols-sm-2">
+    <div v-if="product?.data?.product" class="row row-cols-1 row-cols-sm-2">
       <div class="col">
         <img
           :src="`${BACKEND_URL}/public/uploads/${product.data.product.image}`"
@@ -33,20 +33,6 @@
       </div>
     </div>
 
-    <!--      <div class="card-body">-->
-    <!--        <h5 class="card-title-->
-    <!--            ">{{ product.data.name }}</h5>-->
-    <!--        <p class="card-text">{{ product.data.description }}</p>-->
-    <!--        <p class="card-text">{{ product.data.price }} $</p>-->
-    <!--        <img-->
-    <!--          :src="`${BACKEND_URL}/public/uploads/${product.data.image}`"-->
-    <!--          class="card-img-top"-->
-    <!--          style=" width: 100%;-->
-    <!--      height: 50%;-->
-    <!--      object-fit: cover;"-->
-    <!--          alt="Image du produit"-->
-    <!--        />-->
-    <!--      </div>-->
   </div>
 </template>
 
@@ -59,14 +45,18 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 const route = useRoute()
 const productId = ref<null | string>(null)
+const {
+  data: product,
+  loading: productLoading,
+  error: productError
+} = useProduct(productId)
 
 watchEffect(() => {
   console.log('route id ', route.params.id)
   const id = route.params.id
   if (id) {
-    productId.value = id
+    productId.value = id instanceof Array ? id[0] : id
   }
 })
 
-const { data: product, loading: productLoading, error: productError } = useProduct(productId)
 </script>

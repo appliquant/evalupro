@@ -9,7 +9,7 @@ import { categoriesRoute } from './routes/categories.route'
 import { productsRoute } from './routes/products.route'
 import * as path from 'node:path'
 import { criteriasRoute } from './routes/criterias.route'
-import { favoritesRoute } from './routes/favorites.route'
+import { userFavoritesRoute } from './routes/userFavorites.route'
 
 const PORT = 3000
 const app = express()
@@ -30,7 +30,7 @@ app.use('/api/profile', profileRoute)
 app.use('/api/categories', categoriesRoute)
 app.use('/api/products', productsRoute)
 app.use('/api/criterias', criteriasRoute)
-app.use('/api/favorites', favoritesRoute)
+app.use('/api/favorites', userFavoritesRoute)
 
 // port
 app.listen(PORT, () => {

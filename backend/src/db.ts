@@ -205,4 +205,4 @@ const initDb = () => {
   })
 }
 
-export { sequelize, initDb, User, Category, Product, Criteria }
+export { sequelize, initDb, User, Category, Product, Criteria, Favorite }

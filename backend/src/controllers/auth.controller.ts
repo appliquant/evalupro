@@ -33,8 +33,7 @@ const signin = async (req: express.Request, res: express.Response, next: express
     const userExists = await User.findOne({
       where: {
         email: email
-      },
-      attributes: ['email', 'password', 'role']
+      }
     })
 
     if (!userExists) {
@@ -74,7 +73,8 @@ const signin = async (req: express.Request, res: express.Response, next: express
       message: `Connecté`,
       data: {
         jwt,
-        role: userExists.dataValues.role
+        role: userExists.dataValues.role,
+        userId: userExists.dataValues.id
       }
     }
 
