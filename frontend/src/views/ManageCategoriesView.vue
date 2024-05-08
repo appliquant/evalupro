@@ -27,7 +27,8 @@
           </li>
         </ul>
         <p v-else-if="loadingCategories" class="text-center">Chargement...</p>
-        <p v-else-if="categoriesError" class="text-center text-danger">{{ categoriesError }}</p> <p v-if="categories?.data?.categories?.length <= 0">Aucune catégorie disponible</p>
+        <p v-else-if="categoriesError" class="text-center text-danger">{{ categoriesError }}</p>
+        <p v-if="categories?.data?.categories?.length <= 0">Aucune catégorie disponible</p>
       </div>
 
       <div class="col">
@@ -71,10 +72,9 @@
               </div>
             </div>
 
-            <div>
+            <div class="d-flex gap-2">
               <button
-                style="margin-right: 0.5rem"
-                class="btn btn-primary mt-2"
+                class="btn btn-primary"
                 @click.prevent="updateCategory"
               >
                 Modifier

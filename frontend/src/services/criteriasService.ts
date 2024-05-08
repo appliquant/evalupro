@@ -1,4 +1,4 @@
-import type { ApiResponseType } from '@/types'
+import type { ApiResponseType, Criteria } from '@/types'
 import { handleApiResponse } from '@/services/handleApiResponse'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
@@ -56,5 +56,33 @@ const createCriteria = async (jwt: string, newCriteria: object): Promise<ApiResp
   }
 }
 
-const criteriasService = { getCriterias, createCriteria }
+const updateCriteria = async (jwt: string, updatedCriteria: Criteria): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/criterias/${updatedCriteria.id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedCriteria)
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la mise à jour du critère',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+
+}
+
+const criteriasService = { getCriterias, createCriteria, updateCriteria }
 export { criteriasService }

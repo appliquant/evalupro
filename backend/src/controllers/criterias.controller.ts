@@ -44,9 +44,10 @@ const createCriteria = async (req: express.Request, res: express.Response, next:
     }
 
     // 2. Vérifier les données
-    const validationErrors = createCriteriaValidations(
+    const validationErrors = validations(
       name,
-      coefficient
+      coefficient,
+      'createCriteria'
     )
 
     if (validationErrors.errors?.length) {
@@ -75,18 +76,95 @@ const createCriteria = async (req: express.Request, res: express.Response, next:
   }
 }
 
-const createCriteriaValidations = (name: string, coefficient: number) => {
+const updateCriteria = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // todo: le nom ne peut pas exister en double pour la même catégorie
+    // todo: ne pas modifier un critere deja evalué
+
+    // 1. Extraire les données
+    const { name, coefficient } = req.body
+
+    if (!name || !coefficient) {
+      const missing = []
+      if (!name) missing.push('name')
+      if (!coefficient) missing.push('coefficient')
+
+      const missingFieldsResponse: ApiResponseType = {
+        status: 400,
+        message: 'Champs manquants',
+        errors: missing.map(field => ({
+          field,
+          message: `Le champ ${field} est manquant`
+        }))
+      }
+
+      return res.status(missingFieldsResponse.status).json(missingFieldsResponse)
+    }
+
+    // 2. Vérifier les données
+    const validationErrors = validations(
+      name,
+      coefficient,
+      'updateCriteria'
+    )
+
+    if (validationErrors.errors?.length) {
+      return res.status(validationErrors.status).json(validationErrors)
+    }
+
+    // 3. Vérifier si le critère existe
+    const criteria = await Criteria.findByPk(req.params.id)
+    if (!criteria) {
+      const notFoundResponse: ApiResponseType = {
+        status: 404,
+        message: 'Critère non trouvé',
+        errors: [
+          {
+            field: 'id',
+            message: 'Le critère n\'existe pas'
+          }
+        ]
+      }
+
+      return res.status(notFoundResponse.status).json(notFoundResponse)
+    }
+
+    // 4. Mettre à jour le critère
+    await Criteria.update({
+      name,
+      coefficient
+    }, {
+      where: {
+        id: req.params.id
+      }
+    })
+
+    // 5. Répondre
+    const response: ApiResponseType = {
+      status: 200,
+      message: 'Critère mis à jour'
+    }
+
+    return res.status(response.status).json(response)
+  } catch (err) {
+    next(err)
+  }
+}
+
+const validations = (name: string, coefficient: number, partToValidate: 'createCriteria' | 'updateCriteria') => {
   const errors: ApiResponseType = {
     status: 400,
     message: 'Erreurs de validation',
     errors: []
   }
 
+  const prefix = partToValidate === 'createCriteria' ? 'new' : 'selected'
+
   // name
   if (name.trim().length < dataLengthValidations.criteriaName.minlength ||
     name.trim().length > dataLengthValidations.criteriaName.maxlength) {
     errors.errors?.push({
-      field: 'newCriteriaNameInput',
+      field: `${prefix}CriteriaNameInput`,
       message: `Le nom doit être entre ${dataLengthValidations.criteriaName.minlength} et ${dataLengthValidations.criteriaName.maxlength} caractères`
     })
   }
@@ -95,7 +173,7 @@ const createCriteriaValidations = (name: string, coefficient: number) => {
   const parsedCoefficient = parseInt(coefficient.toString())
   if (isNaN(parsedCoefficient)) {
     errors.errors?.push({
-      field: 'newCriteriaCoefficientInput',
+      field: `${prefix}CriteriaCoefficientInput`,
       message: 'Le coefficient doit être un nombre'
     })
   }
@@ -103,7 +181,7 @@ const createCriteriaValidations = (name: string, coefficient: number) => {
   if (!isNaN(parsedCoefficient) && (parsedCoefficient < dataLengthValidations.criteriaCoefficient.minlength ||
     coefficient > dataLengthValidations.criteriaCoefficient.maxlength)) {
     errors.errors?.push({
-      field: 'newCriteriaCoefficientInput',
+      field: `${prefix}CriteriaCoefficientInput`,
       message: `Le coefficient doit être entre ${dataLengthValidations.criteriaCoefficient.minlength} et ${dataLengthValidations.criteriaCoefficient.maxlength}`
     })
   }
@@ -111,4 +189,4 @@ const createCriteriaValidations = (name: string, coefficient: number) => {
   return errors
 }
 
-export { getCriterias, createCriteria }
+export { getCriterias, createCriteria, updateCriteria }

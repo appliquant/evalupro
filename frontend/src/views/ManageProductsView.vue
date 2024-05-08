@@ -38,7 +38,7 @@
 
         <form novalidate class="needs-validation">
           <fieldset :disabled="selectedProduct === null">
-            <div class="row">
+            <div class="row row-cols-1 row-cols-sm-2">
               <div class="col">
                 <!-- Name -->
                 <div>
@@ -99,7 +99,7 @@
                 <!-- Description -->
                 <div>
                   <label for="selectedProductDescriptionTextarea" class="form-label"
-                    >Description</label
+                  >Description</label
                   >
                   <textarea
                     class="form-control"
@@ -314,7 +314,8 @@
                   v-if="categories?.data?.categories?.length <= 0"
                 >
                   <RouterLink to="/manage-categories" target="_blank"
-                    >Ajouter une catégorie</RouterLink
+                  >Ajouter une catégorie
+                  </RouterLink
                   >
                   <button class="btn btn-link p-0" @click.prevent="categoriesReload">
                     Recharger catégories

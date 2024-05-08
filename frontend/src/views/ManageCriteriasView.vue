@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container mt-3">
     <h1>Gérer les critères</h1>
 
     <div class="row row-cols-1 row-cols-sm-2 2">
@@ -19,8 +19,9 @@
           <li
             v-for="criteria in criterias?.data"
             :key="criteria.id"
-            class="list-group-item d-flex justify-content-between align-items-center"
+            :class="`list-group-item d-flex justify-content-between align-items-center ${selectedCriteria?.id === criteria.id && 'active'}`"
             style="cursor: pointer; user-select: none;"
+            @click="selectCriteria(criteria)"
           >
             {{ criteria.name }}
           </li>
@@ -30,7 +31,90 @@
         <p v-if="criterias?.data?.length === 0">Aucun critère</p>
       </div>
 
-      <div class="col"></div>
+      <div class="col">
+
+        <h2>Critère sélectionné</h2>
+
+        <form class="needs-validation" novalidate>
+          <fieldset :disabled="selectedCriteria === null">
+            <div class="row row-cols-1 row-cols-sm-2">
+              <div class="col">
+
+                <!-- Nom -->
+                <div>
+                  <label for="selectedCriteriaNameInput">Nom</label>
+                  <input
+                    type="text"
+                    :value="selectedCriteria?.name"
+                    v-on:input="(e) => {
+                     if (selectedCriteria) {
+                        selectedCriteria.name = ((e.target as HTMLInputElement).value);
+                        removeErrors('selectedCriteriaNameInput');
+                     }
+                    }"
+                    :minlength="dataLengthValidations.criteriaName.minlength"
+                    :maxlength="dataLengthValidations.criteriaName.maxlength"
+                    class="form-control"
+                    id="selectedCriteriaNameInput"
+                    placeholder="Nom du critère"
+                    aria-describedby="selectedCriteriaNameInputHelpBlock selectedCriteriaNameInputInvalidFeedback"
+                    required
+                  />
+
+                  <div id="selectedCriteriaNameInputInvalidFeedback" class="invalid-feedback"></div>
+                  <div id="selectedCriteriaNameInputHelpBlock" class="form-text">
+                    Le nom du critère doit contenir entre
+                    {{ dataLengthValidations.criteriaName.minlength }} et
+                    {{ dataLengthValidations.criteriaName.maxlength }} caractères.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Coefficient -->
+              <div class="col">
+
+                <div>
+                  <label for="selectedCriteriaCoefficientInput">Coefficient</label>
+                  <input
+                    type="number"
+                    :value="selectedCriteria?.coefficient"
+                    v-on:input="(e) => {
+                     if (selectedCriteria) {
+                        selectedCriteria.coefficient = parseInt((e.target as HTMLInputElement).value);
+                        removeErrors('selectedCriteriaCoefficientInput');
+                     }
+                    }"
+                    :min="dataLengthValidations.criteriaCoefficient.minlength"
+                    :max="dataLengthValidations.criteriaCoefficient.maxlength"
+                    class="form-control"
+                    id="selectedCriteriaCoefficientInput"
+                    placeholder="Coefficient du critère"
+                    aria-describedby="selectedCriteriaCoefficientInputHelpBlock selectedCriteriaCoefficientInputInvalidFeedback"
+                    required
+                  />
+
+                  <div id="selectedCriteriaCoefficientInputInvalidFeedback" class="invalid-feedback">
+                  </div>
+
+                  <div id="selectedCriteriaCoefficientInputHelpBlock" class="form-text">
+                    Le coefficient du critère doit être compris entre
+                    {{ dataLengthValidations.criteriaCoefficient.minlength }} et
+                    {{ dataLengthValidations.criteriaCoefficient.maxlength }} (incluant les bornes).
+                  </div>
+                </div>
+              </div>
+
+
+            </div>
+
+            <div class="d-flex gap-2 mt-2">
+              <button class="btn btn-primary" @click.prevent="updateCriteria">Modifier</button>
+              <button class="btn btn-outline-danger">Supprimer</button>
+            </div>
+          </fieldset>
+        </form>
+
+      </div>
     </div>
 
     <!-- Modal ajout critère -->
@@ -120,7 +204,7 @@ import { dataLengthValidations } from '@/validations.js'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useCriterias } from '@/composables/useCriterias'
-import type { ApiResponseType, ValidationError } from '@/types'
+import type { ApiResponseType, Criteria, ValidationError } from '@/types'
 import { push } from 'notivue'
 import { criteriasService } from '@/services/criteriasService'
 
@@ -132,6 +216,7 @@ const {
   reload: criteriasReload
 } = useCriterias()
 
+const selectedCriteria = ref<Criteria | null>(null)
 const newCriteriaPayload = ref({
   name: '',
   coefficient: 1
@@ -142,6 +227,10 @@ let newCriteriaNameInputInvalidFeedback: null | HTMLDivElement
 let newCriteriaCoefficientInput: null | HTMLInputElement
 let newCriteriaCoefficientInputInvalidFeedback: null | HTMLDivElement
 let newCriteriaSuccessMessage: null | HTMLParagraphElement
+let selectedCriteriaNameInput: null | HTMLInputElement
+let selectedCriteriaNameInputInvalidFeedback: null | HTMLDivElement
+let selectedCriteriaCoefficientInput: null | HTMLInputElement
+let selectedCriteriaCoefficientInputInvalidFeedback: null | HTMLDivElement
 
 onMounted(() => {
   newCriteriaNameInput = document.getElementById('newCriteriaNameInput') as HTMLInputElement
@@ -149,6 +238,10 @@ onMounted(() => {
   newCriteriaCoefficientInput = document.getElementById('newCriteriaCoefficientInput') as HTMLInputElement
   newCriteriaCoefficientInputInvalidFeedback = document.getElementById('newCriteriaCoefficientInputInvalidFeedback') as HTMLDivElement
   newCriteriaSuccessMessage = document.getElementById('newCriteriaSuccessMessage') as HTMLParagraphElement
+  selectedCriteriaNameInput = document.getElementById('selectedCriteriaNameInput') as HTMLInputElement
+  selectedCriteriaNameInputInvalidFeedback = document.getElementById('selectedCriteriaNameInputInvalidFeedback') as HTMLDivElement
+  selectedCriteriaCoefficientInput = document.getElementById('selectedCriteriaCoefficientInput') as HTMLInputElement
+  selectedCriteriaCoefficientInputInvalidFeedback = document.getElementById('selectedCriteriaCoefficientInputInvalidFeedback') as HTMLDivElement
 
   // Événement de fermeture du modal bootstrap
   document.addEventListener('hidden.bs.modal', () => {
@@ -199,12 +292,66 @@ const createCriteria = async () => {
   }
 }
 
+const updateCriteria = async () => {
+  if (!selectedCriteria.value) return
+
+  const validationErrors = validations('updateCriteria')
+  if (validationErrors.length > 0) {
+    validationErrors.forEach((error) => showErrors(error))
+    return
+  }
+
+  try {
+
+    console.log(selectedCriteria.value)
+    const res = await criteriasService.updateCriteria(
+      authStore.jwt,
+      selectedCriteria.value
+    )
+
+    if (res.errors && res.errors.length > 0) {
+      res.errors.forEach((error: ValidationError) => showErrors(error))
+      return
+    }
+
+    if (res.status === 200) {
+      push.success({
+        title: 'Succès',
+        message: res.message,
+        duration: 5000
+      })
+      criteriasReload()
+    }
+
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
+const selectCriteria = (criteria: Criteria) => {
+  if (selectedCriteria.value?.id === criteria.id) {
+    return unSelectCriteria()
+  }
+
+  // On clone le critère pour éviter les modifications directes
+  selectedCriteria.value = { ...criteria }
+}
+
+const unSelectCriteria = () => {
+  selectedCriteria.value = null
+}
+
 const validations = (partToValidate: 'createCriteria' | 'updateCriteria'): ValidationError[] => {
   const errors: ValidationError[] = []
 
   if (partToValidate === 'createCriteria') {
     const newCriteriaName = newCriteriaPayload.value.name.trim()
-    if (newCriteriaName.length < dataLengthValidations.criteriaName.minlength || newCriteriaName.length > dataLengthValidations.criteriaName.maxlength) {
+    if (newCriteriaName.trim().length < dataLengthValidations.criteriaName.minlength || newCriteriaName.length > dataLengthValidations.criteriaName.maxlength) {
       errors.push({
         field: 'newCriteriaNameInput',
         message: `Le nom du critère doit contenir entre ${dataLengthValidations.criteriaName.minlength} et ${dataLengthValidations.criteriaName.maxlength} caractères.`
@@ -225,6 +372,41 @@ const validations = (partToValidate: 'createCriteria' | 'updateCriteria'): Valid
     ) {
       errors.push({
         field: 'newCriteriaCoefficientInput',
+        message: `Le coefficient du critère doit être compris entre ${dataLengthValidations.criteriaCoefficient.minlength} et ${dataLengthValidations.criteriaCoefficient.maxlength} (incluant les bornes).`
+      })
+    }
+  }
+
+  if (partToValidate === 'updateCriteria') {
+    const selectedCriteriaName = selectedCriteria.value?.name.trim()
+    if (
+      selectedCriteriaName &&
+      (selectedCriteriaName.trim().length < dataLengthValidations.criteriaName.minlength ||
+        selectedCriteriaName.trim().length > dataLengthValidations.criteriaName.maxlength)) {
+      errors.push({
+        field: 'selectedCriteriaNameInput',
+        message: `Le nom du critère doit contenir entre ${dataLengthValidations.criteriaName.minlength} et ${dataLengthValidations.criteriaName.maxlength} caractères.`
+      })
+    }
+
+    const selectedCriteriaCoefficient = selectedCriteria.value?.coefficient
+
+    if (selectedCriteriaCoefficient && isNaN(parseInt(selectedCriteriaCoefficient.toString()))) {
+      errors.push(({
+        field: 'selectedCriteriaCoefficientInput',
+        message: 'Le coefficient du critère doit être un nombre.'
+      }))
+    }
+
+    if (
+      selectedCriteriaCoefficient &&
+      !isNaN(parseInt(selectedCriteriaCoefficient.toString())) &&
+      (parseInt(selectedCriteriaCoefficient.toString()) < dataLengthValidations.criteriaCoefficient.minlength ||
+        parseInt(selectedCriteriaCoefficient.toString()) > dataLengthValidations.criteriaCoefficient.maxlength
+      )
+    ) {
+      errors.push({
+        field: 'selectedCriteriaCoefficientInput',
         message: `Le coefficient du critère doit être compris entre ${dataLengthValidations.criteriaCoefficient.minlength} et ${dataLengthValidations.criteriaCoefficient.maxlength} (incluant les bornes).`
       })
     }
@@ -252,10 +434,18 @@ const showErrors = (error: ValidationError) => {
       newCriteriaCoefficientInput?.classList.add('is-invalid')
       if (newCriteriaCoefficientInputInvalidFeedback) newCriteriaCoefficientInputInvalidFeedback.innerText = error.message
       break
+    case 'selectedCriteriaNameInput':
+      selectedCriteriaNameInput?.classList.add('is-invalid')
+      if (selectedCriteriaNameInputInvalidFeedback) selectedCriteriaNameInputInvalidFeedback.innerText = error.message
+      break
+    case 'selectedCriteriaCoefficientInput':
+      selectedCriteriaCoefficientInput?.classList.add('is-invalid')
+      if (selectedCriteriaCoefficientInputInvalidFeedback) selectedCriteriaCoefficientInputInvalidFeedback.innerText = error.message
+      break
   }
 }
 
-const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInput') => {
+const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInput' | 'selectedCriteriaNameInput' | 'selectedCriteriaCoefficientInput') => {
   switch (input) {
     case 'newCriteriaNameInput':
       newCriteriaNameInput?.classList.remove('is-invalid')
@@ -264,6 +454,14 @@ const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInp
     case 'newCriteriaCoefficientInput':
       newCriteriaCoefficientInput?.classList.remove('is-invalid')
       if (newCriteriaCoefficientInputInvalidFeedback) newCriteriaCoefficientInputInvalidFeedback.innerText = ''
+      break
+    case 'selectedCriteriaNameInput':
+      selectedCriteriaNameInput?.classList.remove('is-invalid')
+      if (selectedCriteriaNameInputInvalidFeedback) selectedCriteriaNameInputInvalidFeedback.innerText = ''
+      break
+    case 'selectedCriteriaCoefficientInput':
+      selectedCriteriaCoefficientInput?.classList.remove('is-invalid')
+      if (selectedCriteriaCoefficientInputInvalidFeedback) selectedCriteriaCoefficientInputInvalidFeedback.innerText = ''
       break
   }
 }

@@ -327,6 +327,8 @@ const updateProduct = async (req: express.Request, res: express.Response, next: 
 
       return res.status(missingFieldsResponse.status).json(missingFieldsResponse)
     }
+    
+    // todo: validation des données
 
     // 3. Vérifier si le produit existe
     const product = await Product.findByPk(id.toString())

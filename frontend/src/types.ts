@@ -31,3 +31,9 @@ export type Product = {
   price: number
   image: string
 }
+
+export type Criteria = {
+  id: string
+  name: string
+  coefficient: number
+}
