@@ -64,6 +64,15 @@ const router = createRouter({
         requiresAuth: true,
         requiresRole: UserRoles.ADMIN
       }
+    },
+
+    {
+      path: '/favorites',
+      name: 'favorites',
+      component: () => import('../views/FavoritesView.vue'),
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })

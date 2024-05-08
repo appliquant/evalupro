@@ -12,9 +12,9 @@
           to="/manage-categories"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-          >Gérer les catégories
+        >Gérer les catégories
         </RouterLink>
-        <span class="badge rounded-pill text-bg-primary">{{ data?.data.role }}</span>
+        <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
       </li>
 
       <!-- Gérer les produits -->
@@ -23,9 +23,9 @@
           to="/manage-products"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-          >Gérer les produits
+        >Gérer les produits
         </RouterLink>
-        <span class="badge rounded-pill text-bg-primary">{{ data?.data.role }}</span>
+        <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
       </li>
 
       <!-- Gérer les critères -->
@@ -34,9 +34,20 @@
           to="/manage-criterias"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-          >Gérer les critères
+        >Gérer les critères
         </RouterLink>
-        <span class="badge rounded-pill text-bg-primary">{{ data?.data.role }}</span>
+        <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
+      </li>
+
+      <!-- Favoris -->
+      <li class="nav-item mt-2">
+        <RouterLink
+          to="/favorites"
+          style="margin-right: 0.5rem"
+          class="link-underline-opacity-0"
+        >Favoris
+        </RouterLink>
+        <span class="badge rounded-pill text-bg-primary">{{ UserRoles.USER }}</span>
       </li>
     </ul>
   </div>
