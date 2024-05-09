@@ -56,6 +56,28 @@ const createCriteria = async (req: express.Request, res: express.Response, next:
 
     // todo: le nom ne doit pas exister en double pour la même catégorie
 
+    // 3. Vérifier si le critère existe
+    const existingCriteria = await Criteria.findOne({
+      where: {
+        name
+      }
+    })
+
+    if (existingCriteria) {
+      const existingCriteriaResponse: ApiResponseType = {
+        status: 400,
+        message: 'Critère existant',
+        errors: [
+          {
+            field: 'newCriteriaNameInput',
+            message: 'Un critère avec ce nom existe déjà'
+          }
+        ]
+      }
+
+      return res.status(existingCriteriaResponse.status).json(existingCriteriaResponse)
+    }
+
     // 3. Créer le critère
     const newCriteria = await Criteria.create({
       name,
