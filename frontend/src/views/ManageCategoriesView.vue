@@ -64,13 +64,15 @@
               </div>
               <div class="col">
 
-                <!-- Categorie parente -->
+                <!-- Catégorie parente -->
                 <select class="form-select"
+                        id="selectedCategoryParentId"
                         :value="selectedCategory?.parentId"
                         v-on:change="
                           (e) => {
                             if (selectedCategory)
-                              selectedCategory.parentId = (e.target as HTMLSelectElement).value
+                              selectedCategory.parentId = (e.target as HTMLSelectElement).value;
+                            removeErrors('selectedCategoryParentId')
                           }"
                 >
                   <option value=""></option>
@@ -83,6 +85,8 @@
                     {{ category.title }}
                   </option>
                 </select>
+
+                <div id="selectedCategoryParentIdInvalidFeedback" class="invalid-feedback"></div>
               </div>
             </div>
 
@@ -211,6 +215,8 @@ let newCategoryTitleInput: null | HTMLElement
 let newCategoryTitleInputInvalidFeedback: null | HTMLElement
 let selectedCategoryTitleInput: null | HTMLElement
 let selectedCategoryTitleInputInvalidFeedback: null | HTMLElement
+let selectedCategoryParentId: null | HTMLSelectElement
+let selectedCategoryParentIdInvalidFeedback: null | HTMLElement
 let newCategorySuccessMessage: null | HTMLElement
 
 onMounted(() => {
@@ -221,6 +227,10 @@ onMounted(() => {
   selectedCategoryTitleInput = document.getElementById('selectedCategoryTitleInput')
   selectedCategoryTitleInputInvalidFeedback = document.getElementById(
     'selectedCategoryTitleInvalidFeedback'
+  )
+  selectedCategoryParentId = document.getElementById('selectedCategoryParentId') as HTMLSelectElement
+  selectedCategoryParentIdInvalidFeedback = document.getElementById(
+    'selectedCategoryParentIdInvalidFeedback'
   )
   newCategorySuccessMessage = document.getElementById('newCategorySuccessMessage')
 
@@ -386,18 +396,19 @@ const validations = (partToValidate: 'createCategory' | 'updateCategory'): Valid
 
   if (partToValidate === 'updateCategory') {
     const selectedCategoryTitle = selectedCategory?.value?.title
-    if (
-      selectedCategoryTitle &&
-      selectedCategoryTitle.trim().length < dataLengthValidations?.categoryTitle?.minlength
-    ) {
-      errors.push({ field: 'selectedCategoryTitle', message: 'Titre de catégorie trop court' })
+    if (!selectedCategoryTitle) {
+      errors.push({ field: 'selectedCategoryTitle', message: 'Titre de catégorie est obligatoire' })
     }
 
     if (
-      selectedCategoryTitle &&
-      selectedCategoryTitle.trim().length > dataLengthValidations?.categoryTitle?.maxlength
-    ) {
-      errors.push({ field: 'selectedCategoryTitle', message: 'Titre de catégorie trop long' })
+      selectedCategoryTitle && (
+        selectedCategoryTitle.trim().length < dataLengthValidations?.categoryTitle?.minlength ||
+        selectedCategoryTitle.trim().length > dataLengthValidations?.categoryTitle?.maxlength
+      )) {
+      errors.push({
+        field: 'selectedCategoryTitle',
+        message: `Titre de catégorie doit être entre ${dataLengthValidations.categoryTitle.minlength} et ${dataLengthValidations.categoryTitle.maxlength} caractères`
+      })
     }
   }
 
@@ -423,6 +434,11 @@ const showErrors = (error: ValidationError) => {
       if (selectedCategoryTitleInputInvalidFeedback)
         selectedCategoryTitleInputInvalidFeedback.innerText = error.message
       break
+    case 'selectedCategoryParentId':
+      selectedCategoryParentId?.classList.add('is-invalid')
+      if (selectedCategoryParentIdInvalidFeedback)
+        selectedCategoryParentIdInvalidFeedback.innerText = error.message
+      break
     case 'deleteCategory':
       push.error({
         title: 'Erreur',
@@ -434,7 +450,7 @@ const showErrors = (error: ValidationError) => {
   }
 }
 
-const removeErrors = (input: 'newCategoryTitle' | 'selectedCategoryTitle') => {
+const removeErrors = (input: 'newCategoryTitle' | 'selectedCategoryTitle' | 'selectedCategoryParentId') => {
   switch (input) {
     case 'newCategoryTitle':
       newCategoryTitleInput?.classList.remove('is-invalid')
@@ -444,6 +460,11 @@ const removeErrors = (input: 'newCategoryTitle' | 'selectedCategoryTitle') => {
       selectedCategoryTitleInput?.classList.remove('is-invalid')
       if (selectedCategoryTitleInputInvalidFeedback)
         selectedCategoryTitleInputInvalidFeedback.innerText = ''
+      break
+    case 'selectedCategoryParentId':
+      selectedCategoryParentId?.classList.remove('is-invalid')
+      if (selectedCategoryParentIdInvalidFeedback)
+        selectedCategoryParentIdInvalidFeedback.innerText = ''
       break
   }
 }

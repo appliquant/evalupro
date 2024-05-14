@@ -50,6 +50,6 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
     errResponse.message = 'Signature JWT invalide'
   }
 
-  console.error(`Erreur interne : ${err}`)
+  console.error(`Erreur interne : ${err.stack}`)
   res.status(errResponse.status).json(errResponse)
 })

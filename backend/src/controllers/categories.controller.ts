@@ -198,19 +198,35 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
       }
     }
 
-    // 5. Mettre à jour la catégorie
+    // 5. Vérifier que la catégorie parente n'est pas la catégorie elle-même
+    if (parentCategory && parentCategory.dataValues.id === category.dataValues.id) {
+      const parentCategoryItselfError: ApiResponseType = {
+        status: 400,
+        message: 'Catégorie parente ne peut pas être la catégorie elle-même',
+        errors: [
+          {
+            field: 'selectedCategoryParentId',
+            message: 'Catégorie parente ne peut pas être la catégorie elle-même'
+          }
+        ]
+      }
+
+      return res.status(parentCategoryItselfError.status).json(parentCategoryItselfError)
+    }
+
+    // 6. Mettre à jour la catégorie
     await category.update({
       title,
       parentId
     })
 
-    // 6. Répondre
+    // 7. Répondre
     const response: ApiResponseType = {
       status: 200,
       message: 'Catégorie mise à jour'
     }
 
-    res.setHeader('Location', `/api/categories/${response.data.id}`)
+    res.setHeader('Location', `/api/categories/${category.dataValues.id}`)
     return res.status(response.status).json(response)
   } catch (err) {
     next(err)
