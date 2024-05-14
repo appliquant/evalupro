@@ -3,7 +3,8 @@
     <h1>Favoris</h1>
 
     <p v-if="favoritesLoading" class="text-info">Chargement...</p>
-    <p v-else-if="favoritesError" class="text-danger">{{ favoritesError}}</p>
+    <p v-else-if="favoritesError" class="text-danger">{{ favoritesError }}</p>
+    <p v-if="favorites?.data.length <= 0">Aucun favori</p>
 
     <!-- Liste -->
     <ul class="list-group">
@@ -43,7 +44,7 @@ const removeFavorite = async (favoriteId: string) => {
   try {
     const confirmation = confirm('Voulez-vous vraiment retirer ce produit de vos favoris ?')
     if (!confirmation) return
-    
+
     const res = await favoritesService.removeFavorite(
       authStore.jwt,
       favoriteId
@@ -62,7 +63,7 @@ const removeFavorite = async (favoriteId: string) => {
       message: 'Le produit a été retiré de vos favoris',
       duration: 5000
     })
-    
+
     reloadFavorites()
   } catch (e) {
     const err = e as ApiResponseType
