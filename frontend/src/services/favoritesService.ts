@@ -82,5 +82,31 @@ const checkIfProductIsFavorite = async (jwt: string, productId: string): Promise
   }
 }
 
-const favoritesService = { getFavorites, addFavorite, checkIfProductIsFavorite }
+const removeFavorite = async (jwt: string, productId: string): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/favorites/${productId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`
+      }
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la suppression du favori',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+const favoritesService = { getFavorites, addFavorite, checkIfProductIsFavorite, removeFavorite }
 export { favoritesService }

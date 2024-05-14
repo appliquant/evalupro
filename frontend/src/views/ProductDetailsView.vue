@@ -94,9 +94,7 @@ async function checkIfProductIsFavorite() {
       product.value?.data?.product.id
     )
 
-    res.status === 200
-      ? isFavorite.value = true
-      : isFavorite.value = false
+    return res?.data?.isFavorite ? isFavorite.value = true : isFavorite.value = false
   } catch (e) {
     const err = e as ApiResponseType
     push.error({
@@ -129,6 +127,8 @@ const addFavorite = async () => {
       message: 'Produit ajouté aux favoris',
       duration: 5000
     })
+
+    checkIfProductIsFavorite()
   } catch (e) {
     const err = e as ApiResponseType
     push.error({
@@ -141,7 +141,29 @@ const addFavorite = async () => {
 
 const removeFavorite = async () => {
   try {
-    
+    if (!productId.value) return
+
+    const res = await favoritesService.removeFavorite(
+      authStore.jwt,
+      productId.value
+    )
+
+    if (res.status !== 200) {
+      return push.error({
+        title: 'Erreur',
+        message: res.message,
+        duration: 5000
+      })
+    }
+
+    push.success({
+      title: 'Succès',
+      message: 'Produit retiré des favoris',
+      duration: 3000
+    })
+
+    checkIfProductIsFavorite()
+
   } catch (e) {
     const err = e as ApiResponseType
     push.error({
