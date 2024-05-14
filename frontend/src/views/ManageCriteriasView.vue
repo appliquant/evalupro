@@ -40,32 +40,63 @@
             <div class="row row-cols-1 row-cols-sm-2">
               <div class="col">
 
-                <!-- Nom -->
                 <div>
-                  <label for="selectedCriteriaNameInput">Nom</label>
-                  <input
-                    type="text"
-                    :value="selectedCriteria?.name"
-                    v-on:input="(e) => {
+                  <!-- Nom -->
+                  <div>
+                    <label for="selectedCriteriaNameInput">Nom</label>
+                    <input
+                      type="text"
+                      :value="selectedCriteria?.name"
+                      v-on:input="(e) => {
                      if (selectedCriteria) {
                         selectedCriteria.name = ((e.target as HTMLInputElement).value);
                         removeErrors('selectedCriteriaNameInput');
                      }
                     }"
-                    :minlength="dataLengthValidations.criteriaName.minlength"
-                    :maxlength="dataLengthValidations.criteriaName.maxlength"
-                    class="form-control"
-                    id="selectedCriteriaNameInput"
-                    placeholder="Nom du critère"
-                    aria-describedby="selectedCriteriaNameInputHelpBlock selectedCriteriaNameInputInvalidFeedback"
-                    required
-                  />
+                      :minlength="dataLengthValidations.criteriaName.minlength"
+                      :maxlength="dataLengthValidations.criteriaName.maxlength"
+                      class="form-control"
+                      id="selectedCriteriaNameInput"
+                      placeholder="Nom du critère"
+                      aria-describedby="selectedCriteriaNameInputHelpBlock selectedCriteriaNameInputInvalidFeedback"
+                      required
+                    />
 
-                  <div id="selectedCriteriaNameInputInvalidFeedback" class="invalid-feedback"></div>
-                  <div id="selectedCriteriaNameInputHelpBlock" class="form-text">
-                    Le nom du critère doit contenir entre
-                    {{ dataLengthValidations.criteriaName.minlength }} et
-                    {{ dataLengthValidations.criteriaName.maxlength }} caractères.
+                    <div id="selectedCriteriaNameInputInvalidFeedback" class="invalid-feedback"></div>
+                    <div id="selectedCriteriaNameInputHelpBlock" class="form-text">
+                      Le nom du critère doit contenir entre
+                      {{ dataLengthValidations.criteriaName.minlength }} et
+                      {{ dataLengthValidations.criteriaName.maxlength }} caractères.
+                    </div>
+                  </div>
+
+                  <!-- Catégorie -->
+                  <!--                      @input="removeErrors('selectedCriteriaCategoryInput')"-->
+                  <div class="mt-3">
+                    <label for="selectedCriteriaCategoryInput">Catégorie</label>
+                    <select
+                      :value="selectedCriteria?.categoryId"
+                      v-on:input="(e) => {
+                      if (selectedCriteria) {
+                          selectedCriteria.categoryId = (e.target as HTMLSelectElement).value;
+                          removeErrors('selectedCriteriaCategoryInput');
+                          }
+                      }"
+                      class="form-select"
+                      id="selectedCriteriaCategoryInput"
+                      required
+                    >
+                      <option value="" disabled selected>Choisir une catégorie</option>
+                      <option
+                        v-for="category in categories?.data?.categories"
+                        :key="category.id"
+                        :value="category.id"
+                        :selected="category.id === selectedCriteria?.categoryId"
+                      >
+                        {{ category.title }}
+                      </option>
+                    </select>
+                    <div id="selectedCriteriaCategoryInputInvalidFeedback" class="invalid-feedback"></div>
                   </div>
                 </div>
               </div>
@@ -240,10 +271,7 @@ const {
 } = useCriterias()
 
 const {
-  data: categories,
-  loading: categoriesLoading,
-  error: categoriesError,
-  reload: categoriesReload
+  data: categories
 } = useCategories()
 
 const selectedCriteria = ref<Criteria | null>(null)
@@ -264,6 +292,8 @@ let selectedCriteriaNameInput: null | HTMLInputElement
 let selectedCriteriaNameInputInvalidFeedback: null | HTMLDivElement
 let selectedCriteriaCoefficientInput: null | HTMLInputElement
 let selectedCriteriaCoefficientInputInvalidFeedback: null | HTMLDivElement
+let selectedCriteriaCategoryInput: null | HTMLSelectElement
+let selectedCriteriaCategoryInputInvalidFeedback: null | HTMLDivElement
 
 onMounted(() => {
   newCriteriaNameInput = document.getElementById('newCriteriaNameInput') as HTMLInputElement
@@ -277,6 +307,8 @@ onMounted(() => {
   selectedCriteriaNameInputInvalidFeedback = document.getElementById('selectedCriteriaNameInputInvalidFeedback') as HTMLDivElement
   selectedCriteriaCoefficientInput = document.getElementById('selectedCriteriaCoefficientInput') as HTMLInputElement
   selectedCriteriaCoefficientInputInvalidFeedback = document.getElementById('selectedCriteriaCoefficientInputInvalidFeedback') as HTMLDivElement
+  selectedCriteriaCategoryInput = document.getElementById('selectedCriteriaCategoryInput') as HTMLSelectElement
+  selectedCriteriaCategoryInputInvalidFeedback = document.getElementById('selectedCriteriaCategoryInputInvalidFeedback') as HTMLDivElement
 
   // Événement de fermeture du modal bootstrap
   document.addEventListener('hidden.bs.modal', () => {
@@ -526,6 +558,10 @@ const showErrors = (error: ValidationError) => {
       selectedCriteriaCoefficientInput?.classList.add('is-invalid')
       if (selectedCriteriaCoefficientInputInvalidFeedback) selectedCriteriaCoefficientInputInvalidFeedback.innerText = error.message
       break
+    case 'selectedCriteriaCategoryInput':
+      selectedCriteriaCategoryInput?.classList.add('is-invalid')
+      if (selectedCriteriaCategoryInputInvalidFeedback) selectedCriteriaCategoryInputInvalidFeedback.innerText = error.message
+      break
     case 'deleteCriteria':
       push.error({
         title: 'Erreur',
@@ -535,7 +571,7 @@ const showErrors = (error: ValidationError) => {
   }
 }
 
-const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInput' | 'newCriteriaCategoryInput' | 'selectedCriteriaNameInput' | 'selectedCriteriaCoefficientInput') => {
+const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInput' | 'newCriteriaCategoryInput' | 'selectedCriteriaNameInput' | 'selectedCriteriaCoefficientInput' | 'selectedCriteriaCategoryInput') => {
   switch (input) {
     case 'newCriteriaNameInput':
       newCriteriaNameInput?.classList.remove('is-invalid')
@@ -556,6 +592,10 @@ const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInp
     case 'newCriteriaCategoryInput':
       newCriteriaCategoryInput?.classList.remove('is-invalid')
       if (newCriteriaCategoryInputInvalidFeedback) newCriteriaCategoryInputInvalidFeedback.innerText = ''
+      break
+    case 'selectedCriteriaCategoryInput':
+      selectedCriteriaCategoryInput?.classList.remove('is-invalid')
+      if (selectedCriteriaCategoryInputInvalidFeedback) selectedCriteriaCategoryInputInvalidFeedback.innerText = ''
       break
   }
 }

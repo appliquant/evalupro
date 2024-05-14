@@ -5,11 +5,8 @@ import { dataLengthValidations } from '../validations'
 
 const getCriterias = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    console.log('api/criterias')
     // 1. Trouver les critères
     const criterias = await Criteria.findAll()
-
-    console.log(`criterias: ${criterias}`)
 
     // 2. Retourner les critères
     const response: ApiResponseType = {
@@ -126,13 +123,15 @@ const updateCriteria = async (req: express.Request, res: express.Response, next:
     // todo: ne pas modifier un critere deja evalué
 
     // 1. Extraire les données
-    const { name, coefficient } = req.body
+    const { name, coefficient, categoryId } = req.body
     const { id } = req.params
 
-    if (!id || !name || !coefficient) {
+    if (!id || !name || !coefficient || !categoryId) {
       const missing = []
+      if (!id) missing.push('id')
       if (!name) missing.push('name')
       if (!coefficient) missing.push('coefficient')
+      if (!categoryId) missing.push('categoryId')
 
       const missingFieldsResponse: ApiResponseType = {
         status: 400,
@@ -174,10 +173,28 @@ const updateCriteria = async (req: express.Request, res: express.Response, next:
       return res.status(notFoundResponse.status).json(notFoundResponse)
     }
 
+    // 4. Vérifier si la catégorie existe
+    const existingCategory = await Category.findByPk(categoryId)
+    if (!existingCategory) {
+      const existingCategoryResponse: ApiResponseType = {
+        status: 400,
+        message: 'Catégorie inexistante',
+        errors: [
+          {
+            field: 'selectedCriteriaCategoryIdInput',
+            message: 'La catégorie n\'existe pas'
+          }
+        ]
+      }
+
+      return res.status(existingCategoryResponse.status).json(existingCategoryResponse)
+    }
+
     // 4. Mettre à jour le critère
     await Criteria.update({
       name,
-      coefficient
+      coefficient,
+      categoryId
     }, {
       where: {
         id: id
