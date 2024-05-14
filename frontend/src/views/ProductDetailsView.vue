@@ -22,7 +22,12 @@
           </p>
           <span class="badge rounded-pill text-bg-light">{{ product.data.category.title }}</span>
           <div v-if="isUserLoggedIn">
-            <button class="btn btn-link my-0 py-0" @click.prevent="addFavorite">&hearts; Ajouter aux favoris</button>
+            <button v-if="!isFavorite " class="btn btn-link my-0 py-0" @click.prevent="addFavorite">&hearts; Ajouter aux
+              favoris
+            </button>
+            <button v-else class="btn btn-link my-0 py-0" @click.prevent="removeFavorite">
+              &#10006; Retirer des favoris
+            </button>
           </div>
         </div>
 
@@ -56,10 +61,10 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 const route = useRoute()
 const authStore = useAuthStore()
 
+const isFavorite = ref(false)
 const isUserLoggedIn = computed(() => {
   return authStore.jwt !== ''
 })
-
 
 const productId = ref<null | string>(null)
 const {
@@ -73,7 +78,34 @@ watchEffect(() => {
   if (id) {
     productId.value = id instanceof Array ? id[0] : id
   }
+
+  if (isUserLoggedIn.value && productId.value) {
+    checkIfProductIsFavorite()
+  }
 })
+
+
+async function checkIfProductIsFavorite() {
+  if (!product.value) return false
+
+  try {
+    const res = await favoritesService.checkIfProductIsFavorite(
+      authStore.jwt,
+      product.value?.data?.product.id
+    )
+
+    res.status === 200
+      ? isFavorite.value = true
+      : isFavorite.value = false
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
 
 const addFavorite = async () => {
   try {
@@ -97,6 +129,19 @@ const addFavorite = async () => {
       message: 'Produit ajouté aux favoris',
       duration: 5000
     })
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
+const removeFavorite = async () => {
+  try {
+    
   } catch (e) {
     const err = e as ApiResponseType
     push.error({

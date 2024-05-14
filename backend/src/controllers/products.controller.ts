@@ -1,9 +1,10 @@
 import express from 'express'
 import { ApiResponseType } from '../types'
-import { Category, Product } from '../db'
+import { Category, Favorite, Product, User } from '../db'
 import formidable from 'formidable'
 import { dataLengthValidations } from '../validations'
 import { Op } from 'sequelize'
+import * as constants from 'node:constants'
 
 const formidableOpt: formidable.Options = {
   uploadDir: `${__dirname}/../public/uploads`,
@@ -64,7 +65,7 @@ const getProduct = async (req: express.Request, res: express.Response, next: exp
       return res.status(categoryNotFoundError.status).json(categoryNotFoundError)
     }
 
-    // 3. Retourner le produit
+    // 4. Retourner le produit
     const successResponse: ApiResponseType = {
       status: 200,
       message: 'Produit trouvé',
@@ -327,7 +328,7 @@ const updateProduct = async (req: express.Request, res: express.Response, next: 
 
       return res.status(missingFieldsResponse.status).json(missingFieldsResponse)
     }
-    
+
     // todo: validation des données
 
     // 3. Vérifier si le produit existe
