@@ -41,39 +41,6 @@ const getUserFavorites = async (req: express.Request, res: express.Response, nex
     }
 
     return res.status(response.status).json(response)
-
-    // 1. Récupérer l'utilisateur
-    // const user = await User.findOne({
-    //   where: {
-    //     email: req.jwtToken?.email
-    //   }
-    // })
-    //
-    // if (!user) {
-    //   const notFoundResponse: ApiResponseType = {
-    //     status: 404,
-    //     message: 'Utilisateur non trouvé'
-    //   }
-    //   return res.status(notFoundResponse.status).json(notFoundResponse)
-    // }
-    //
-    // // 2. Récupérer les favoris de l'utilisateur
-    // const favorites = await Favorite.findOne({
-    //   where: {
-    //     userId: user.dataValues.id
-    //   }
-    // })
-    //
-    // // 2. Répondre 
-    // const response: ApiResponseType = {
-    //   status: 200,
-    //   message: 'Favoris récupérés',
-    //   data: favorites?.dataValues.favorites
-    // }
-    //
-    // console.log(favorites)
-
-    // return res.status(response.status).json(response)
   } catch (err) {
     next(err)
   }
