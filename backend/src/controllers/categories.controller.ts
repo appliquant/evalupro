@@ -214,10 +214,35 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
       return res.status(parentCategoryItselfError.status).json(parentCategoryItselfError)
     }
 
+    // 6. Vérifier que la catégorie parente n'est pas un enfant de la catégorie elle-même 
+    // (pas de boucle circulaire)
+    if (parentCategory) {
+      let currentParent: Category | null = parentCategory
+      while (currentParent) {
+        if (currentParent.dataValues.id === category.dataValues.id) {
+          const circularParentError: ApiResponseType = {
+            status: 400,
+            message: 'Catégorie parente ne peut pas être un enfant de la catégorie elle-même (boucle circulaire)',
+            errors: [
+              {
+                field: 'selectedCategoryParentId',
+                message: 'Catégorie parente ne peut pas être un enfant de la catégorie elle-même'
+              }
+            ]
+          }
+
+          return res.status(circularParentError.status).json(circularParentError)
+        }
+
+        currentParent = await Category.findByPk(currentParent.dataValues.parentId)
+      }
+    }
+
     // 6. Mettre à jour la catégorie
     await category.update({
       title,
-      parentId
+      // Si parentId est null, on met null, sinon on met parentCategory.id
+      parentId: parentCategory ? parentCategory.dataValues.id : null
     })
 
     // 7. Répondre
