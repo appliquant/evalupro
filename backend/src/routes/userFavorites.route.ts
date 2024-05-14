@@ -1,9 +1,10 @@
 import express from 'express'
 import { requireIsSignedin } from '../middlewares/requireIsSignedin'
-import { getUserFavorites } from '../controllers/userFavorites.controller'
+import { addUserFavorite, getUserFavorites } from '../controllers/userFavorites.controller'
 
 const userFavoritesRoute = express.Router()
 
-userFavoritesRoute.get('/:id', requireIsSignedin, getUserFavorites)
+userFavoritesRoute.get('/', requireIsSignedin, getUserFavorites)
+userFavoritesRoute.post('/', requireIsSignedin, addUserFavorite)
 
 export { userFavoritesRoute }
