@@ -6,7 +6,21 @@ import { dataLengthValidations } from '../validations'
 const getCriterias = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // 1. Trouver les critères
-    const criterias = await Criteria.findAll()
+    // Trier par ordre hiérarchique (catégorie parente, catégorie enfant, critère)
+    const criterias = await Criteria.findAll({
+      include: {
+        model: Category,
+        as: 'category'
+      },
+      order: [
+        [{ model: Category, as: 'category' }, 'parentId', 'ASC'],
+        [{ model: Category, as: 'category' }, 'id', 'ASC'],
+        ['id', 'ASC']
+      ]
+    });
+
+
+    // const criterias = await Criteria.findAll()
 
     // 2. Retourner les critères
     const response: ApiResponseType = {

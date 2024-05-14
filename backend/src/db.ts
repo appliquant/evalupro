@@ -290,9 +290,13 @@ Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' })
 Product.belongsTo(Category, { as: 'category', foreignKey: 'categoryId' })
 Category.hasMany(Product, { as: 'products', foreignKey: 'categoryId' })
 
-// Relation Category -> Criteria
-Category.hasMany(Criteria, { as: 'criteria', foreignKey: 'categoryId' })
-Criteria.belongsTo(Category, { foreignKey: 'categoryId' })
+// // Relation Category -> Criteria
+// Category.hasMany(Criteria, { as: 'criteria', foreignKey: 'categoryId' })
+// Criteria.belongsTo(Category, { foreignKey: 'categoryId' })
+//
+
+Criteria.belongsTo(Category, { as: 'category', foreignKey: 'categoryId' });
+Category.hasMany(Criteria, { as: 'criteria', foreignKey: 'categoryId' });
 
 // Relation Evaluation -> Product
 Evaluation.belongsTo(Product, { as: 'product', foreignKey: 'productId' })
