@@ -63,11 +63,25 @@
                 </div>
               </div>
               <div class="col">
-                <select class="form-select" aria-label="Default select example">
-                  <option selected>Catégorie parente</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+
+                <!-- Categorie parente -->
+                <select class="form-select"
+                        :value="selectedCategory?.parentId"
+                        v-on:change="
+                          (e) => {
+                            if (selectedCategory)
+                              selectedCategory.parentId = (e.target as HTMLSelectElement).value
+                          }"
+                >
+                  <option value=""></option>
+                  <option v-for="category in categories?.data?.categories"
+                          :key="category.id"
+                          :value="category.id"
+                          :selected="category.id === selectedCategory?.parentId"
+                  >
+
+                    {{ category.title }}
+                  </option>
                 </select>
               </div>
             </div>

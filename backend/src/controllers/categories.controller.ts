@@ -53,7 +53,7 @@ const createCategory = async (req: express.Request, res: express.Response, next:
     if (newParentCategoryId) {
       parentCategory = await Category.findOne({
         where: {
-          title: newParentCategoryId
+          id: newParentCategoryId
         }
       })
 
