@@ -315,7 +315,9 @@ Evaluation.hasMany(CriteriaEvaluation, { as: 'evaluationCriteria', foreignKey: '
 const initDb = async (): Promise<void> => {
   try {
     await sequelize.authenticate()
-    await sequelize.sync()
+    await sequelize.sync({
+      // force: true
+    })
     console.log('✅ Db connectée et synchronisée.')
   } catch (error) {
     console.error('❌ Erreur de connexion à la base de données', error)

@@ -1,12 +1,15 @@
 import express from 'express'
-import { Criteria } from '../db'
+import { Category, Criteria } from '../db'
 import { ApiResponseType } from '../types'
 import { dataLengthValidations } from '../validations'
 
 const getCriterias = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
+    console.log('api/criterias')
     // 1. Trouver les critères
     const criterias = await Criteria.findAll()
+
+    console.log(`criterias: ${criterias}`)
 
     // 2. Retourner les critères
     const response: ApiResponseType = {
@@ -24,12 +27,13 @@ const getCriterias = async (req: express.Request, res: express.Response, next: e
 const createCriteria = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // 1. Extraire les données
-    const { name, coefficient } = req.body
+    const { name, coefficient, categoryId } = req.body
 
-    if (!name || !coefficient) {
+    if (!name || !coefficient || !categoryId) {
       const missing = []
       if (!name) missing.push('name')
       if (!coefficient) missing.push('coefficient')
+      if (!categoryId) missing.push('categoryId')
 
       const missingFieldsResponse: ApiResponseType = {
         status: 400,
@@ -78,13 +82,31 @@ const createCriteria = async (req: express.Request, res: express.Response, next:
       return res.status(existingCriteriaResponse.status).json(existingCriteriaResponse)
     }
 
-    // 3. Créer le critère
+    // 3. Vérifier si la catégorie existe
+    const existingCategory = await Category.findByPk(categoryId)
+    if (!existingCategory) {
+      const existingCategoryResponse: ApiResponseType = {
+        status: 400,
+        message: 'Catégorie inexistante',
+        errors: [
+          {
+            field: 'newCriteriaCategoryIdInput',
+            message: 'La catégorie n\'existe pas'
+          }
+        ]
+      }
+
+      return res.status(existingCategoryResponse.status).json(existingCategoryResponse)
+    }
+
+    // 4. Créer le critère
     const newCriteria = await Criteria.create({
       name,
-      coefficient
+      coefficient,
+      categoryId
     })
 
-    // 4. Répondre
+    // 5. Répondre
     const response: ApiResponseType = {
       status: 201,
       message: 'Critère créé',

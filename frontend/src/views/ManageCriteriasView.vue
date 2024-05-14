@@ -185,6 +185,28 @@
                 </div>
               </div>
 
+              <!-- Catégorie -->
+              <div>
+                <label for="newCriteriaCategoryInput">Catégorie</label>
+                <select
+                  v-model="newCriteriaPayload.categoryId"
+                  @input="removeErrors('newCriteriaCategoryInput')"
+                  class="form-select"
+                  id="newCriteriaCategoryInput"
+                  required
+                >
+                  <option value="" disabled selected>Choisir une catégorie</option>
+                  <option
+                    v-for="category in categories?.data?.categories"
+                    :key="category.id"
+                    :value="category.id"
+                  >
+                    {{ category.title }}
+                  </option>
+                </select>
+                <div id="newCriteriaCategoryInputInvalidFeedback" class="invalid-feedback"></div>
+              </div>
+
               <p id="newCriteriaSuccessMessage" class="mt-3 text-success"></p>
             </form>
 
@@ -207,6 +229,7 @@ import { useCriterias } from '@/composables/useCriterias'
 import type { ApiResponseType, Criteria, ValidationError } from '@/types'
 import { push } from 'notivue'
 import { criteriasService } from '@/services/criteriasService'
+import { useCategories } from '@/composables/useCategories'
 
 const authStore = useAuthStore()
 const {
@@ -216,16 +239,26 @@ const {
   reload: criteriasReload
 } = useCriterias()
 
+const {
+  data: categories,
+  loading: categoriesLoading,
+  error: categoriesError,
+  reload: categoriesReload
+} = useCategories()
+
 const selectedCriteria = ref<Criteria | null>(null)
 const newCriteriaPayload = ref({
   name: '',
-  coefficient: 1
+  coefficient: 1,
+  categoryId: ''
 })
 
 let newCriteriaNameInput: null | HTMLInputElement
 let newCriteriaNameInputInvalidFeedback: null | HTMLDivElement
 let newCriteriaCoefficientInput: null | HTMLInputElement
 let newCriteriaCoefficientInputInvalidFeedback: null | HTMLDivElement
+let newCriteriaCategoryInput: null | HTMLSelectElement
+let newCriteriaCategoryInputInvalidFeedback: null | HTMLDivElement
 let newCriteriaSuccessMessage: null | HTMLParagraphElement
 let selectedCriteriaNameInput: null | HTMLInputElement
 let selectedCriteriaNameInputInvalidFeedback: null | HTMLDivElement
@@ -237,6 +270,8 @@ onMounted(() => {
   newCriteriaNameInputInvalidFeedback = document.getElementById('newCriteriaNameInputInvalidFeedback') as HTMLDivElement
   newCriteriaCoefficientInput = document.getElementById('newCriteriaCoefficientInput') as HTMLInputElement
   newCriteriaCoefficientInputInvalidFeedback = document.getElementById('newCriteriaCoefficientInputInvalidFeedback') as HTMLDivElement
+  newCriteriaCategoryInput = document.getElementById('newCriteriaCategoryInput') as HTMLSelectElement
+  newCriteriaCategoryInputInvalidFeedback = document.getElementById('newCriteriaCategoryInputInvalidFeedback') as HTMLDivElement
   newCriteriaSuccessMessage = document.getElementById('newCriteriaSuccessMessage') as HTMLParagraphElement
   selectedCriteriaNameInput = document.getElementById('selectedCriteriaNameInput') as HTMLInputElement
   selectedCriteriaNameInputInvalidFeedback = document.getElementById('selectedCriteriaNameInputInvalidFeedback') as HTMLDivElement
@@ -302,8 +337,6 @@ const updateCriteria = async () => {
   }
 
   try {
-
-    console.log(selectedCriteria.value)
     const res = await criteriasService.updateCriteria(
       authStore.jwt,
       selectedCriteria.value
@@ -413,6 +446,14 @@ const validations = (partToValidate: 'createCriteria' | 'updateCriteria'): Valid
         message: `Le coefficient du critère doit être compris entre ${dataLengthValidations.criteriaCoefficient.minlength} et ${dataLengthValidations.criteriaCoefficient.maxlength} (incluant les bornes).`
       })
     }
+
+    const newCriteriaCategory = newCriteriaPayload.value.categoryId.toString()
+    if (newCriteriaCategory.trim().length <= 0) {
+      errors.push({
+        field: 'newCriteriaCategoryInput',
+        message: 'Veuillez choisir une catégorie.'
+      })
+    }
   }
 
   if (partToValidate === 'updateCriteria') {
@@ -457,6 +498,7 @@ const validations = (partToValidate: 'createCriteria' | 'updateCriteria'): Valid
 const emptyNewCriteriaPayload = () => {
   newCriteriaPayload.value.name = ''
   newCriteriaPayload.value.coefficient = 1
+  newCriteriaPayload.value.categoryId = ''
   if (newCriteriaSuccessMessage) newCriteriaSuccessMessage.innerText = ''
   removeErrors('newCriteriaNameInput')
   removeErrors('newCriteriaCoefficientInput')
@@ -471,6 +513,10 @@ const showErrors = (error: ValidationError) => {
     case 'newCriteriaCoefficientInput':
       newCriteriaCoefficientInput?.classList.add('is-invalid')
       if (newCriteriaCoefficientInputInvalidFeedback) newCriteriaCoefficientInputInvalidFeedback.innerText = error.message
+      break
+    case 'newCriteriaCategoryInput':
+      newCriteriaCategoryInput?.classList.add('is-invalid')
+      if (newCriteriaCategoryInputInvalidFeedback) newCriteriaCategoryInputInvalidFeedback.innerText = error.message
       break
     case 'selectedCriteriaNameInput':
       selectedCriteriaNameInput?.classList.add('is-invalid')
@@ -489,7 +535,7 @@ const showErrors = (error: ValidationError) => {
   }
 }
 
-const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInput' | 'selectedCriteriaNameInput' | 'selectedCriteriaCoefficientInput') => {
+const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInput' | 'newCriteriaCategoryInput' | 'selectedCriteriaNameInput' | 'selectedCriteriaCoefficientInput') => {
   switch (input) {
     case 'newCriteriaNameInput':
       newCriteriaNameInput?.classList.remove('is-invalid')
@@ -506,6 +552,10 @@ const removeErrors = (input: 'newCriteriaNameInput' | 'newCriteriaCoefficientInp
     case 'selectedCriteriaCoefficientInput':
       selectedCriteriaCoefficientInput?.classList.remove('is-invalid')
       if (selectedCriteriaCoefficientInputInvalidFeedback) selectedCriteriaCoefficientInputInvalidFeedback.innerText = ''
+      break
+    case 'newCriteriaCategoryInput':
+      newCriteriaCategoryInput?.classList.remove('is-invalid')
+      if (newCriteriaCategoryInputInvalidFeedback) newCriteriaCategoryInputInvalidFeedback.innerText = ''
       break
   }
 }
