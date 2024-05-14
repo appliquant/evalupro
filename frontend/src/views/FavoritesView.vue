@@ -7,20 +7,16 @@
 
     <!-- Liste -->
     <ul class="list-group">
-      <RouterLink class="list-group-item" to="/product/1">
-        elm1
-      </RouterLink>
-      <RouterLink class="list-group-item" to="/product/1">
-        elm1
-      </RouterLink>
-      <RouterLink class="list-group-item" to="/product/1">
-        elm1
-      </RouterLink>
-      <RouterLink class="list-group-item" to="/product/1">
-        elm1
-      </RouterLink>
-      <RouterLink class="list-group-item" to="/product/1">
-        elm1
+      <RouterLink class="list-group-item" v-for="favorite in favorites?.data" :key="favorite.id"
+                  :to="`/product/${favorite.id}`">
+        <!-- Badge prix -->
+        <span class="badge bg-primary rounded-pill">{{ favorite.price }} $</span>
+        
+        <!-- Nom -->
+        {{ favorite.name }}
+        
+        <!-- Bouton de suppression -->
+        <button class="btn btn-danger btn-sm float-end">Supprimer</button>
       </RouterLink>
     </ul>
 

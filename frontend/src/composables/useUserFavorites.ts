@@ -11,7 +11,7 @@ export const useUserFavorites = () => {
 
   const reload = () => {
     favoritesService
-      .getFavorites(authStore.jwt, authStore.userId)
+      .getFavorites(authStore.jwt)
       .then((res) => (data.value = res))
       .catch((err) => (error.value = err))
       .finally(() => (loading.value = false))

@@ -1,16 +1,17 @@
 import express from 'express'
-import { Favorite, User } from '../db'
+import { Favorite, Product, User } from '../db'
 import { ApiResponseType } from '../types'
 
 const getUserFavorites = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    // 1. Récupérer les favoris de l'utilisateur
-    const favorites = await Favorite.findOne({
+    // 1. Récupérer l'utilisateur
+    const user = await User.findOne({
       where: {
-        email: req.jwtToken?.email
+        email: req?.jwtToken?.email
       }
     })
-    if (!favorites) {
+
+    if (!user) {
       const notFoundResponse: ApiResponseType = {
         status: 404,
         message: 'Utilisateur non trouvé'
@@ -18,16 +19,61 @@ const getUserFavorites = async (req: express.Request, res: express.Response, nex
       return res.status(notFoundResponse.status).json(notFoundResponse)
     }
 
-    console.log(favorites.dataValues)
+    // 2. Récupérer les favoris de l'utilisateur
+    const favoriteProducts = await User.findOne({
+      where: {
+        email: req.jwtToken?.email
+      },
 
-    // 2. Répondre 
+      include: [{
+        model: Product,
+        as: 'FavoriteProducts',
+        through: { attributes: [] }
+      }]
+    })
+
+    // 3. Répondre
     const response: ApiResponseType = {
       status: 200,
       message: 'Favoris récupérés',
-      data: favorites.dataValues.favorites
+      // @ts-ignore
+      data: favoriteProducts?.FavoriteProducts
     }
 
     return res.status(response.status).json(response)
+
+    // 1. Récupérer l'utilisateur
+    // const user = await User.findOne({
+    //   where: {
+    //     email: req.jwtToken?.email
+    //   }
+    // })
+    //
+    // if (!user) {
+    //   const notFoundResponse: ApiResponseType = {
+    //     status: 404,
+    //     message: 'Utilisateur non trouvé'
+    //   }
+    //   return res.status(notFoundResponse.status).json(notFoundResponse)
+    // }
+    //
+    // // 2. Récupérer les favoris de l'utilisateur
+    // const favorites = await Favorite.findOne({
+    //   where: {
+    //     userId: user.dataValues.id
+    //   }
+    // })
+    //
+    // // 2. Répondre 
+    // const response: ApiResponseType = {
+    //   status: 200,
+    //   message: 'Favoris récupérés',
+    //   data: favorites?.dataValues.favorites
+    // }
+    //
+    // console.log(favorites)
+
+    // return res.status(response.status).json(response)
   } catch (err) {
     next(err)
   }

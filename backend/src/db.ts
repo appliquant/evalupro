@@ -194,15 +194,26 @@ Favorite.init({
 User.belongsToMany(Product, { through: Favorite, as: 'FavoriteProducts', foreignKey: 'userId' })
 Product.belongsToMany(User, { through: Favorite, as: 'FavoritedByUsers', foreignKey: 'productId' })
 
-const initDb = () => {
-  sequelize.authenticate().then(() => {
-    sequelize.sync({
-      // alter: true
-    }).then(() => {
-    })
-  }).catch((error) => {
+// const initDb = () => {
+//   sequelize.authenticate().then(() => {
+//     sequelize.sync({
+//       // alter: true
+//     }).then(() => {
+//     })
+//   }).catch((error) => {
+//     console.error('❌ Erreur de connexion à la base de données', error)
+//   })
+// }
+
+
+const initDb = async (): Promise<void> => {
+  try {
+    await sequelize.authenticate()
+    await sequelize.sync()
+    console.log('✅ Db connectée et synchronisée.')
+  } catch (error) {
     console.error('❌ Erreur de connexion à la base de données', error)
-  })
+  }
 }
 
 export { sequelize, initDb, User, Category, Product, Criteria, Favorite }
