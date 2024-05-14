@@ -21,7 +21,9 @@
             <strong>{{ product.data.product.brand }}</strong>
           </p>
           <span class="badge rounded-pill text-bg-light">{{ product.data.category.title }}</span>
-          <button class="btn btn-link my-0 py-0" @click.prevent="addFavorite">&hearts; Ajouter aux favoris</button>
+          <div v-if="isUserLoggedIn">
+            <button class="btn btn-link my-0 py-0" @click.prevent="addFavorite">&hearts; Ajouter aux favoris</button>
+          </div>
         </div>
 
 
@@ -42,7 +44,7 @@
 
 <script lang="ts" setup>
 import { useProduct } from '@/composables/useProduct'
-import { ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { favoritesService } from '@/services/favoritesService'
 import type { ApiResponseType } from '@/types'
@@ -53,6 +55,12 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 const route = useRoute()
 const authStore = useAuthStore()
+
+const isUserLoggedIn = computed(() => {
+  return authStore.jwt !== ''
+})
+
+
 const productId = ref<null | string>(null)
 const {
   data: product,
