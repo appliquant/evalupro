@@ -38,6 +38,7 @@
           <fieldset :disabled="selectedCategory === null">
             <div class="row">
               <div class="col">
+                <label for="selectedCategoryTitleInput">Titre</label>
                 <!-- Pas possible d'utiliser 'v-model' car 'selectedCategory' peut-être null -->
                 <input
                   type="text"
@@ -65,6 +66,7 @@
               <div class="col">
 
                 <!-- Catégorie parente -->
+                <label for="selectedCategoryParentId">Catégorie parente</label>
                 <select class="form-select"
                         id="selectedCategoryParentId"
                         :value="selectedCategory?.parentId"
