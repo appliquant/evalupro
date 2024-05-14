@@ -215,14 +215,14 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
     }
 
     // 6. Vérifier que la catégorie parente n'est pas un enfant de la catégorie elle-même 
-    // (pas de boucle circulaire)
+    // (pas d'héritage circulaire/boucle infinie)
     if (parentCategory) {
       let currentParent: Category | null = parentCategory
       while (currentParent) {
         if (currentParent.dataValues.id === category.dataValues.id) {
           const circularParentError: ApiResponseType = {
             status: 400,
-            message: 'Catégorie parente ne peut pas être un enfant de la catégorie elle-même (boucle circulaire)',
+            message: 'Catégorie parente ne peut pas être un enfant de la catégorie elle-même (héritage circulaire)',
             errors: [
               {
                 field: 'selectedCategoryParentId',
@@ -234,6 +234,7 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
           return res.status(circularParentError.status).json(circularParentError)
         }
 
+        // Remonter d'un niveau jusqu'à la racine
         currentParent = await Category.findByPk(currentParent.dataValues.parentId)
       }
     }

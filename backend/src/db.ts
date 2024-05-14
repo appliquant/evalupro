@@ -24,6 +24,9 @@ class Criteria extends Model {
 class CriteriaEvaluation extends Model {
 }
 
+class Evaluation extends Model {
+}
+
 class Favorite extends Model {
 }
 
@@ -83,9 +86,6 @@ Category.init({
   timestamps: true
 })
 
-// Relation Category -> Parent Category
-Category.hasMany(Category, { as: 'children', foreignKey: 'parentId' })
-Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' })
 
 Product.init({
   id: {
@@ -139,10 +139,6 @@ Product.init({
   timestamps: true
 })
 
-// Relation Product -> Category
-Product.belongsTo(Category, { as: 'category', foreignKey: 'categoryId' })
-Category.hasMany(Product, { as: 'products', foreignKey: 'categoryId' })
-
 Criteria.init({
   id: {
     type: DataTypes.INTEGER,
@@ -159,6 +155,15 @@ Criteria.init({
   coefficient: {
     type: DataTypes.INTEGER,
     allowNull: false
+  },
+
+  categoryId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Category,
+      key: 'id'
+    }
   }
 }, {
   sequelize,
@@ -191,19 +196,120 @@ Favorite.init({
   }
 }, { sequelize, timestamps: true })
 
+Evaluation.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'id'
+    }
+  },
+
+  productId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Product,
+      key: 'id'
+    }
+  },
+
+  comment: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  }
+}, {
+  sequelize,
+  timestamps: true
+})
+
+CriteriaEvaluation.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+
+  criteriaId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Criteria,
+      key: 'id'
+    }
+  },
+
+  evaluationId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: Evaluation,
+      key: 'id'
+    }
+  },
+
+  // Choix :
+  // 1 : excellent
+  // 0.8 : very good
+  // 0.6 : good
+  // 0.4 : bad
+  // 0.2 : very bad
+  value: {
+    type: DataTypes.FLOAT,
+    allowNull: false
+  }
+}, {
+  sequelize,
+  timestamps: true
+})
+
+// Relations :
+//
+//     User et Product ont une relation many-to-many relationship par Favorite.
+//     Category possède une relation sur elle-même.
+//     Product appartient à Category.
+//     Category contient plusieurs Criteria.
+//     Evaluation appartient à Product et User.
+//     CriteriaEvaluation appartient à Criteria et Evaluation.
+
+// Relation User -> Favorite
 User.belongsToMany(Product, { through: Favorite, as: 'FavoriteProducts', foreignKey: 'userId' })
 Product.belongsToMany(User, { through: Favorite, as: 'FavoritedByUsers', foreignKey: 'productId' })
 
-// const initDb = () => {
-//   sequelize.authenticate().then(() => {
-//     sequelize.sync({
-//       // alter: true
-//     }).then(() => {
-//     })
-//   }).catch((error) => {
-//     console.error('❌ Erreur de connexion à la base de données', error)
-//   })
-// }
+// Relation Category -> Parent Category
+Category.hasMany(Category, { as: 'children', foreignKey: 'parentId' })
+Category.belongsTo(Category, { as: 'parent', foreignKey: 'parentId' })
+
+// Relation Product -> Category
+Product.belongsTo(Category, { as: 'category', foreignKey: 'categoryId' })
+Category.hasMany(Product, { as: 'products', foreignKey: 'categoryId' })
+
+// Relation Category -> Criteria
+Category.hasMany(Criteria, { as: 'criteria', foreignKey: 'categoryId' })
+Criteria.belongsTo(Category, { foreignKey: 'categoryId' })
+
+// Relation Evaluation -> Product
+Evaluation.belongsTo(Product, { as: 'product', foreignKey: 'productId' })
+Product.hasMany(Evaluation, { as: 'evaluations', foreignKey: 'productId' })
+
+// Relation Evaluation -> User
+Evaluation.belongsTo(User, { as: 'user', foreignKey: 'userId' })
+User.hasMany(Evaluation, { as: 'evaluations', foreignKey: 'userId' })
+
+// Relation CriteriaEvaluation -> Criteria (one-to-many)
+CriteriaEvaluation.belongsTo(Criteria, { as: 'criteria', foreignKey: 'criteriaId' })
+Criteria.hasMany(CriteriaEvaluation, { as: 'criteriaEvaluations', foreignKey: 'criteriaId' })
+
+// Relation CriteriaEvaluation -> Evaluation (one-to-many)
+CriteriaEvaluation.belongsTo(Evaluation, { as: 'evaluation', foreignKey: 'evaluationId' })
+Evaluation.hasMany(CriteriaEvaluation, { as: 'evaluationCriteria', foreignKey: 'evaluationId' })
 
 
 const initDb = async (): Promise<void> => {
@@ -216,4 +322,4 @@ const initDb = async (): Promise<void> => {
   }
 }
 
-export { sequelize, initDb, User, Category, Product, Criteria, Favorite }
+export { sequelize, initDb, User, Category, Product, Criteria, Favorite, Evaluation, CriteriaEvaluation }
