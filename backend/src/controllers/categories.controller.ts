@@ -5,7 +5,7 @@ import { ApiResponseType } from '../types'
 const createCategory = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // 1. Vérifier les données
-    const { newCategoryTitle, newParentCategoryTitle } = req.body
+    const { newCategoryTitle, newParentCategoryId } = req.body
 
     if (!newCategoryTitle) {
       const missingFieldsErrors: ApiResponseType = {
@@ -50,10 +50,10 @@ const createCategory = async (req: express.Request, res: express.Response, next:
 
     // 3. Trouver la catégorie parent
     let parentCategory
-    if (newParentCategoryTitle) {
+    if (newParentCategoryId) {
       parentCategory = await Category.findOne({
         where: {
-          title: newParentCategoryTitle
+          title: newParentCategoryId
         }
       })
 

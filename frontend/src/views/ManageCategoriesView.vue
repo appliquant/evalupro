@@ -135,16 +135,21 @@
                 <select
                   id="newCategoryParentSelect"
                   class="form-select"
-                  v-model="newCategoryPayload.parentCategoryName"
+                  v-model="newCategoryPayload.parentCategoryId"
                   aria-describedby="newCategoryParentHelpBlock"
                   aria-label="Sélectionner catégorie parente"
                 >
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                  <option value=""></option>
+                  <option
+                    v-for="category in categories?.data?.categories"
+                    :key="category.id"
+                    :value="category.id"
+                  >
+                    {{ category.title }}
+                  </option>
                 </select>
                 <div id="newCategoryParentHelpBlock" class="form-text">
-                  Sélectionner une catégorie parente
+                  Sélectionner une catégorie parente (non obligatoire)
                 </div>
               </div>
 
@@ -185,7 +190,7 @@ const selectedCategory = ref<Category | null>(null)
 
 const newCategoryPayload = ref({
   title: '',
-  parentCategoryName: ''
+  parentCategoryId: ''
 })
 
 let newCategoryTitleInput: null | HTMLElement
@@ -246,7 +251,7 @@ const createCategory = async () => {
     const res = await categoriesService.createCategory(
       authStore.jwt,
       newCategoryPayload.value.title,
-      newCategoryPayload.value.parentCategoryName
+      newCategoryPayload.value.parentCategoryId
     )
 
     if (res.errors && res.errors.length > 0) {
@@ -354,13 +359,14 @@ const validations = (partToValidate: 'createCategory' | 'updateCategory'): Valid
   const errors: ValidationError[] = []
 
   if (partToValidate === 'createCategory') {
-    const newCategoryTitle = newCategoryPayload.value.title
-    if (newCategoryTitle.trim().length < dataLengthValidations?.categoryTitle?.minlength) {
-      errors.push({ field: 'newCategoryTitle', message: 'Titre de catégorie trop court' })
-    }
+    const newCategoryTitle = newCategoryPayload.value.title.trim()
 
-    if (newCategoryTitle.trim().length > dataLengthValidations?.categoryTitle?.maxlength) {
-      errors.push({ field: 'newCategoryTitle', message: 'Titre de catégorie trop long' })
+    if (newCategoryTitle.length < dataLengthValidations.categoryTitle.minlength ||
+      newCategoryTitle.length > dataLengthValidations.categoryTitle.maxlength) {
+      errors.push({
+        field: 'newCategoryTitle',
+        message: `Titre de catégorie doit être entre ${dataLengthValidations.categoryTitle.minlength} et ${dataLengthValidations.categoryTitle.maxlength} caractères`
+      })
     }
   }
 
@@ -386,7 +392,7 @@ const validations = (partToValidate: 'createCategory' | 'updateCategory'): Valid
 
 const emptyNewCategoryData = () => {
   newCategoryPayload.value.title = ''
-  newCategoryPayload.value.parentCategoryName = ''
+  newCategoryPayload.value.parentCategoryId = ''
   if (newCategorySuccessMessage) newCategorySuccessMessage.innerText = ''
   removeErrors('newCategoryTitle')
 }
