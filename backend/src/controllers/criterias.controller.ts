@@ -55,32 +55,8 @@ const createCriteria = async (req: express.Request, res: express.Response, next:
       return res.status(validationErrors.status).json(validationErrors)
     }
 
-    // todo: le nom ne doit pas exister en double pour la même catégorie
-
-    // 3. Vérifier si le critère existe
-    const existingCriteria = await Criteria.findOne({
-      where: {
-        name
-      }
-    })
-
-    if (existingCriteria) {
-      const existingCriteriaResponse: ApiResponseType = {
-        status: 400,
-        message: 'Critère existant',
-        errors: [
-          {
-            field: 'newCriteriaNameInput',
-            message: 'Un critère avec ce nom existe déjà'
-          }
-        ]
-      }
-
-      return res.status(existingCriteriaResponse.status).json(existingCriteriaResponse)
-    }
-
     // 3. Vérifier si la catégorie existe
-    const existingCategory = await Category.findByPk(categoryId)
+    let existingCategory = await Category.findByPk(categoryId)
     if (!existingCategory) {
       const existingCategoryResponse: ApiResponseType = {
         status: 400,
@@ -96,14 +72,82 @@ const createCriteria = async (req: express.Request, res: express.Response, next:
       return res.status(existingCategoryResponse.status).json(existingCategoryResponse)
     }
 
-    // 4. Créer le critère
+
+    // 4. Vérifier si le critère existe pour la même catégorie ou une catégorie parente
+    // (qui hérite des critères de la catégorie parente)
+    while (existingCategory) {
+      let existingCriteria = await Criteria.findOne({
+        where: {
+          name,
+          categoryId: existingCategory.dataValues.id
+        }
+      })
+
+      if (existingCriteria) {
+        const existingCriteriaResponse: ApiResponseType = {
+          status: 400,
+          message: 'Critère existant',
+          errors: [
+            {
+              field: 'newCriteriaNameInput',
+              message: 'Un critère avec ce nom existe déjà dans la catégorie ou une catégorie parente'
+            }
+          ]
+        }
+
+        return res.status(existingCriteriaResponse.status).json(existingCriteriaResponse)
+      }
+
+      existingCategory = await Category.findByPk(existingCategory.dataValues.parentId)
+    }
+
+    // 5. Vérifier si la catégorie qu'on veut créer existe déja sur un des enfants
+    // (qui hérite des critères de la catégorie qu'on veut créer)
+    let existingChildCategory = await Category.findOne({
+      where: {
+        parentId: categoryId
+      }
+    })
+
+    while (existingChildCategory) {
+      let existingCriteria = await Criteria.findOne({
+        where: {
+          name,
+          categoryId: existingChildCategory.dataValues.id
+        }
+      })
+
+      if (existingCriteria) {
+        const existingCriteriaResponse: ApiResponseType = {
+          status: 400,
+          message: 'Critère existant',
+          errors: [
+            {
+              field: 'newCriteriaNameInput',
+              message: 'Un critère avec ce nom existe déjà dans un des enfants de la catégorie'
+            }
+          ]
+        }
+
+        return res.status(existingCriteriaResponse.status).json(existingCriteriaResponse)
+      }
+
+      existingChildCategory = await Category.findOne({
+        where: {
+          parentId: existingChildCategory.dataValues.id
+        }
+      })
+    }
+
+
+    // 6. Créer le critère
     const newCriteria = await Criteria.create({
       name,
       coefficient,
       categoryId
     })
 
-    // 5. Répondre
+    // 7. Répondre
     const response: ApiResponseType = {
       status: 201,
       message: 'Critère créé',
@@ -190,7 +234,7 @@ const updateCriteria = async (req: express.Request, res: express.Response, next:
       return res.status(existingCategoryResponse.status).json(existingCategoryResponse)
     }
 
-    // 4. Mettre à jour le critère
+    // 5. Mettre à jour le critère
     await Criteria.update({
       name,
       coefficient,
@@ -201,7 +245,7 @@ const updateCriteria = async (req: express.Request, res: express.Response, next:
       }
     })
 
-    // 5. Répondre
+    // 6. Répondre
     const response: ApiResponseType = {
       status: 200,
       message: 'Critère mis à jour'
