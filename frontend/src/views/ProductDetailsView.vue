@@ -31,10 +31,18 @@
           </div>
         </div>
 
+        <div>
+          <h6>Critères d'évaluations</h6>
+          <div class="d-flex gap-2 mb-2">
+            <span v-for="criteria in product?.data?.criterias" :key="criteria.id" class="badge bg-primary rounded-pill">
+            {{ criteria.name }}
+          </span>
+          </div>
+        </div>
 
         <div class="d-flex gap-2 align-items-start">
           <p class="fw-bolder">{{ product.data.product.price }} $</p>
-          <p>pointage : {{ product.data.product.averageScore }}</p>
+          <p v-if="isUserLoggedIn">pointage : {{ product.data.product.averageScore }}</p>
         </div>
 
         <p>{{ product.data.product.description }}</p>
@@ -80,6 +88,8 @@ watchEffect(() => {
   }
 
   if (isUserLoggedIn.value && productId.value) {
+    console.log(`productId: ${productId.value}`)
+    console.log(`isUserLoggedIn: ${isUserLoggedIn.value}`)
     checkIfProductIsFavorite()
   }
 })

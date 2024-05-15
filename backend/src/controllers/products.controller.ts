@@ -1,6 +1,6 @@
 import express from 'express'
 import { ApiResponseType } from '../types'
-import { Category, Favorite, Product, User } from '../db'
+import { Category, Criteria, Favorite, Product, User } from '../db'
 import formidable from 'formidable'
 import { dataLengthValidations } from '../validations'
 import { Op } from 'sequelize'
@@ -65,13 +65,17 @@ const getProduct = async (req: express.Request, res: express.Response, next: exp
       return res.status(categoryNotFoundError.status).json(categoryNotFoundError)
     }
 
-    // 4. Retourner le produit
+    // 4. Trouver critères
+    const criterias = await getCategoryAndAncestorCriterias(category)
+
+    // 5. Retourner le produit
     const successResponse: ApiResponseType = {
       status: 200,
       message: 'Produit trouvé',
       data: {
         product,
-        category
+        category,
+        criterias
       }
     }
 
@@ -455,6 +459,22 @@ const deleteProduct = async (req: express.Request, res: express.Response, next: 
   } catch (err) {
     next(err)
   }
+}
+
+
+const getCategoryAndAncestorCriterias = async (category: Category) => {
+  let criterias: any[] = []
+  let currentCategory: Category | null = category
+
+  while (currentCategory) {
+    const categoryCriterias = await Criteria.findAll({
+      where: { categoryId: currentCategory.dataValues.id }
+    })
+    criterias = criterias.concat(categoryCriterias)
+    currentCategory = await Category.findByPk(currentCategory.dataValues.parentId)
+  }
+
+  return criterias
 }
 
 export { getProducts, getProduct, createProduct, updateProduct, deleteProduct }

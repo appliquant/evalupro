@@ -20,8 +20,6 @@ const getCriterias = async (req: express.Request, res: express.Response, next: e
     });
 
 
-    // const criterias = await Criteria.findAll()
-
     // 2. Retourner les critères
     const response: ApiResponseType = {
       status: 200,
