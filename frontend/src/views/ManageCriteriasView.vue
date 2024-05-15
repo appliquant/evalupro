@@ -4,8 +4,7 @@
 
     <div class="row row-cols-1 row-cols-sm-2 2">
       <div class="col">
-        <div class="d-flex justify-content-between w-100 mb-3">
-          <h2>Liste des critères</h2>
+        <div class="d-flex justify-content-between w-100 mb-3"><h2>Liste des critères</h2>
           <button
             class="btn btn-primary btn-sm"
             data-bs-toggle="modal"
@@ -71,7 +70,6 @@
                   </div>
 
                   <!-- Catégorie -->
-                  <!--                      @input="removeErrors('selectedCriteriaCategoryInput')"-->
                   <div class="mt-3">
                     <label for="selectedCriteriaCategoryInput">Catégorie</label>
                     <select

@@ -22,7 +22,7 @@
           </p>
           <span class="badge rounded-pill text-bg-light">{{ product.data.category.title }}</span>
           <div v-if="isUserLoggedIn">
-            <button v-if="!isFavorite " class="btn btn-link my-0 py-0" @click.prevent="addFavorite">&hearts; Ajouter aux
+            <button v-if="!isFavorite" class="btn btn-link" @click.prevent="addFavorite">&hearts; Ajouter aux
               favoris
             </button>
             <button v-else class="btn btn-link my-0 py-0" @click.prevent="removeFavorite">
@@ -31,6 +31,7 @@
           </div>
         </div>
 
+
         <div>
           <h6>Critères d'évaluations</h6>
           <div class="d-flex gap-2 mb-2">
@@ -38,6 +39,15 @@
             {{ criteria.name }}
           </span>
           </div>
+        </div>
+
+        <!-- Aller vers page de l'évaluation -->
+        <div v-show="canCreateEvaluation" class="my-3">
+          <RouterLink
+            :to="`/create-evaluation-tester/${product.data.product.id}`"
+            class="btn btn-outline-dark btn-sm"
+          >★ Évaluer ce produit
+          </RouterLink>
         </div>
 
         <div class="d-flex gap-2 align-items-start">
@@ -60,7 +70,7 @@ import { useProduct } from '@/composables/useProduct'
 import { computed, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { favoritesService } from '@/services/favoritesService'
-import type { ApiResponseType } from '@/types'
+import { type ApiResponseType, UserRoles } from '@/types'
 import { push } from 'notivue'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -72,6 +82,10 @@ const authStore = useAuthStore()
 const isFavorite = ref(false)
 const isUserLoggedIn = computed(() => {
   return authStore.jwt !== ''
+})
+
+const canCreateEvaluation = computed(() => {
+  return isUserLoggedIn.value && authStore.role === UserRoles.TESTER && product.value?.data?.product
 })
 
 const productId = ref<null | string>(null)
@@ -88,8 +102,6 @@ watchEffect(() => {
   }
 
   if (isUserLoggedIn.value && productId.value) {
-    console.log(`productId: ${productId.value}`)
-    console.log(`isUserLoggedIn: ${isUserLoggedIn.value}`)
     checkIfProductIsFavorite()
   }
 })

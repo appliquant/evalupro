@@ -39,6 +39,17 @@
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
       </li>
 
+      <!-- Gérer ses évaluations (en tant que testeur) -->
+      <li class="nav-item mt-2" v-show="data?.data.role === UserRoles.TESTER">
+        <RouterLink
+          to="/manage-evaluations-tester"
+          style="margin-right: 0.5rem"
+          class="link-underline-opacity-0"
+        >Gérer mes évaluations de testeur
+        </RouterLink>
+        <span class="badge rounded-pill text-bg-primary">{{ UserRoles.TESTER }}</span>
+      </li>
+
       <!-- Favoris -->
       <li class="nav-item mt-2">
         <RouterLink

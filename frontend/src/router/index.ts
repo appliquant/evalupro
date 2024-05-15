@@ -67,6 +67,26 @@ const router = createRouter({
     },
 
     {
+      path: '/create-evaluation-tester/:id',
+      name: 'create-evaluation-tester',
+      component: () => import('../views/CreateEvaluationTesterView.vue'),
+      meta: {
+        requiresAuth: true,
+        requiresRole: UserRoles.TESTER
+      }
+    },
+
+    {
+      path: '/manage-evaluations-tester',
+      name: 'manage-evaluations-tester',
+      component: () => import('../views/ManageEvaluationsTesterView.vue'),
+      meta: {
+        requiresAuth: true,
+        requiresRole: UserRoles.TESTER
+      }
+    },
+
+    {
       path: '/favorites',
       name: 'favorites',
       component: () => import('../views/FavoritesView.vue'),

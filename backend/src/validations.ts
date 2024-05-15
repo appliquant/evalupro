@@ -15,6 +15,7 @@ type Keys = {
   productPrice: DataLengthValidations
   criteriaName: DataLengthValidations
   criteriaCoefficient: DataLengthValidations
+  optional_evaluationComment: DataLengthValidations
 }
 
 const dataLengthValidations: Keys = {
@@ -71,11 +72,16 @@ const dataLengthValidations: Keys = {
      * Valeur inclusive
      */
     minlength: 1,
-   
+
     /**
      * Valeur inclusive
      */
     maxlength: 10
+  },
+
+  optional_evaluationComment: {
+    minlength: 3,
+    maxlength: 200
   }
 }
 
