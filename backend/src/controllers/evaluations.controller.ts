@@ -1,9 +1,8 @@
 import express from 'express'
-import { ApiResponseType } from './types'
-import { dataLengthValidations } from './validations'
-import { Category, CriteriaEvaluation, Evaluation, Product, User } from './db'
-import { getCategoryAndAncestorCriterias } from './controllers/getCategoryAndAncestorCriterias'
-import * as constants from 'node:constants'
+import { ApiResponseType } from '../types'
+import { dataLengthValidations } from '../validations'
+import { Category, CriteriaEvaluation, Evaluation, Product } from '../db'
+import { getCategoryAndAncestorCriterias } from './getCategoryAndAncestorCriterias'
 
 const createEvaluation = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
@@ -151,6 +150,7 @@ const createEvaluation = async (req: express.Request, res: express.Response, nex
       message: 'Evaluation créée'
     }
 
+    // todo: faire header Location
     // res.setHeader('Location', '/evaluations/'id)
     return res.status(response.status).json(response)
   } catch (err) {

@@ -2,7 +2,7 @@ import express from 'express'
 import { requireIsSignedin } from '../middlewares/requireIsSignedin'
 import { requireRole } from '../middlewares/requireRole'
 import { UserRoles } from '../types'
-import { createEvaluation } from '../evaluations.controller'
+import { createEvaluation } from '../controllers/evaluations.controller'
 
 const evaluationsRoute = express.Router()
 
