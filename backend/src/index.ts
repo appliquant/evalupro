@@ -10,7 +10,6 @@ import { productsRoute } from './routes/products.route'
 import * as path from 'node:path'
 import { criteriasRoute } from './routes/criterias.route'
 import { userFavoritesRoute } from './routes/userFavorites.route'
-import { _evaluationsRoute } from './routes/_evaluations.route'
 import { evaluationsRoute } from './routes/evaluations.route'
 
 const PORT = 3000
@@ -33,7 +32,6 @@ app.use('/api/categories', categoriesRoute)
 app.use('/api/products', productsRoute)
 app.use('/api/criterias', criteriasRoute)
 app.use('/api/favorites', userFavoritesRoute)
-// app.use('/api/evaluations', _evaluationsRoute)
 app.use('/api/evaluations', evaluationsRoute)
 
 // port
