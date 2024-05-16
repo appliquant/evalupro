@@ -35,7 +35,7 @@ export async function requireIsSignedin(req: express.Request, res: express.Respo
 
     req.jwtToken = {
       email: jwt.payload.email as string,
-      userId: user.dataValues.id as string
+      userId: user.dataValues.id as string,
     }
 
     next()

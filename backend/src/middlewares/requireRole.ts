@@ -42,6 +42,12 @@ export function requireRole(...requiredRole: UserRoles[]) {
           return res.status(unauthorizedError.status).json(unauthorizedError)
         }
 
+        req.jwtToken = {
+          userId: user.dataValues.id,
+          email: user.dataValues.email,
+          role: user.dataValues.role
+        }
+
         next()
       } catch (err) {
         next(err)

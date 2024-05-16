@@ -20,7 +20,7 @@ import { useAuthStore } from '@/stores/authStore'
 import type { ApiResponseType, Category, Criteria, CriteriasEvaluation, Evaluation, Product } from '@/types'
 import { onMounted, ref } from 'vue'
 import { push } from 'notivue'
-import type { evaluationsService } from '@/services/evaluationsService';
+import { evaluationsService } from '@/services/evaluationsService'
 
 const authStore = useAuthStore()
 
@@ -35,12 +35,25 @@ type Data = {
 const items = ref<Data[]>([])
 
 onMounted(() => {
-
+  getEvaluations()
 })
 
 const getEvaluations = async () => {
   try {
-    // const res = await evaluationsService.
+    const res = await evaluationsService.getEvaluations(
+      authStore.jwt
+    )
+
+    if (res.status !== 200) {
+      return push.error({
+        title: 'Erreur',
+        message: res.message,
+        duration: 5000
+      })
+    }
+
+    items.value = res.data
+    console.log(items.value)
   } catch (e) {
     const err = e as ApiResponseType
     push.error({

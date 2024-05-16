@@ -2,7 +2,8 @@ declare namespace Express {
   export interface Request {
     jwtToken?: {
       email: string,
-      userId: string
+      userId: string,
+      role?: import('../types').UserRoles
     }
   }
 }
