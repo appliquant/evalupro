@@ -6,6 +6,29 @@
       <div class="col">
         <h2>Liste de toutes les évaluations</h2>
 
+        <p v-if="items.length <= 0">Aucune évaluation n'existe</p>
+
+        <!-- Liste des évaluations -->
+<!--        <div v-else>-->
+<!--          <div v-for="item in items" :key="item.evaluation.id">-->
+<!--            <div class="card mb-3">-->
+<!--              <div class="card-body">-->
+<!--                <h5 class="card-title">{{ item.product.name }}</h5>-->
+<!--                <p class="card-text">{{ item.evaluation.comment }}</p>-->
+<!--                <button class="btn btn-primary">Voir</button>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+        <ul class="list-group" id="list-container">
+         <li v-for="(item, index) in items"
+             :key="item.evaluation.id"
+             class="list-group-item"
+         >
+          {{ item.product.name}} 
+         </li> 
+        </ul>
+
       </div>
 
       <div class="col">
@@ -64,3 +87,10 @@ const getEvaluations = async () => {
   }
 }
 </script>
+
+<style lang="scss">
+#list-container {
+  max-height: 50dvh;
+  overflow-y: auto;
+}
+</style>
