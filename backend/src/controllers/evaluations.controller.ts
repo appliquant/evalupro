@@ -383,6 +383,59 @@ const updateMyEvaluationsTester = async (req: express.Request, res: express.Resp
   }
 }
 
+const deleteMyEvaluationTester = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // 1. Récupérer l'évaluation
+    const { evaluationId } = req.params
+
+    if (!evaluationId) {
+      const missingFieldsResponse: ApiResponseType = {
+        status: 400,
+        message: 'Champ manquant',
+        errors: [{
+          field: 'evaluationId',
+          message: 'Le champ evaluationId est manquant'
+        }]
+      }
+
+      return res.status(missingFieldsResponse.status).json(missingFieldsResponse)
+    }
+
+    // 2. Vérifier que l'évaluation existe
+    const evaluation = await Evaluation.findByPk(evaluationId)
+
+    if (!evaluation) {
+      const notFoundResponse: ApiResponseType = {
+        status: 404,
+        message: 'Evaluation non trouvée'
+      }
+      return res.status(notFoundResponse.status).json(notFoundResponse)
+    }
+
+    // 3. Vérifier que l'évaluation appartient au testeur
+    if (evaluation.dataValues.userId !== req.jwtToken?.userId) {
+      const forbiddenResponse: ApiResponseType = {
+        status: 403,
+        message: 'Vous n\'êtes pas autorisé à supprimer cette évaluation'
+      }
+      return res.status(forbiddenResponse.status).json(forbiddenResponse)
+    }
+
+    // 4. Supprimer l'évaluation
+    await evaluation.destroy()
+
+    // 5. Répondre
+    const response: ApiResponseType = {
+      status: 200,
+      message: 'Evaluation supprimée'
+    }
+
+    return res.status(response.status).json(response)
+  } catch (err) {
+    next(err)
+  }
+}
+
 const validations = (criterias: {}[], comment: string | undefined): ApiResponseType => {
   const errors: ApiResponseType = {
     status: 400,
@@ -414,4 +467,4 @@ const validations = (criterias: {}[], comment: string | undefined): ApiResponseT
   return errors
 }
 
-export { createEvaluation, getMyEvaluationsTester, updateMyEvaluationsTester }
+export { createEvaluation, getMyEvaluationsTester, updateMyEvaluationsTester, deleteMyEvaluationTester }

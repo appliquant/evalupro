@@ -83,7 +83,8 @@
             <div class="d-flex gap-2">
               <button type="submit" class="btn btn-primary" @click.prevent="updateMyEvaluationsTester">Enregistrer
               </button>
-              <button type="submit" class="btn btn-outline-danger">Supprimer</button>
+              <button type="submit" class="btn btn-outline-danger" @click.prevent="deleteMyEvaluationTester">Supprimer
+              </button>
             </div>
           </fieldset>
         </form>
@@ -206,6 +207,44 @@ const updateMyEvaluationsTester = async () => {
         message: res.message,
         duration: 3000
       })
+    }
+
+    push.error({
+      title: 'Erreur',
+      message: res.message,
+      duration: 5000
+    })
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
+const deleteMyEvaluationTester = async () => {
+  if (!selectedItem.value) return
+
+  const confirmation = confirm('Voulez-vous vraiment supprimer cette évaluation ?')
+  if (!confirmation) return
+
+  try {
+    const res = await evaluationsService.deleteMyEvaluationTester(
+      authStore.jwt,
+      selectedItem.value.evaluation.id
+    )
+
+    if (res.status === 200) {
+      push.success({
+        title: 'Succès',
+        message: res.message,
+        duration: 3000
+      })
+
+      unSelectItem()
+      return
     }
 
     push.error({

@@ -313,8 +313,8 @@ CriteriaEvaluation.belongsTo(Criteria, { as: 'criteria', foreignKey: 'criteriaId
 Criteria.hasMany(CriteriaEvaluation, { as: 'criteriaEvaluations', foreignKey: 'criteriaId' })
 
 // Relation CriteriaEvaluation -> Evaluation (one-to-many)
-CriteriaEvaluation.belongsTo(Evaluation, { as: 'evaluation', foreignKey: 'evaluationId' })
-Evaluation.hasMany(CriteriaEvaluation, { as: 'evaluationCriteria', foreignKey: 'evaluationId' })
+CriteriaEvaluation.belongsTo(Evaluation, { as: 'evaluation', foreignKey: 'evaluationId', onDelete: 'CASCADE' })
+Evaluation.hasMany(CriteriaEvaluation, { as: 'evaluationCriteria', foreignKey: 'evaluationId', onDelete: 'CASCADE' })
 
 
 const initDb = async (): Promise<void> => {

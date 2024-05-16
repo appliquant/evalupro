@@ -5,7 +5,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 const createEvaluation = async (jwt: string, productId: string, data: object): Promise<ApiResponseType> => {
   try {
-    const res = await fetch(`${BACKEND_URL}/api/evaluations/${productId}`, {
+    const res = await fetch(`${BACKEND_URL}/api/evaluations/tester/${productId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -32,7 +32,7 @@ const createEvaluation = async (jwt: string, productId: string, data: object): P
 
 const getMyEvaluationsTester = async (jwt: string): Promise<ApiResponseType> => {
   try {
-    const res = await fetch(`${BACKEND_URL}/api/evaluations/me`, {
+    const res = await fetch(`${BACKEND_URL}/api/evaluations/tester`, {
       headers: {
         Authorization: `Bearer ${jwt}`
       }
@@ -56,7 +56,7 @@ const getMyEvaluationsTester = async (jwt: string): Promise<ApiResponseType> => 
 
 const updateMyEvaluationTester = async (jwt: string, evaluationId: string, data: object): Promise<ApiResponseType> => {
   try {
-    const res = await fetch(`${BACKEND_URL}/api/evaluations/me/${evaluationId}`, {
+    const res = await fetch(`${BACKEND_URL}/api/evaluations/tester/${evaluationId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -81,5 +81,35 @@ const updateMyEvaluationTester = async (jwt: string, evaluationId: string, data:
   }
 }
 
-const evaluationsService = { createEvaluation, getMyEvaluationsTester, updateMyEvaluationTester }
+const deleteMyEvaluationTester = async (jwt: string, evaluationId: string): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/evaluations/tester/${evaluationId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      }
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la suppression de l\'évaluation',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+const evaluationsService = {
+  createEvaluation,
+  getMyEvaluationsTester,
+  updateMyEvaluationTester,
+  deleteMyEvaluationTester
+}
 export { evaluationsService }
