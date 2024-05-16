@@ -5,6 +5,7 @@ import formidable from 'formidable'
 import { dataLengthValidations } from '../validations'
 import { Op } from 'sequelize'
 import * as constants from 'node:constants'
+import { getCategoryAndAncestorCriterias } from './getCategoryAndAncestorCriterias'
 
 const formidableOpt: formidable.Options = {
   uploadDir: `${__dirname}/../public/uploads`,
@@ -461,20 +462,19 @@ const deleteProduct = async (req: express.Request, res: express.Response, next: 
   }
 }
 
-
-const getCategoryAndAncestorCriterias = async (category: Category) => {
-  let criterias: any[] = []
-  let currentCategory: Category | null = category
-
-  while (currentCategory) {
-    const categoryCriterias = await Criteria.findAll({
-      where: { categoryId: currentCategory.dataValues.id }
-    })
-    criterias = criterias.concat(categoryCriterias)
-    currentCategory = await Category.findByPk(currentCategory.dataValues.parentId)
-  }
-
-  return criterias
-}
+// const getCategoryAndAncestorCriterias = async (category: Category) => {
+//   let criterias: any[] = []
+//   let currentCategory: Category | null = category
+//
+//   while (currentCategory) {
+//     const categoryCriterias = await Criteria.findAll({
+//       where: { categoryId: currentCategory.dataValues.id }
+//     })
+//     criterias = criterias.concat(categoryCriterias)
+//     currentCategory = await Category.findByPk(currentCategory.dataValues.parentId)
+//   }
+//
+//   return criterias
+// }
 
 export { getProducts, getProduct, createProduct, updateProduct, deleteProduct }

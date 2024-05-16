@@ -10,8 +10,6 @@
     <p v-if="productLoading" class="text-info">Chargement...</p>
     <p v-if="productError" class="text-danger">{{ productError }}</p>
 
-    {{ evaluationPayload }}
-
     <!-- Formulaire de création d'évaluation -->
     <form v-if="product?.data?.product" novalidate>
       <!-- Liste des critères d'évaluation avec un champ pour donner une note -->
@@ -73,13 +71,17 @@ import { useRoute } from 'vue-router'
 import { dataLengthValidations } from '@/validations'
 import type { ApiResponseType, ValidationError } from '@/types'
 import { push } from 'notivue'
+import { evaluationsService } from '@/services/evaluationsService'
+import { useAuthStore } from '@/stores/authStore'
+
+const route = useRoute()
+const authStore = useAuthStore()
 
 const evaluationPayload = ref({
-  criteria: [] as { criteriaId: string, value: number }[],
+  criterias: [] as { criteriaId: string, value: number }[],
   comment: ''
 })
 
-const route = useRoute()
 const productId = ref<null | string>(null)
 const {
   data: product,
@@ -99,12 +101,12 @@ let commentInvalidFeedback: HTMLDivElement | null
 let fieldset: HTMLFieldSetElement | null
 
 const onCriteriaChange = (criteriaId: string, value: string) => {
-  const index = evaluationPayload.value.criteria.findIndex(c => c.criteriaId === criteriaId)
+  const index = evaluationPayload.value.criterias.findIndex(c => c.criteriaId === criteriaId)
   if (index === -1) {
     const criteria = { criteriaId, value: Number(value) }
-    evaluationPayload.value.criteria.push(criteria)
+    evaluationPayload.value.criterias.push(criteria)
   } else {
-    evaluationPayload.value.criteria[index].value = Number(value)
+    evaluationPayload.value.criterias[index].value = Number(value)
   }
 }
 
@@ -117,7 +119,32 @@ const createEvaluation = async () => {
   }
 
   try {
-    console.log(1)
+    const res = await evaluationsService.createEvaluation(
+      authStore.jwt,
+      productId.value as string,
+      evaluationPayload.value
+    )
+
+    if (res.errors && res.errors.length > 0) {
+      res.errors.forEach((err) => showErrors(err))
+      return
+    }
+
+    if (res.status === 201) {
+      return push.success({
+        title: 'Succès',
+        message: res.message,
+        duration: 3000
+      })
+    }
+
+
+    push.error({
+      title: 'Erreur',
+      message: res.message,
+      duration: 5000
+    })
+
   } catch (e) {
     const err = e as ApiResponseType
     push.error({
@@ -178,6 +205,12 @@ const showErrors = (error: ValidationError) => {
       commentTextArea?.classList.add('is-invalid')
       if (commentInvalidFeedback) commentInvalidFeedback.textContent = error.message
       break
+    default:
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 5000
+      })
   }
 }
 

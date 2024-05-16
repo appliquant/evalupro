@@ -223,6 +223,12 @@ Evaluation.init({
   comment: {
     type: DataTypes.TEXT,
     allowNull: true
+  },
+
+  // Moyenne pondérée des évaluations des critères
+  average: {
+    type: DataTypes.FLOAT,
+    allowNull: false
   }
 }, {
   sequelize,
@@ -291,8 +297,8 @@ Product.belongsTo(Category, { as: 'category', foreignKey: 'categoryId' })
 Category.hasMany(Product, { as: 'products', foreignKey: 'categoryId' })
 
 
-Criteria.belongsTo(Category, { as: 'category', foreignKey: 'categoryId' });
-Category.hasMany(Criteria, { as: 'criteria', foreignKey: 'categoryId' });
+Criteria.belongsTo(Category, { as: 'category', foreignKey: 'categoryId' })
+Category.hasMany(Criteria, { as: 'criteria', foreignKey: 'categoryId' })
 
 // Relation Evaluation -> Product
 Evaluation.belongsTo(Product, { as: 'product', foreignKey: 'productId' })
@@ -316,6 +322,7 @@ const initDb = async (): Promise<void> => {
     await sequelize.authenticate()
     await sequelize.sync({
       // force: true
+      // alter: true
     })
     console.log('✅ Db connectée et synchronisée.')
   } catch (error) {

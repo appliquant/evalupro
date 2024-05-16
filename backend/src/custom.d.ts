@@ -1,7 +1,8 @@
 declare namespace Express {
   export interface Request {
     jwtToken?: {
-      email: string
+      email: string,
+      userId: string
     }
   }
 }
