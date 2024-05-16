@@ -87,6 +87,16 @@ const router = createRouter({
     },
 
     {
+      path: '/manage-evaluations-admin',
+      name: 'manage-evaluations-admin',
+      component: () => import('../views/managing/ManageEvaluationsAdminView.vue'),
+      meta: {
+        requiresAuth: true,
+        requiresRole: UserRoles.ADMIN
+      }
+    },
+
+    {
       path: '/favorites',
       name: 'favorites',
       component: () => import('../views/managing/FavoritesView.vue'),

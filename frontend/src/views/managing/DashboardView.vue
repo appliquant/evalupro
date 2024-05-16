@@ -50,16 +50,27 @@
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.TESTER }}</span>
       </li>
 
-      <!-- Favoris -->
-      <li class="nav-item mt-2">
+      <!-- Gérer les évaluations (en tant qu'administrateur) -->
+      <li class="nav-item mt-2" v-show="data?.data.role === UserRoles.ADMIN">
         <RouterLink
-          to="/favorites"
+          to="/manage-evaluations-admin"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-        >Favoris
+        >Gérer les évaluations (administration)
         </RouterLink>
-        <span class="badge rounded-pill text-bg-primary">{{ UserRoles.USER }}</span>
+        <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
       </li>
+
+        <!-- Favoris -->
+        <li class="nav-item mt-2">
+          <RouterLink
+            to="/favorites"
+            style="margin-right: 0.5rem"
+            class="link-underline-opacity-0"
+          >Favoris
+          </RouterLink>
+          <span class="badge rounded-pill text-bg-primary">{{ UserRoles.USER }}</span>
+        </li>
     </ul>
   </div>
 </template>

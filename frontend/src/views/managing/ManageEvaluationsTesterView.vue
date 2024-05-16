@@ -1,11 +1,13 @@
 <template>
   <div class="container mt-3">
     <h1>Gérer mes évaluations de testeur</h1>
+    <p style="max-width: 60ch"><em>Pour ajouter des évaluations, naviguez vers les détails d'un produit puis cliquez sur
+      le bouton « Évaluez ce produit ».</em></p>
 
     <div class="row row-cols-1 row-cols-sm-2">
       <div class="col">
 
-        <h2>Liste des mes évaluations</h2>
+        <h2>Liste de mes évaluations</h2>
 
         <p v-if="items.length <= 0">Aucune évaluation</p>
 
