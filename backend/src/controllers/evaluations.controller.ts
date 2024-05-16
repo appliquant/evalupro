@@ -324,8 +324,7 @@ const updateEvaluations = async (req: express.Request, res: express.Response, ne
         const evaluationCriteria = evaluationCriterias.find(ec => ec.dataValues.criteriaId === criteriaId)
 
         if (evaluationCriteria) {
-          evaluationCriteria.dataValues.value = value
-          await evaluationCriteria.save()
+          await evaluationCriteria.update({ value })
         }
       }
     }
@@ -340,6 +339,7 @@ const updateEvaluations = async (req: express.Request, res: express.Response, ne
     next(err)
   }
 }
+
 const deleteEvaluations = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     const { evaluationId } = req.params
@@ -410,7 +410,6 @@ const validations = (criterias: {}[], comment: string | undefined): ApiResponseT
       })
     }
   }
-
 
   return errors
 }

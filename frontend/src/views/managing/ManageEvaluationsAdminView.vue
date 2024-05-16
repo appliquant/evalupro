@@ -45,7 +45,7 @@
                             if (criteriaEvaluation) {
                               criteriaEvaluation.value = Number(value)
                             }
-                            // removeErrors('fieldset')
+                            removeErrors('fieldset')
                           }
                         }">
                   <option value="1">Excellent</option>
@@ -66,7 +66,7 @@
                         v-on:input="e => {
                          if (selectedItem) {
                             selectedItem.evaluation.comment = (e.target as HTMLTextAreaElement).value
-                            // removeErrors('comment')
+                            removeErrors('comment')
                          }
                         }"
                         aria-describedby="commentInvalidFeedback commentHelpBlock"></textarea>
@@ -80,7 +80,7 @@
             </div>
 
             <div class="d-flex gap-2">
-              <button class="btn btn-primary">Enregistrer</button>
+              <button class="btn btn-primary" @click.prevent="updateEvaluation">Enregistrer</button>
               <button class="btn btn-outline-danger">Supprimer</button>
             </div>
           </fieldset>
@@ -92,11 +92,19 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/authStore'
-import type { ApiResponseType, Category, Criteria, CriteriasEvaluation, Evaluation, Product } from '@/types'
+import type {
+  ApiResponseType,
+  Category,
+  Criteria,
+  CriteriasEvaluation,
+  Evaluation,
+  Product,
+  ValidationError
+} from '@/types'
 import { onMounted, ref, toRaw } from 'vue'
 import { push } from 'notivue'
 import { evaluationsService } from '@/services/evaluationsService'
-import { dataLengthValidations } from '../../validations'
+import { dataLengthValidations } from '@/validations'
 
 const authStore = useAuthStore()
 
@@ -110,6 +118,10 @@ type Data = {
 
 const items = ref<Data[]>([])
 const selectedItem = ref<Data | null>(null)
+
+let commentTextArea: HTMLTextAreaElement | null
+let commentInvalidFeedback: HTMLDivElement | null
+let fieldset: HTMLFieldSetElement | null
 
 onMounted(() => {
   getEvaluations()
@@ -141,6 +153,87 @@ const getEvaluations = async () => {
   }
 }
 
+const updateEvaluation = async () => {
+  const errors = validations()
+  if (errors.length > 0) {
+    errors.forEach((error) => showErrors(error))
+    return
+  }
+
+  if (!selectedItem.value) return
+
+  try {
+    const payload = {
+      comment: selectedItem.value.evaluation.comment,
+      criterias: selectedItem.value.criteriasEvaluation.map(c => ({
+        criteriaId: c.criteriaId,
+        value: c.value
+      }))
+    }
+
+    const res = await evaluationsService.updateEvaluation(
+      authStore.jwt,
+      selectedItem.value.evaluation.id,
+      payload
+    )
+
+    if (res.status !== 200) {
+      return push.error({
+        title: 'Erreur',
+        message: res.message,
+        duration: 5000
+      })
+    }
+
+    push.success({
+      title: 'Succès',
+      message: 'L\'évaluation a été mise à jour avec succès',
+      duration: 5000
+    })
+
+    return getEvaluations()
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
+const validations = (): ValidationError[] => {
+  const errors: ValidationError[] = []
+
+  let selectsInsideFieldset = document.querySelectorAll('fieldset select')
+  let criteriasNotSelected = false
+  selectsInsideFieldset.forEach((select) => {
+    const selectElement = select as HTMLSelectElement
+    if (selectElement.value === '' && !criteriasNotSelected) {
+      errors.push({
+        field: 'criteria',
+        message: 'Veuillez sélectionner une note pour chaque critère'
+      })
+
+      // Pour afficher l'erreur une seule fois
+      criteriasNotSelected = true
+    }
+  })
+
+  const comment = selectedItem.value?.evaluation.comment.trim()
+  if (comment && comment.length > 0) {
+    if (comment.length < dataLengthValidations.optional_evaluationComment.minlength ||
+      comment.length > dataLengthValidations.optional_evaluationComment.maxlength) {
+      errors.push({
+        field: 'comment',
+        message: `Le commentaire doit comprendre entre ${dataLengthValidations.optional_evaluationComment.minlength} et ${dataLengthValidations.optional_evaluationComment.maxlength} caractères.`
+      })
+    }
+  }
+
+  return errors
+}
+
 const selectItem = (index: number) => {
   const item = items.value[index]
 
@@ -153,6 +246,46 @@ const selectItem = (index: number) => {
 
 const unSelectItem = () => {
   selectedItem.value = null
+}
+
+
+const showErrors = (error: ValidationError) => {
+  switch (error.field) {
+    case 'criteria':
+      fieldset = document.querySelector('fieldset')
+      fieldset?.classList.add('border-danger')
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 5000
+      })
+      break
+
+    case 'comment':
+      commentTextArea = document.querySelector('#commentTextArea')
+      commentInvalidFeedback = document.querySelector('#commentInvalidFeedback')
+      commentTextArea?.classList.add('is-invalid')
+      if (commentInvalidFeedback) commentInvalidFeedback.textContent = error.message
+      break
+    default:
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 5000
+      })
+  }
+}
+
+const removeErrors = (input: 'comment' | 'fieldset') => {
+  switch (input) {
+    case 'comment':
+      commentTextArea?.classList.remove('is-invalid')
+      if (commentInvalidFeedback) commentInvalidFeedback.textContent = ''
+      break
+    case 'fieldset':
+      fieldset?.classList.remove('border-danger')
+      break
+  }
 }
 </script>
 

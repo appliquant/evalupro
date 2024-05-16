@@ -205,6 +205,7 @@ const updateMyEvaluationsTester = async () => {
     }
 
     if (res.status === 200) {
+      getMyEvaluationsTester()
       return push.success({
         title: 'Succès',
         message: res.message,
