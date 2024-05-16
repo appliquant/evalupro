@@ -116,7 +116,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { dataLengthValidations } from '@/validations.js'
+import { dataLengthValidations } from '@/validations'
 import { authService } from '@/services/authService'
 import type { ApiResponseType, ValidationError } from '@/types'
 import { onMounted, ref } from 'vue'

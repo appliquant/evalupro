@@ -7,30 +7,30 @@ const router = createRouter({
     {
       path: '/signup',
       name: 'signup',
-      component: () => import('../views/SignupView.vue')
+      component: () => import('../views/auth/SignupView.vue')
     },
     {
       path: '/signin',
       name: 'signin',
-      component: () => import('../views/SigninView.vue')
+      component: () => import('../views/auth/SigninView.vue')
     },
 
     {
       path: '/',
       name: 'search',
-      component: () => import('../views/SearchPageView.vue')
+      component: () => import('../views/products/SearchPageView.vue')
     },
 
     {
       path: '/product/:id',
       name: 'product-details',
-      component: () => import('../views/ProductDetailsView.vue')
+      component: () => import('../views/products/ProductDetailsView.vue')
     },
 
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import('../views/DashboardView.vue'),
+      component: () => import('../views/managing/DashboardView.vue'),
       meta: {
         requiresAuth: true
       }
@@ -39,7 +39,7 @@ const router = createRouter({
     {
       path: '/manage-categories',
       name: 'manage-categories',
-      component: () => import('../views/ManageCategoriesView.vue'),
+      component: () => import('../views/managing/ManageCategoriesView.vue'),
       meta: {
         requiresAuth: true,
         requiresRole: UserRoles.ADMIN
@@ -49,7 +49,7 @@ const router = createRouter({
     {
       path: '/manage-products',
       name: 'manage-products',
-      component: () => import('../views/ManageProductsView.vue'),
+      component: () => import('../views/managing/ManageProductsView.vue'),
       meta: {
         requiresAuth: true,
         requiresRole: UserRoles.ADMIN
@@ -59,7 +59,7 @@ const router = createRouter({
     {
       path: '/manage-criterias',
       name: 'manage-criterias',
-      component: () => import('../views/ManageCriteriasView.vue'),
+      component: () => import('../views/managing/ManageCriteriasView.vue'),
       meta: {
         requiresAuth: true,
         requiresRole: UserRoles.ADMIN
@@ -69,7 +69,7 @@ const router = createRouter({
     {
       path: '/create-evaluation-tester/:id',
       name: 'create-evaluation-tester',
-      component: () => import('../views/CreateEvaluationTesterView.vue'),
+      component: () => import('../views/products/CreateEvaluationTesterView.vue'),
       meta: {
         requiresAuth: true,
         requiresRole: UserRoles.TESTER
@@ -79,7 +79,7 @@ const router = createRouter({
     {
       path: '/manage-evaluations-tester',
       name: 'manage-evaluations-tester',
-      component: () => import('../views/ManageEvaluationsTesterView.vue'),
+      component: () => import('../views/managing/ManageEvaluationsTesterView.vue'),
       meta: {
         requiresAuth: true,
         requiresRole: UserRoles.TESTER
@@ -89,7 +89,7 @@ const router = createRouter({
     {
       path: '/favorites',
       name: 'favorites',
-      component: () => import('../views/FavoritesView.vue'),
+      component: () => import('../views/managing/FavoritesView.vue'),
       meta: {
         requiresAuth: true
       }

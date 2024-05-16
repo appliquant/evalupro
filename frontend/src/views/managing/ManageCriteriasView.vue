@@ -251,7 +251,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { dataLengthValidations } from '@/validations.js'
+import { dataLengthValidations } from '@/validations'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { useCriterias } from '@/composables/useCriterias'
