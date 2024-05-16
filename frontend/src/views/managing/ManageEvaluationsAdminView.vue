@@ -142,7 +142,6 @@ const getEvaluations = async () => {
     }
 
     items.value = res.data
-    console.log(items.value)
   } catch (e) {
     const err = e as ApiResponseType
     push.error({
