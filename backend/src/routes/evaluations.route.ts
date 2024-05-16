@@ -2,7 +2,11 @@ import express from 'express'
 import { requireIsSignedin } from '../middlewares/requireIsSignedin'
 import { requireRole } from '../middlewares/requireRole'
 import { UserRoles } from '../types'
-import { createEvaluation, getMyEvaluationsTester } from '../controllers/evaluations.controller'
+import {
+  createEvaluation,
+  getMyEvaluationsTester,
+  updateMyEvaluationsTester
+} from '../controllers/evaluations.controller'
 
 const evaluationsRoute = express.Router()
 
@@ -14,5 +18,6 @@ const evaluationsRoute = express.Router()
 
 evaluationsRoute.get('/me', requireIsSignedin, requireRole(UserRoles.TESTER), getMyEvaluationsTester)
 evaluationsRoute.post('/:productId', requireIsSignedin, requireRole(UserRoles.TESTER), createEvaluation)
+evaluationsRoute.put('/me/:evaluationId', requireIsSignedin, requireRole(UserRoles.TESTER), updateMyEvaluationsTester)
 
 export { evaluationsRoute }

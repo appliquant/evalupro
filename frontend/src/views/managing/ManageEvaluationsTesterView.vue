@@ -41,8 +41,12 @@
                         :value="selectedItem?.criteriasEvaluation.find(c => c.criteriaId === criteria.id)?.value"
                         v-on:input="e => {
                           if (selectedItem) {
-                            // selectedItem.criterias.find(c => c.id === criteria.id)!.value = (e.target as HTMLSelectElement).value
-                            // removeErrors('fieldset')
+                            const value = (e.target as HTMLSelectElement).value
+                            const criteriaEvaluation = selectedItem.criteriasEvaluation.find(c => c.criteriaId === criteria.id)
+                            if (criteriaEvaluation) {
+                              criteriaEvaluation.value = Number(value)
+                            }
+                            removeErrors('fieldset')
                           }
                         }">
                   <option value="1">Excellent</option>
@@ -63,7 +67,7 @@
                         v-on:input="e => {
                          if (selectedItem) {
                             selectedItem.evaluation.comment = (e.target as HTMLTextAreaElement).value
-                            // removeErrors('comment')
+                            removeErrors('comment')
                          }
                         }"
                         aria-describedby="commentInvalidFeedback commentHelpBlock"></textarea>
@@ -77,7 +81,8 @@
             </div>
 
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary">Enregistrer</button>
+              <button type="submit" class="btn btn-primary" @click.prevent="updateMyEvaluationsTester">Enregistrer
+              </button>
               <button type="submit" class="btn btn-outline-danger">Supprimer</button>
             </div>
           </fieldset>
@@ -90,7 +95,15 @@
 
 <script setup lang="ts">
 import { onMounted, ref, toRaw } from 'vue'
-import type { ApiResponseType, Category, Criteria, CriteriasEvaluation, Evaluation, Product } from '@/types'
+import type {
+  ApiResponseType,
+  Category,
+  Criteria,
+  CriteriasEvaluation,
+  Evaluation,
+  Product,
+  ValidationError
+} from '@/types'
 import { push } from 'notivue'
 import { evaluationsService } from '@/services/evaluationsService'
 import { useAuthStore } from '@/stores/authStore'
@@ -109,6 +122,9 @@ type Data = {
 const items = ref<Data[]>([])
 const selectedItem = ref<Data | null>(null)
 
+let commentTextArea: HTMLTextAreaElement | null
+let commentInvalidFeedback: HTMLDivElement | null
+let fieldset: HTMLFieldSetElement | null
 
 onMounted(() => {
   const getMyEvaluationsTester = async () => {
@@ -126,7 +142,6 @@ onMounted(() => {
       }
 
       items.value = res.data
-      console.log(res.data)
     } catch (e) {
       const err = e as ApiResponseType
       push.error({
@@ -154,6 +169,130 @@ const unSelectItem = () => {
   selectedItem.value = null
 }
 
+const updateMyEvaluationsTester = async () => {
+  if (!selectedItem.value) return
+
+  const validationErrors = validations()
+  if (validationErrors.length > 0) {
+    validationErrors.forEach((err) => showErrors(err))
+    return
+  }
+
+  try {
+    const payload = {
+      comment: selectedItem.value.evaluation.comment,
+      criterias: selectedItem.value.criteriasEvaluation.map((c) => {
+        return {
+          criteriaId: c.criteriaId,
+          value: c.value
+        }
+      })
+    }
+
+    const res = await evaluationsService.updateMyEvaluationTester(
+      authStore.jwt,
+      selectedItem.value.evaluation.id,
+      payload
+    )
+
+    if (res.errors && res.errors.length > 0) {
+      res.errors.forEach((err) => showErrors(err))
+      return
+    }
+
+    if (res.status === 200) {
+      return push.success({
+        title: 'Succès',
+        message: res.message,
+        duration: 3000
+      })
+    }
+
+    push.error({
+      title: 'Erreur',
+      message: res.message,
+      duration: 5000
+    })
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
+const validations = (): ValidationError[] => {
+  const errors: ValidationError[] = []
+
+  let selectsInsideFieldset = document.querySelectorAll('fieldset select')
+  let criteriasNotSelected = false
+  selectsInsideFieldset.forEach((select) => {
+    const selectElement = select as HTMLSelectElement
+    if (selectElement.value === '' && !criteriasNotSelected) {
+      errors.push({
+        field: 'criteria',
+        message: 'Veuillez sélectionner une note pour chaque critère'
+      })
+
+      // Pour afficher l'erreur une seule fois
+      criteriasNotSelected = true
+    }
+  })
+
+  const comment = selectedItem.value?.evaluation.comment.trim()
+  if (comment && comment.length > 0) {
+    if (comment.length < dataLengthValidations.optional_evaluationComment.minlength ||
+      comment.length > dataLengthValidations.optional_evaluationComment.maxlength) {
+      errors.push({
+        field: 'comment',
+        message: `Le commentaire doit comprendre entre ${dataLengthValidations.optional_evaluationComment.minlength} et ${dataLengthValidations.optional_evaluationComment.maxlength} caractères.`
+      })
+    }
+  }
+
+  return errors
+}
+
+const showErrors = (error: ValidationError) => {
+  switch (error.field) {
+    case 'criteria':
+      fieldset = document.querySelector('fieldset')
+      fieldset?.classList.add('border-danger')
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 5000
+      })
+      break
+
+    case 'comment':
+      commentTextArea = document.querySelector('#commentTextArea')
+      commentInvalidFeedback = document.querySelector('#commentInvalidFeedback')
+      commentTextArea?.classList.add('is-invalid')
+      if (commentInvalidFeedback) commentInvalidFeedback.textContent = error.message
+      break
+    default:
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 5000
+      })
+  }
+}
+
+const removeErrors = (input: 'comment' | 'fieldset') => {
+  switch (input) {
+    case 'comment':
+      commentTextArea?.classList.remove('is-invalid')
+      if (commentInvalidFeedback) commentInvalidFeedback.textContent = ''
+      break
+    case 'fieldset':
+      fieldset?.classList.remove('border-danger')
+      break
+  }
+}
 
 </script>
 

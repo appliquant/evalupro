@@ -54,5 +54,32 @@ const getMyEvaluationsTester = async (jwt: string): Promise<ApiResponseType> => 
   }
 }
 
-const evaluationsService = { createEvaluation, getMyEvaluationsTester }
+const updateMyEvaluationTester = async (jwt: string, evaluationId: string, data: object): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/evaluations/me/${evaluationId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`
+      },
+      body: JSON.stringify(data)
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la mise à jour de l\'évaluation',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+const evaluationsService = { createEvaluation, getMyEvaluationsTester, updateMyEvaluationTester }
 export { evaluationsService }
