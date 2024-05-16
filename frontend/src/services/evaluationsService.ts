@@ -30,5 +30,29 @@ const createEvaluation = async (jwt: string, productId: string, data: object): P
   }
 }
 
-const evaluationsService = { createEvaluation }
+const getMyEvaluationsTester = async (jwt: string): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/evaluations/me`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      }
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la récupération des évaluations',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
+const evaluationsService = { createEvaluation, getMyEvaluationsTester }
 export { evaluationsService }

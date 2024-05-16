@@ -4,6 +4,67 @@ import { dataLengthValidations } from '../validations'
 import { Category, CriteriaEvaluation, Evaluation, Product } from '../db'
 import { getCategoryAndAncestorCriterias } from './getCategoryAndAncestorCriterias'
 
+const getMyEvaluationsTester = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // 1. Récupérer les évaluations, le produit, la catégorie et les critères
+    const evaluations = await Evaluation.findAll({
+      where: {
+        userId: req.jwtToken?.userId
+      }
+    })
+
+    const evaluationsWithProductAndCategory =
+      await Promise.all(evaluations.map(async evaluation => {
+        const product = await Product.findByPk(evaluation.dataValues.productId)
+
+        if (!product) {
+          const notFoundResponse: ApiResponseType = {
+            status: 404,
+            message: 'Produit non trouvé'
+          }
+          return res.status(notFoundResponse.status).json(notFoundResponse)
+        }
+
+        const category = await Category.findByPk(product?.dataValues.categoryId)
+
+        if (!category) {
+          const notFoundResponse: ApiResponseType = {
+            status: 404,
+            message: 'Catégorie du produit non trouvée'
+          }
+          return res.status(notFoundResponse.status).json(notFoundResponse)
+        }
+
+        const criterias = await getCategoryAndAncestorCriterias(category)
+
+        const criteriasEvaluation = await CriteriaEvaluation.findAll({
+          where: {
+            evaluationId: evaluation.dataValues.id
+          }
+        })
+
+        return {
+          evaluation,
+          product,
+          category,
+          criterias,
+          criteriasEvaluation
+        }
+      }))
+
+    // 2. Répondre
+    const response: ApiResponseType = {
+      status: 200,
+      message: 'Evaluations récupérées',
+      data: evaluationsWithProductAndCategory
+    }
+
+    return res.status(response.status).json(response)
+  } catch (err) {
+    next(err)
+  }
+}
+
 const createEvaluation = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
     // 1. Récupérer les données
@@ -188,4 +249,4 @@ const validations = (criterias: {}[], comment: string | undefined): ApiResponseT
   return errors
 }
 
-export { createEvaluation }
+export { createEvaluation, getMyEvaluationsTester }
