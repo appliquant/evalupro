@@ -61,16 +61,27 @@
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
       </li>
 
-        <!-- Favoris -->
-        <li class="nav-item mt-2">
-          <RouterLink
-            to="/favorites"
-            style="margin-right: 0.5rem"
-            class="link-underline-opacity-0"
-          >Favoris
-          </RouterLink>
-          <span class="badge rounded-pill text-bg-primary">{{ UserRoles.USER }}</span>
-        </li>
+      <!-- Comparer deux produits -->
+      <li class="nav-item mt-2">
+        <RouterLink
+          to="/compare-products"
+          style="margin-right: 0.5rem"
+          class="link-underline-opacity-0"
+        >Comparer deux produits
+        </RouterLink>
+        <span class="badge rounded-pill text-bg-primary">{{ UserRoles.USER }}</span>
+      </li>
+
+      <!-- Favoris -->
+      <li class="nav-item mt-2">
+        <RouterLink
+          to="/favorites"
+          style="margin-right: 0.5rem"
+          class="link-underline-opacity-0"
+        >Favoris
+        </RouterLink>
+        <span class="badge rounded-pill text-bg-primary">{{ UserRoles.USER }}</span>
+      </li>
     </ul>
   </div>
 </template>

@@ -28,6 +28,15 @@ const router = createRouter({
     },
 
     {
+      path: '/compare-products',
+      name: 'compare-products',
+      component: () => import('@/views/products/CompareProductsView.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+
+    {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/managing/DashboardView.vue'),
