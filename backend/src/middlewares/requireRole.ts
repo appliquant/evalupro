@@ -3,7 +3,7 @@ import express from 'express'
 import { User } from '../db'
 
 // Vérifier à chaque requête si l'utilisateur a le rôle nécessaire
-export function requireRole(requiredRole: UserRoles) {
+export function requireRole(...requiredRole: UserRoles[]) {
   return async function(req: express.Request, res: express.Response, next: express.NextFunction) {
     {
       try {
@@ -33,7 +33,7 @@ export function requireRole(requiredRole: UserRoles) {
           return res.status(userNotFoundError.status).json(userNotFoundError)
         }
 
-        if (user.dataValues.role !== requiredRole) {
+        if (!requiredRole.includes(user.dataValues.role)) {
           const unauthorizedError: ApiResponseType = {
             status: 403,
             message: 'Non autorisé'

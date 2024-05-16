@@ -119,7 +119,7 @@ const createEvaluation = async () => {
   }
 
   try {
-    const res = await evaluationsService.createEvaluation(
+    const res = await evaluationsService.createMyEvaluationsTester(
       authStore.jwt,
       productId.value as string,
       evaluationPayload.value

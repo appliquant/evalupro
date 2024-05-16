@@ -3,7 +3,7 @@ import { handleApiResponse } from '@/services/handleApiResponse'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-const createEvaluation = async (jwt: string, productId: string, data: object): Promise<ApiResponseType> => {
+const createMyEvaluationsTester = async (jwt: string, productId: string, data: object): Promise<ApiResponseType> => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/evaluations/tester/${productId}`, {
       method: 'POST',
@@ -106,8 +106,32 @@ const deleteMyEvaluationTester = async (jwt: string, evaluationId: string): Prom
   }
 }
 
+const getEvaluations = async (jwt: string): Promise<ApiResponseType> => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/evaluations`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      }
+    })
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: 'Impossible d\'attendre le serveur lors de la récupération des évaluations',
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
 const evaluationsService = {
-  createEvaluation,
+  createMyEvaluationsTester,
   getMyEvaluationsTester,
   updateMyEvaluationTester,
   deleteMyEvaluationTester
