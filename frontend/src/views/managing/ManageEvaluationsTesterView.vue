@@ -128,33 +128,34 @@ let commentInvalidFeedback: HTMLDivElement | null
 let fieldset: HTMLFieldSetElement | null
 
 onMounted(() => {
-  const getMyEvaluationsTester = async () => {
-    try {
-      const res = await evaluationsService.getMyEvaluationsTester(
-        authStore.jwt
-      )
+  getMyEvaluationsTester()
+})
 
-      if (res.status !== 200) {
-        return push.error({
-          title: 'Erreur',
-          message: 'Une erreur est survenue',
-          duration: 5000
-        })
-      }
+const getMyEvaluationsTester = async () => {
+  try {
+    const res = await evaluationsService.getMyEvaluationsTester(
+      authStore.jwt
+    )
 
-      items.value = res.data
-    } catch (e) {
-      const err = e as ApiResponseType
-      push.error({
+    if (res.status !== 200) {
+      return push.error({
         title: 'Erreur',
-        message: err.message,
+        message: 'Une erreur est survenue',
         duration: 5000
       })
     }
-  }
 
-  getMyEvaluationsTester()
-})
+    items.value = res.data
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
 
 const selectItem = (index: number) => {
   const item = items.value[index]
@@ -244,6 +245,7 @@ const deleteMyEvaluationTester = async () => {
       })
 
       unSelectItem()
+      getMyEvaluationsTester()
       return
     }
 
