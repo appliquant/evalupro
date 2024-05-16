@@ -38,3 +38,18 @@ export type Criteria = {
   coefficient: number,
   categoryId: string
 }
+
+export type Evaluation = {
+  id: string
+  comment: string
+  productId: string
+  userId: string
+  average: number
+}
+
+export type CriteriasEvaluation = {
+  id: string
+  evaluationId: string
+  criteriaId: string
+  value: number
+}
