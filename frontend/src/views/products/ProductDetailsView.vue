@@ -3,6 +3,7 @@
     <p v-if="productLoading" class="text-info">Chargement...</p>
     <p v-if="productError" class="text-danger">{{ productError }}</p>
 
+    <!-- Informations du produit -->
     <div v-if="product?.data?.product" class="row row-cols-1 row-cols-sm-2">
       <div class="col">
         <img
@@ -50,7 +51,7 @@
           <RouterLink
             :to="`/create-evaluation-tester/${product.data.product.id}`"
             class="btn btn-outline-dark btn-sm"
-            >★ Évaluer ce produit
+          >★ Évaluer ce produit
           </RouterLink>
         </div>
 
@@ -65,10 +66,23 @@
 
         <p>{{ product.data.product.description }}</p>
 
-        <p>todo: commentaires des testeurs</p>
         <p>todo: pointages des criteres</p>
       </div>
     </div>
+
+
+    <!-- Commentaires des testeurs -->
+    <!-- Seuelement Afficher une liste avec la date et le commentaire -->
+    <div v-if="testersComments.length > 0" class="mb-3">
+      <h2>Commentaires des testeurs</h2>
+      <ul class="list-group">
+        <li class="list-group-item" v-for="comment in testersComments" :key="comment.id">
+          {{ comment?.comment }}
+        </li>
+      </ul>
+    </div>
+
+    <p v-else class="mt-3">Aucun commentaire de testeurs.</p>
   </div>
 </template>
 
@@ -80,12 +94,15 @@ import { favoritesService } from '@/services/favoritesService'
 import { type ApiResponseType, UserRoles } from '@/types'
 import { push } from 'notivue'
 import { useAuthStore } from '@/stores/authStore'
+import { productsService } from '@/services/productsService'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 const route = useRoute()
 const authStore = useAuthStore()
 
+const productId = ref<null | string>(null)
+const testersComments = ref<{ id: string; comment: string }[]>([])
 const isFavorite = ref(false)
 const isUserLoggedIn = computed(() => {
   return authStore.jwt !== ''
@@ -95,13 +112,17 @@ const canCreateEvaluation = computed(() => {
   return isUserLoggedIn.value && authStore.role === UserRoles.TESTER && product.value?.data?.product
 })
 
-const productId = ref<null | string>(null)
-const { data: product, loading: productLoading, error: productError } = useProduct(productId)
+const {
+  data: product,
+  loading: productLoading,
+  error: productError
+} = useProduct(productId)
 
 watchEffect(() => {
   const id = route.params.id
   if (id) {
     productId.value = id instanceof Array ? id[0] : id
+    getTestersComments()
   }
 
   if (isUserLoggedIn.value && productId.value) {
@@ -181,6 +202,34 @@ const removeFavorite = async () => {
     })
 
     checkIfProductIsFavorite()
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
+}
+
+async function getTestersComments() {
+  try {
+    if (!productId.value) return
+
+    const res = await productsService.getTestersComments(
+      authStore.jwt,
+      productId.value
+    )
+
+    if (res.status !== 200) {
+      return push.error({
+        title: 'Erreur',
+        message: res.message,
+        duration: 5000
+      })
+    }
+
+    testersComments.value = res.data.comments
   } catch (e) {
     const err = e as ApiResponseType
     push.error({

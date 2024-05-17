@@ -508,4 +508,43 @@ const deleteProduct = async (req: express.Request, res: express.Response, next: 
   }
 }
 
-export { getProducts, getProduct, createProduct, updateProduct, deleteProduct }
+const getTestersComments = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  // 1. Extraire les données de la requête
+  const { productId } = req.params
+
+  if (!productId) {
+    const missingIdError: ApiResponseType = {
+      status: 400,
+      message: 'ID manquant',
+      errors: [
+        {
+          field: 'id',
+          message: 'Id manquant'
+        }
+      ]
+    }
+
+    return res.status(missingIdError.status).json(missingIdError)
+  }
+
+  // 2. Trouver les commentaires des testeurs
+  const comments = await Evaluation.findAll({
+    where: {
+      productId: productId
+    },
+    attributes: ['id', 'comment']
+  })
+
+  // 3. Répondre
+  const successResponse: ApiResponseType = {
+    status: 200,
+    message: 'Commentaires trouvés',
+    data: {
+      comments
+    }
+  }
+
+  return res.status(successResponse.status).json(successResponse)
+}
+
+export { getProducts, getProduct, getTestersComments, createProduct, updateProduct, deleteProduct }
