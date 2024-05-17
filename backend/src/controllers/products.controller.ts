@@ -1,10 +1,9 @@
 import express from 'express'
 import { ApiResponseType } from '../types'
-import { Category, Criteria, CriteriaEvaluation, Evaluation, Favorite, Product, User } from '../db'
+import { Category, CriteriaEvaluation, Evaluation, Product } from '../db'
 import formidable from 'formidable'
 import { dataLengthValidations } from '../validations'
 import { Op } from 'sequelize'
-import * as constants from 'node:constants'
 import { getCategoryAndAncestorCriterias } from './getCategoryAndAncestorCriterias'
 
 const formidableOpt: formidable.Options = {
@@ -111,7 +110,10 @@ const getProduct = async (req: express.Request, res: express.Response, next: exp
       }
     }
 
-    // 6. Retourner le produit
+    // 6. Calculer la moyenne du score accordé par les testeurs à ce produit
+    const averageScore = productEvaluations.reduce((acc, evaluation) => acc + evaluation.dataValues.average, 0) / productEvaluations.length
+
+    // 7. Retourner le produit
     const successResponse: ApiResponseType = {
       status: 200,
       message: 'Produit trouvé',
@@ -119,7 +121,8 @@ const getProduct = async (req: express.Request, res: express.Response, next: exp
         product,
         category,
         criterias,
-        criteriasScores
+        criteriasScores,
+        averageScore
       }
     }
 
