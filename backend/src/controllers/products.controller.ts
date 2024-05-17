@@ -217,11 +217,12 @@ const createProduct = async (req: express.Request, res: express.Response, next: 
     }
 
     // 2. Vérifier les données
-    const validationErrors = createProductValidations(
+    const validationErrors = validations(
       name.toString(),
       brand.toString(),
       description.toString(),
-      price.toString()
+      price.toString(),
+      'createProduct'
     )
     if (validationErrors.errors !== undefined && validationErrors.errors.length > 0) {
       return res.status(validationErrors.status).json(validationErrors)
@@ -294,18 +295,20 @@ const createProduct = async (req: express.Request, res: express.Response, next: 
   }
 }
 
-const createProductValidations = (name: string, brand: string, description: string, price: string): ApiResponseType => {
+const validations = (name: string, brand: string, description: string, price: string, partToValidate: 'createProduct' | 'updateProduct'): ApiResponseType => {
   const errors: ApiResponseType = {
     status: 400,
     message: 'Erreurs de validation',
     errors: []
   }
 
+  const prefix = partToValidate === 'createProduct' ? 'new' : 'selected'
+
   // name
   if (name.trim().length < dataLengthValidations?.productName?.minlength ||
     name.trim().length > dataLengthValidations?.productName?.maxlength) {
     errors.errors?.push({
-      field: 'newProductNameInput',
+      field: `${prefix}ProductNameInput`,
       message: `Le nom du produit doit contenir entre ${dataLengthValidations?.productName?.minlength}
     et ${dataLengthValidations?.productName?.maxlength} caractères.`
     })
@@ -315,7 +318,7 @@ const createProductValidations = (name: string, brand: string, description: stri
   if (brand.trim().length < dataLengthValidations?.productBrand?.minlength ||
     brand.trim().length > dataLengthValidations?.productBrand?.maxlength) {
     errors.errors?.push({
-      field: 'newProductBrandInput',
+      field: `${prefix}ProductBrandInput`,
       message: `La marque du produit doit contenir entre ${dataLengthValidations?.productBrand?.minlength}
     et ${dataLengthValidations?.productBrand?.maxlength} caractères.`
     })
@@ -325,7 +328,7 @@ const createProductValidations = (name: string, brand: string, description: stri
   if (description.trim().length < dataLengthValidations?.productDescription?.minlength ||
     description.trim().length > dataLengthValidations?.productDescription?.maxlength) {
     errors.errors?.push({
-      field: 'newProductDescriptionTextarea',
+      field: `${prefix}ProductDescriptionInput`,
       message: `La description du produit doit contenir entre ${dataLengthValidations?.productDescription?.minlength}
     et ${dataLengthValidations?.productDescription?.maxlength} caractères.`
     })
@@ -336,14 +339,14 @@ const createProductValidations = (name: string, brand: string, description: stri
 
   if (isNaN(parsedPrice)) {
     errors.errors?.push({
-      field: 'newProductPriceInput',
+      field: `${prefix}ProductPriceInput`,
       message: 'Le prix doit être un nombre'
     })
   }
 
   if (!isNaN(parsedPrice) && (parsedPrice < dataLengthValidations.productPrice.minlength || parsedPrice > dataLengthValidations.productPrice.maxlength)) {
     errors.errors?.push({
-      field: 'newProductPriceInput',
+      field: `${prefix}ProductPriceInput`,
       message: `Le prix doit être compris entre ${dataLengthValidations.productPrice.minlength} et ${dataLengthValidations.productPrice.maxlength}`
     })
   }
@@ -380,7 +383,17 @@ const updateProduct = async (req: express.Request, res: express.Response, next: 
       return res.status(missingFieldsResponse.status).json(missingFieldsResponse)
     }
 
-    // todo: validation des données
+    const validationErrors = validations(
+      name.toString(),
+      brand.toString(),
+      description.toString(),
+      price.toString(),
+      'updateProduct'
+    )
+
+    if (validationErrors.errors !== undefined && validationErrors.errors.length > 0) {
+      return res.status(validationErrors.status).json(validationErrors)
+    }
 
     // 3. Vérifier si le produit existe
     const product = await Product.findByPk(id.toString())

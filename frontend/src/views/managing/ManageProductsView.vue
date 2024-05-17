@@ -99,7 +99,7 @@
                 <!-- Description -->
                 <div>
                   <label for="selectedProductDescriptionTextarea" class="form-label"
-                    >Description</label
+                  >Description</label
                   >
                   <textarea
                     class="form-control"
@@ -314,7 +314,7 @@
                   v-if="categories?.data?.categories?.length <= 0"
                 >
                   <RouterLink to="/manage-categories" target="_blank"
-                    >Ajouter une catégorie
+                  >Ajouter une catégorie
                   </RouterLink>
                   <button class="btn btn-link p-0" @click.prevent="categoriesReload">
                     Recharger catégories
@@ -897,6 +897,13 @@ const showErrors = (error: ValidationError) => {
       selectedProductImageInputInvalidFeedback!.textContent = error.message
       break
     case 'deleteProduct':
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 5000
+      })
+      break
+    default:
       push.error({
         title: 'Erreur',
         message: error.message,
