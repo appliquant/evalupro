@@ -1,6 +1,7 @@
 import express from 'express'
 import { Category, Criteria, Product } from '../db'
 import { ApiResponseType } from '../types'
+import { dataLengthValidations } from '../validations'
 
 const createCategory = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
@@ -23,7 +24,10 @@ const createCategory = async (req: express.Request, res: express.Response, next:
     }
 
 
-    // todo: validation des données (longueur, caractères spéciaux, etc.)
+    const validationErrors = validations('createCategory', newCategoryTitle)
+    if (validationErrors.errors && validationErrors.errors.length > 0) {
+      return res.status(validationErrors.status).json(validationErrors)
+    }
 
     // 2. Vérifier si la catégorie existe
     const categoryExists = await Category.findOne({
@@ -135,6 +139,11 @@ const updateCategory = async (req: express.Request, res: express.Response, next:
       }
 
       return res.status(missingFieldsErrors.status).json(missingFieldsErrors)
+    }
+
+    const validationErrors = validations('updateCategory', title)
+    if (validationErrors.errors && validationErrors.errors.length > 0) {
+      return res.status(validationErrors.status).json(validationErrors)
     }
 
     // 2. Vérifier si la catégorie existe
@@ -338,5 +347,32 @@ const deleteCategory = async (req: express.Request, res: express.Response, next:
   }
 }
 
+const validations = (partToValidate: 'createCategory' | 'updateCategory', title: string): ApiResponseType => {
+  const errors: ApiResponseType = {
+    status: 400,
+    message: 'Champs manquant(s)',
+    errors: []
+  }
+
+  if (partToValidate === 'createCategory') {
+    if (title.trim().length < dataLengthValidations.categoryTitle.minlength ||
+      title.trim().length > dataLengthValidations.categoryTitle.maxlength) {
+      errors.errors?.push({
+        field: 'newCategoryTitle',
+        message: `Le titre de la catégorie doit être entre ${dataLengthValidations.categoryTitle.minlength} et ${dataLengthValidations.categoryTitle.maxlength} caractères`
+      })
+    }
+  } else {
+    if (title.trim().length < dataLengthValidations.categoryTitle.minlength ||
+      title.trim().length > dataLengthValidations.categoryTitle.maxlength) {
+      errors.errors?.push({
+        field: 'selectedCategoryTitle',
+        message: `Le titre de la catégorie doit être entre ${dataLengthValidations.categoryTitle.minlength} et ${dataLengthValidations.categoryTitle.maxlength} caractères`
+      })
+    }
+  }
+
+  return errors
+}
 
 export { getCategories, createCategory, updateCategory, deleteCategory }
