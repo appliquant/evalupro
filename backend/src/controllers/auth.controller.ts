@@ -209,7 +209,7 @@ const checkIfEmailIsUsed = async (req: express.Request, res: express.Response, n
 
     // 3. Renvoyer réponse
     const response: ApiResponseType = {
-      status: 200,
+      status: 201,
       message: `Courriel ${email} ${user ? 'utilisé' : 'disponible'}`,
       data: {
         emailUsed: user ? true : false
