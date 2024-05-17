@@ -1,5 +1,5 @@
 import express from 'express'
-import { Category, Criteria } from '../db'
+import { Category, Criteria, CriteriaEvaluation } from '../db'
 import { ApiResponseType } from '../types'
 import { dataLengthValidations } from '../validations'
 
@@ -17,7 +17,7 @@ const getCriterias = async (req: express.Request, res: express.Response, next: e
         [{ model: Category, as: 'category' }, 'id', 'ASC'],
         ['id', 'ASC']
       ]
-    });
+    })
 
 
     // 2. Retourner les critères
@@ -271,7 +271,6 @@ const updateCriteria = async (req: express.Request, res: express.Response, next:
 
 const deleteCriteria = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    // todo: ne pas supprimer un critere deja evalué/utilisé
     // 1. Vérifier les données
     const { id } = req.params
 
@@ -307,14 +306,36 @@ const deleteCriteria = async (req: express.Request, res: express.Response, next:
       return res.status(notFoundResponse.status).json(notFoundResponse)
     }
 
-    // 3. Supprimer le critère
+    // 3. Vérifier si le critère est déjà utilisé quelque part dans une évaluation
+    const criteriaUsed = await CriteriaEvaluation.findOne({
+      where: {
+        criteriaId: id
+      }
+    })
+
+    if (criteriaUsed) {
+      const criteriaUsedResponse: ApiResponseType = {
+        status: 400,
+        message: 'Critère utilisé',
+        errors: [
+          {
+            field: 'deleteCriteria',
+            message: 'Le critère est déjà utilisé dans une évaluation'
+          }
+        ]
+      }
+
+      return res.status(criteriaUsedResponse.status).json(criteriaUsedResponse)
+    }
+
+    // 4. Supprimer le critère
     await Criteria.destroy({
       where: {
         id: id
       }
     })
 
-    // 4. Répondre
+    // 5. Répondre
     const response: ApiResponseType = {
       status: 200,
       message: 'Critère supprimé'
