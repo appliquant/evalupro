@@ -52,7 +52,11 @@
 
         <div class="d-flex gap-2 align-items-start">
           <p class="fw-bolder">{{ product.data.product.price }} $</p>
-          <p v-if="isUserLoggedIn">Pointage moyen : {{ product.data?.averageScore + '%' }}</p>
+          <div v-if="isUserLoggedIn">
+            <p v-if="product.data?.averageScore">
+              Pointage moyen : {{ product.data?.averageScore + '%' }}
+            </p>
+          </div>
         </div>
 
         <p>{{ product.data.product.description }}</p>
