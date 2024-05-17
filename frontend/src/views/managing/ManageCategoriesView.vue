@@ -64,26 +64,27 @@
                 </div>
               </div>
               <div class="col">
-
                 <!-- Catégorie parente -->
                 <label for="selectedCategoryParentId">Catégorie parente</label>
-                <select class="form-select"
-                        id="selectedCategoryParentId"
-                        :value="selectedCategory?.parentId"
-                        v-on:change="
-                          (e) => {
-                            if (selectedCategory)
-                              selectedCategory.parentId = (e.target as HTMLSelectElement).value;
-                            removeErrors('selectedCategoryParentId')
-                          }"
+                <select
+                  class="form-select"
+                  id="selectedCategoryParentId"
+                  :value="selectedCategory?.parentId"
+                  v-on:change="
+                    (e) => {
+                      if (selectedCategory)
+                        selectedCategory.parentId = (e.target as HTMLSelectElement).value
+                      removeErrors('selectedCategoryParentId')
+                    }
+                  "
                 >
                   <option value=""></option>
-                  <option v-for="category in categories?.data?.categories"
-                          :key="category.id"
-                          :value="category.id"
-                          :selected="category.id === selectedCategory?.parentId"
+                  <option
+                    v-for="category in categories?.data?.categories"
+                    :key="category.id"
+                    :value="category.id"
+                    :selected="category.id === selectedCategory?.parentId"
                   >
-
                     {{ category.title }}
                   </option>
                 </select>
@@ -93,12 +94,7 @@
             </div>
 
             <div class="d-flex gap-2">
-              <button
-                class="btn btn-primary"
-                @click.prevent="updateCategory"
-              >
-                Modifier
-              </button>
+              <button class="btn btn-primary" @click.prevent="updateCategory">Modifier</button>
               <button class="btn btn-outline-danger mt-2" @click.prevent="deleteCategory">
                 Supprimer
               </button>
@@ -230,7 +226,9 @@ onMounted(() => {
   selectedCategoryTitleInputInvalidFeedback = document.getElementById(
     'selectedCategoryTitleInvalidFeedback'
   )
-  selectedCategoryParentId = document.getElementById('selectedCategoryParentId') as HTMLSelectElement
+  selectedCategoryParentId = document.getElementById(
+    'selectedCategoryParentId'
+  ) as HTMLSelectElement
   selectedCategoryParentIdInvalidFeedback = document.getElementById(
     'selectedCategoryParentIdInvalidFeedback'
   )
@@ -387,8 +385,10 @@ const validations = (partToValidate: 'createCategory' | 'updateCategory'): Valid
   if (partToValidate === 'createCategory') {
     const newCategoryTitle = newCategoryPayload.value.title.trim()
 
-    if (newCategoryTitle.length < dataLengthValidations.categoryTitle.minlength ||
-      newCategoryTitle.length > dataLengthValidations.categoryTitle.maxlength) {
+    if (
+      newCategoryTitle.length < dataLengthValidations.categoryTitle.minlength ||
+      newCategoryTitle.length > dataLengthValidations.categoryTitle.maxlength
+    ) {
       errors.push({
         field: 'newCategoryTitle',
         message: `Titre de catégorie doit être entre ${dataLengthValidations.categoryTitle.minlength} et ${dataLengthValidations.categoryTitle.maxlength} caractères`
@@ -403,10 +403,10 @@ const validations = (partToValidate: 'createCategory' | 'updateCategory'): Valid
     }
 
     if (
-      selectedCategoryTitle && (
-        selectedCategoryTitle.trim().length < dataLengthValidations?.categoryTitle?.minlength ||
-        selectedCategoryTitle.trim().length > dataLengthValidations?.categoryTitle?.maxlength
-      )) {
+      selectedCategoryTitle &&
+      (selectedCategoryTitle.trim().length < dataLengthValidations?.categoryTitle?.minlength ||
+        selectedCategoryTitle.trim().length > dataLengthValidations?.categoryTitle?.maxlength)
+    ) {
       errors.push({
         field: 'selectedCategoryTitle',
         message: `Titre de catégorie doit être entre ${dataLengthValidations.categoryTitle.minlength} et ${dataLengthValidations.categoryTitle.maxlength} caractères`
@@ -452,7 +452,9 @@ const showErrors = (error: ValidationError) => {
   }
 }
 
-const removeErrors = (input: 'newCategoryTitle' | 'selectedCategoryTitle' | 'selectedCategoryParentId') => {
+const removeErrors = (
+  input: 'newCategoryTitle' | 'selectedCategoryTitle' | 'selectedCategoryParentId'
+) => {
   switch (input) {
     case 'newCategoryTitle':
       newCategoryTitleInput?.classList.remove('is-invalid')

@@ -1,12 +1,15 @@
 <template>
   <div class="container mt-3">
     <h1>Gérer mes évaluations de testeur</h1>
-    <p style="max-width: 60ch"><em>Pour ajouter des évaluations, naviguez vers les détails d'un produit puis cliquez sur
-      le bouton « Évaluez ce produit ».</em></p>
+    <p style="max-width: 60ch">
+      <em
+        >Pour ajouter des évaluations, naviguez vers les détails d'un produit puis cliquez sur le
+        bouton « Évaluez ce produit ».</em
+      >
+    </p>
 
     <div class="row row-cols-1 row-cols-sm-2">
       <div class="col">
-
         <h2>Liste de mes évaluations</h2>
 
         <p v-if="items.length <= 0">Aucune évaluation</p>
@@ -14,7 +17,7 @@
         <!-- Liste des évaluations -->
         <ul class="list-group" id="list-container">
           <li
-            style="cursor: pointer; user-select: none;"
+            style="cursor: pointer; user-select: none"
             v-for="(item, index) in items"
             :key="item.evaluation.id"
             @click="selectItem(index)"
@@ -32,25 +35,32 @@
           <fieldset :disabled="selectedItem === null">
             <!-- Critères d'évaluations -->
             <div>
-              <div
-                class="mb-3"
-                v-for="criteria in selectedItem?.criterias"
-                :key="criteria.id">
-                <label :for="`criteria-${criteria.id}`" class="form-label d-block">{{ criteria.name }} - Coefficient :
-                  {{ criteria.coefficient }}</label>
-                <select :id="`criteria-${criteria.id}`"
-                        class="form-select"
-                        :value="selectedItem?.criteriasEvaluation.find(c => c.criteriaId === criteria.id)?.value"
-                        v-on:input="e => {
-                          if (selectedItem) {
-                            const value = (e.target as HTMLSelectElement).value
-                            const criteriaEvaluation = selectedItem.criteriasEvaluation.find(c => c.criteriaId === criteria.id)
-                            if (criteriaEvaluation) {
-                              criteriaEvaluation.value = Number(value)
-                            }
-                            removeErrors('fieldset')
-                          }
-                        }">
+              <div class="mb-3" v-for="criteria in selectedItem?.criterias" :key="criteria.id">
+                <label :for="`criteria-${criteria.id}`" class="form-label d-block"
+                  >{{ criteria.name }} - Coefficient : {{ criteria.coefficient }}</label
+                >
+                <select
+                  :id="`criteria-${criteria.id}`"
+                  class="form-select"
+                  :value="
+                    selectedItem?.criteriasEvaluation.find((c) => c.criteriaId === criteria.id)
+                      ?.value
+                  "
+                  v-on:input="
+                    (e) => {
+                      if (selectedItem) {
+                        const value = (e.target as HTMLSelectElement).value
+                        const criteriaEvaluation = selectedItem.criteriasEvaluation.find(
+                          (c) => c.criteriaId === criteria.id
+                        )
+                        if (criteriaEvaluation) {
+                          criteriaEvaluation.value = Number(value)
+                        }
+                        removeErrors('fieldset')
+                      }
+                    }
+                  "
+                >
                   <option value="1">Excellent</option>
                   <option value="0.8">Très bon</option>
                   <option value="0.6">Acceptable</option>
@@ -63,16 +73,20 @@
             <!-- Commentaire -->
             <div>
               <label for="comment" class="form-label">(Facultatif) Commentaire</label>
-              <textarea id="commentTextArea"
-                        class="form-control"
-                        :value="selectedItem?.evaluation.comment"
-                        v-on:input="e => {
-                         if (selectedItem) {
-                            selectedItem.evaluation.comment = (e.target as HTMLTextAreaElement).value
-                            removeErrors('comment')
-                         }
-                        }"
-                        aria-describedby="commentInvalidFeedback commentHelpBlock"></textarea>
+              <textarea
+                id="commentTextArea"
+                class="form-control"
+                :value="selectedItem?.evaluation.comment"
+                v-on:input="
+                  (e) => {
+                    if (selectedItem) {
+                      selectedItem.evaluation.comment = (e.target as HTMLTextAreaElement).value
+                      removeErrors('comment')
+                    }
+                  }
+                "
+                aria-describedby="commentInvalidFeedback commentHelpBlock"
+              ></textarea>
 
               <div id="commentInvalidFeedback" class="invalid-feedback"></div>
               <div id="commentHelpBlock" class="form-text">
@@ -83,14 +97,23 @@
             </div>
 
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary" @click.prevent="updateMyEvaluationsTester">Enregistrer
+              <button
+                type="submit"
+                class="btn btn-primary"
+                @click.prevent="updateMyEvaluationsTester"
+              >
+                Enregistrer
               </button>
-              <button type="submit" class="btn btn-outline-danger" @click.prevent="deleteMyEvaluationTester">Supprimer
+              <button
+                type="submit"
+                class="btn btn-outline-danger"
+                @click.prevent="deleteMyEvaluationTester"
+              >
+                Supprimer
               </button>
             </div>
           </fieldset>
         </form>
-
       </div>
     </div>
   </div>
@@ -135,9 +158,7 @@ onMounted(() => {
 
 const getMyEvaluationsTester = async () => {
   try {
-    const res = await evaluationsService.getMyEvaluationsTester(
-      authStore.jwt
-    )
+    const res = await evaluationsService.getMyEvaluationsTester(authStore.jwt)
 
     if (res.status !== 200) {
       return push.error({
@@ -157,7 +178,6 @@ const getMyEvaluationsTester = async () => {
     })
   }
 }
-
 
 const selectItem = (index: number) => {
   const item = items.value[index]
@@ -287,8 +307,10 @@ const validations = (): ValidationError[] => {
 
   const comment = selectedItem.value?.evaluation.comment.trim()
   if (comment && comment.length > 0) {
-    if (comment.length < dataLengthValidations.optional_evaluationComment.minlength ||
-      comment.length > dataLengthValidations.optional_evaluationComment.maxlength) {
+    if (
+      comment.length < dataLengthValidations.optional_evaluationComment.minlength ||
+      comment.length > dataLengthValidations.optional_evaluationComment.maxlength
+    ) {
       errors.push({
         field: 'comment',
         message: `Le commentaire doit comprendre entre ${dataLengthValidations.optional_evaluationComment.minlength} et ${dataLengthValidations.optional_evaluationComment.maxlength} caractères.`
@@ -337,7 +359,6 @@ const removeErrors = (input: 'comment' | 'fieldset') => {
       break
   }
 }
-
 </script>
 
 <style lang="scss">

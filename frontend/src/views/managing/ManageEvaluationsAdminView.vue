@@ -10,16 +10,16 @@
 
         <!-- Liste des évaluations -->
         <ul class="list-group" id="list-container">
-          <li v-for="(item, index) in items"
-              :key="item.evaluation.id"
-              style="cursor: pointer; user-select: none;"
-              @click="selectItem(index)"
-              :class="`list-group-item ${selectedItem?.evaluation.id === item.evaluation.id && 'active'}`"
+          <li
+            v-for="(item, index) in items"
+            :key="item.evaluation.id"
+            style="cursor: pointer; user-select: none"
+            @click="selectItem(index)"
+            :class="`list-group-item ${selectedItem?.evaluation.id === item.evaluation.id && 'active'}`"
           >
             {{ item.product.name }}
           </li>
         </ul>
-
       </div>
 
       <div class="col">
@@ -29,25 +29,33 @@
           <fieldset :disabled="selectedItem === null">
             <!-- Critères d'évaluation -->
             <div>
-              <div class="mb-3"
-                   v-for="criteria in selectedItem?.criterias"
-                   :key="criteria.id">
-                <label :for="`criteria-${criteria.id}`" class="form-label d-block">{{ criteria.name }} - Coefficient :
-                  {{ criteria.coefficient }}</label>
+              <div class="mb-3" v-for="criteria in selectedItem?.criterias" :key="criteria.id">
+                <label :for="`criteria-${criteria.id}`" class="form-label d-block"
+                  >{{ criteria.name }} - Coefficient : {{ criteria.coefficient }}</label
+                >
 
-                <select :id="`criteria-${criteria.id}`"
-                        class="form-select"
-                        :value="selectedItem?.criteriasEvaluation.find(c => c.criteriaId === criteria.id)?.value"
-                        v-on:input="e => {
-                          if (selectedItem) {
-                            const value = (e.target as HTMLSelectElement).value
-                            const criteriaEvaluation = selectedItem.criteriasEvaluation.find(c => c.criteriaId === criteria.id)
-                            if (criteriaEvaluation) {
-                              criteriaEvaluation.value = Number(value)
-                            }
-                            removeErrors('fieldset')
-                          }
-                        }">
+                <select
+                  :id="`criteria-${criteria.id}`"
+                  class="form-select"
+                  :value="
+                    selectedItem?.criteriasEvaluation.find((c) => c.criteriaId === criteria.id)
+                      ?.value
+                  "
+                  v-on:input="
+                    (e) => {
+                      if (selectedItem) {
+                        const value = (e.target as HTMLSelectElement).value
+                        const criteriaEvaluation = selectedItem.criteriasEvaluation.find(
+                          (c) => c.criteriaId === criteria.id
+                        )
+                        if (criteriaEvaluation) {
+                          criteriaEvaluation.value = Number(value)
+                        }
+                        removeErrors('fieldset')
+                      }
+                    }
+                  "
+                >
                   <option value="1">Excellent</option>
                   <option value="0.8">Très bon</option>
                   <option value="0.6">Acceptable</option>
@@ -60,16 +68,20 @@
             <!-- Commentaire -->
             <div>
               <label for="comment" class="form-label">(Facultatif) Commentaire</label>
-              <textarea id="commentTextArea"
-                        class="form-control"
-                        :value="selectedItem?.evaluation.comment"
-                        v-on:input="e => {
-                         if (selectedItem) {
-                            selectedItem.evaluation.comment = (e.target as HTMLTextAreaElement).value
-                            removeErrors('comment')
-                         }
-                        }"
-                        aria-describedby="commentInvalidFeedback commentHelpBlock"></textarea>
+              <textarea
+                id="commentTextArea"
+                class="form-control"
+                :value="selectedItem?.evaluation.comment"
+                v-on:input="
+                  (e) => {
+                    if (selectedItem) {
+                      selectedItem.evaluation.comment = (e.target as HTMLTextAreaElement).value
+                      removeErrors('comment')
+                    }
+                  }
+                "
+                aria-describedby="commentInvalidFeedback commentHelpBlock"
+              ></textarea>
 
               <div id="commentInvalidFeedback" class="invalid-feedback"></div>
               <div id="commentHelpBlock" class="form-text">
@@ -81,7 +93,9 @@
 
             <div class="d-flex gap-2">
               <button class="btn btn-primary" @click.prevent="updateEvaluation">Enregistrer</button>
-              <button class="btn btn-outline-danger" @click.prevent="deleteEvaluation">Supprimer</button>
+              <button class="btn btn-outline-danger" @click.prevent="deleteEvaluation">
+                Supprimer
+              </button>
             </div>
           </fieldset>
         </form>
@@ -129,9 +143,7 @@ onMounted(() => {
 
 const getEvaluations = async () => {
   try {
-    const res = await evaluationsService.getEvaluations(
-      authStore.jwt
-    )
+    const res = await evaluationsService.getEvaluations(authStore.jwt)
 
     if (res.status !== 200) {
       return push.error({
@@ -164,7 +176,7 @@ const updateEvaluation = async () => {
   try {
     const payload = {
       comment: selectedItem.value.evaluation.comment,
-      criterias: selectedItem.value.criteriasEvaluation.map(c => ({
+      criterias: selectedItem.value.criteriasEvaluation.map((c) => ({
         criteriaId: c.criteriaId,
         value: c.value
       }))
@@ -186,7 +198,7 @@ const updateEvaluation = async () => {
 
     push.success({
       title: 'Succès',
-      message: 'L\'évaluation a été mise à jour avec succès',
+      message: "L'évaluation a été mise à jour avec succès",
       duration: 5000
     })
 
@@ -203,7 +215,7 @@ const updateEvaluation = async () => {
 
 const deleteEvaluation = async () => {
   if (!selectedItem.value) return
-  
+
   const confirmation = confirm('Voulez-vous vraiment supprimer cette évaluation ?')
   if (!confirmation) return
 
@@ -223,7 +235,7 @@ const deleteEvaluation = async () => {
 
     push.success({
       title: 'Succès',
-      message: 'L\'évaluation a été supprimée avec succès',
+      message: "L'évaluation a été supprimée avec succès",
       duration: 5000
     })
 
@@ -259,8 +271,10 @@ const validations = (): ValidationError[] => {
 
   const comment = selectedItem.value?.evaluation.comment.trim()
   if (comment && comment.length > 0) {
-    if (comment.length < dataLengthValidations.optional_evaluationComment.minlength ||
-      comment.length > dataLengthValidations.optional_evaluationComment.maxlength) {
+    if (
+      comment.length < dataLengthValidations.optional_evaluationComment.minlength ||
+      comment.length > dataLengthValidations.optional_evaluationComment.maxlength
+    ) {
       errors.push({
         field: 'comment',
         message: `Le commentaire doit comprendre entre ${dataLengthValidations.optional_evaluationComment.minlength} et ${dataLengthValidations.optional_evaluationComment.maxlength} caractères.`
@@ -284,7 +298,6 @@ const selectItem = (index: number) => {
 const unSelectItem = () => {
   selectedItem.value = null
 }
-
 
 const showErrors = (error: ValidationError) => {
   switch (error.field) {

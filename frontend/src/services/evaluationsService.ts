@@ -113,7 +113,7 @@
 //         Authorization: `Bearer ${jwt}`
 //       }
 //     })
-//    
+//
 //     return await handleApiResponse(res)
 //   }
 //   catch (e) {
@@ -144,7 +144,11 @@ import { handleApiResponse } from '@/services/handleApiResponse'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-const createMyEvaluationsTester = async (jwt: string, productId: string, data: object): Promise<ApiResponseType> => {
+const createMyEvaluationsTester = async (
+  jwt: string,
+  productId: string,
+  data: object
+): Promise<ApiResponseType> => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/evaluations/tester/${productId}`, {
       method: 'POST',
@@ -159,7 +163,7 @@ const createMyEvaluationsTester = async (jwt: string, productId: string, data: o
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la création de l\'évaluation',
+      message: "Impossible d'attendre le serveur lors de la création de l'évaluation",
       errors: [
         {
           field: 'network',
@@ -183,7 +187,7 @@ const getMyEvaluationsTester = async (jwt: string): Promise<ApiResponseType> => 
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la récupération des évaluations',
+      message: "Impossible d'attendre le serveur lors de la récupération des évaluations",
       errors: [
         {
           field: 'network',
@@ -195,7 +199,11 @@ const getMyEvaluationsTester = async (jwt: string): Promise<ApiResponseType> => 
   }
 }
 
-const updateMyEvaluationTester = async (jwt: string, evaluationId: string, data: object): Promise<ApiResponseType> => {
+const updateMyEvaluationTester = async (
+  jwt: string,
+  evaluationId: string,
+  data: object
+): Promise<ApiResponseType> => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/evaluations/tester/${evaluationId}`, {
       method: 'PUT',
@@ -210,7 +218,7 @@ const updateMyEvaluationTester = async (jwt: string, evaluationId: string, data:
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la mise à jour de l\'évaluation',
+      message: "Impossible d'attendre le serveur lors de la mise à jour de l'évaluation",
       errors: [
         {
           field: 'network',
@@ -222,7 +230,10 @@ const updateMyEvaluationTester = async (jwt: string, evaluationId: string, data:
   }
 }
 
-const deleteMyEvaluationTester = async (jwt: string, evaluationId: string): Promise<ApiResponseType> => {
+const deleteMyEvaluationTester = async (
+  jwt: string,
+  evaluationId: string
+): Promise<ApiResponseType> => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/evaluations/tester/${evaluationId}`, {
       method: 'DELETE',
@@ -235,7 +246,7 @@ const deleteMyEvaluationTester = async (jwt: string, evaluationId: string): Prom
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la suppression de l\'évaluation',
+      message: "Impossible d'attendre le serveur lors de la suppression de l'évaluation",
       errors: [
         {
           field: 'network',
@@ -259,7 +270,7 @@ const getEvaluations = async (jwt: string): Promise<ApiResponseType> => {
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la récupération des évaluations',
+      message: "Impossible d'attendre le serveur lors de la récupération des évaluations",
       errors: [
         {
           field: 'network',
@@ -271,7 +282,11 @@ const getEvaluations = async (jwt: string): Promise<ApiResponseType> => {
   }
 }
 
-const updateEvaluation = async (jwt: string, evaluationId: string, data: object): Promise<ApiResponseType> => {
+const updateEvaluation = async (
+  jwt: string,
+  evaluationId: string,
+  data: object
+): Promise<ApiResponseType> => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/evaluations/${evaluationId}`, {
       method: 'PUT',
@@ -286,7 +301,7 @@ const updateEvaluation = async (jwt: string, evaluationId: string, data: object)
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la mise à jour de l\'évaluation',
+      message: "Impossible d'attendre le serveur lors de la mise à jour de l'évaluation",
       errors: [
         {
           field: 'network',
@@ -311,7 +326,7 @@ const deleteEvaluation = async (jwt: string, evaluationId: string): Promise<ApiR
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la suppression de l\'évaluation',
+      message: "Impossible d'attendre le serveur lors de la suppression de l'évaluation",
       errors: [
         {
           field: 'network',

@@ -1,7 +1,5 @@
 <template>
   <div class="container mt-3">
-
-
     <!-- Erreurs -->
     <p v-if="productsError" class="text-danger">{{ productsError }}</p>
     <p v-if="categoriesError" class="text-danger">{{ categoriesError }}</p>
@@ -10,123 +8,128 @@
       <h1>Comparer deux produits</h1>
       <p>Sélectionnez deux produits de la même catégorie à comparer.</p>
 
-      <select class="form-select form-select-sm mb-2"
-              aria-label="Filter par catégories"
-              @change="onCategoryChange">
+      <select
+        class="form-select form-select-sm mb-2"
+        aria-label="Filter par catégories"
+        @change="onCategoryChange"
+      >
         <option selected>Sélectionnez une catégorie</option>
-        <option v-for="category in categories?.data?.categories"
-                :key="category.id"
-                :value="category.id">
+        <option
+          v-for="category in categories?.data?.categories"
+          :key="category.id"
+          :value="category.id"
+        >
           {{ category.title }}
         </option>
       </select>
 
-
-      <select :disabled="selectedCategoryId === null"
-              class="form-select form-select-sm mb-2"
-              aria-label="Sélectionnez le premier produit à comparer"
-              @change="onFirstProductChange">
+      <select
+        :disabled="selectedCategoryId === null"
+        class="form-select form-select-sm mb-2"
+        aria-label="Sélectionnez le premier produit à comparer"
+        @change="onFirstProductChange"
+      >
         <option selected>Sélectionnez un produit</option>
-        <option
-          v-for="product in products?.data?.products"
-          :key="product.id"
-          :value="product.id"
-        >{{ product.name }}
+        <option v-for="product in products?.data?.products" :key="product.id" :value="product.id">
+          {{ product.name }}
         </option>
       </select>
 
-
-      <select :disabled="selectedFirstProductId === null"
-              class="form-select form-select-sm mb-2"
-              aria-label="Sélectionnez le deuxième produit à comparer"
-              @change="onSecondProductChange">
+      <select
+        :disabled="selectedFirstProductId === null"
+        class="form-select form-select-sm mb-2"
+        aria-label="Sélectionnez le deuxième produit à comparer"
+        @change="onSecondProductChange"
+      >
         <option selected>Sélectionnez un autre produit</option>
         <option
           v-for="product in filteredProductsWithoutSelectedFirstProduct"
           :key="product.id"
           :value="product.id"
-        >{{ product.name }}
+        >
+          {{ product.name }}
         </option>
       </select>
-
     </section>
 
     <!-- Tableau de comparaison -->
     <section class="mt-3">
       <table class="table">
         <thead>
-        <tr>
-          <th scope="col">Caractéristique</th>
-          <th scope="col">Produit A</th>
-          <th scope="col">Produit B</th>
-        </tr>
+          <tr>
+            <th scope="col">Caractéristique</th>
+            <th scope="col">Produit A</th>
+            <th scope="col">Produit B</th>
+          </tr>
         </thead>
 
         <tbody>
+          <!-- Marque -->
+          <tr>
+            <td>Marque</td>
+            <td>{{ firstProduct?.data?.product.brand }}</td>
+            <td>{{ secondProduct?.data?.product.brand }}</td>
+          </tr>
 
-        <!-- Marque -->
-        <tr>
-          <td>Marque</td>
-          <td>{{ firstProduct?.data?.product.brand }}</td>
-          <td>{{ secondProduct?.data?.product.brand }}</td>
-        </tr>
+          <!-- Nom -->
+          <tr>
+            <td>Nom</td>
+            <td>{{ firstProduct?.data?.product.name }}</td>
+            <td>{{ secondProduct?.data?.product.name }}</td>
+          </tr>
 
-        <!-- Nom -->
-        <tr>
-          <td>Nom</td>
-          <td>{{ firstProduct?.data?.product.name }}</td>
-          <td>{{ secondProduct?.data?.product.name }}</td>
-        </tr>
+          <!-- Catégorie -->
+          <tr>
+            <td>Catégorie</td>
+            <td>{{ firstProduct?.data?.category.title }}</td>
+            <td>{{ secondProduct?.data?.category.title }}</td>
+          </tr>
 
-        <!-- Catégorie -->
-        <tr>
-          <td>Catégorie</td>
-          <td>{{ firstProduct?.data?.category.title }}</td>
-          <td>{{ secondProduct?.data?.category.title }}</td>
-        </tr>
+          <!-- Critères d'évaluations -->
+          <tr>
+            <td style="max-width: 30pt">
+              Critères d'évaluations (avec moyennes des notes par les testeurs)
+            </td>
+            <td>
+              <ul>
+                <li v-for="criteria in firstProduct?.data?.criterias" :key="criteria.id">
+                  {{ criteria.name }}
+                  {{
+                    firstProduct?.data?.criteriasScores?.find(
+                      (elm: any) => elm.criteriaId === criteria.id
+                    )?.averageScore
+                  }}
+                </li>
+              </ul>
+            </td>
 
-        <!-- Critères d'évaluations -->
-        <tr>
-          <td style="max-width: 30pt">Critères d'évaluations (avec moyennes des notes par les testeurs)</td>
-          <td>
-            <ul>
-              <li v-for="criteria in firstProduct?.data?.criterias"
-                  :key="criteria.id"
-              >
-                {{ criteria.name }}
-                {{ firstProduct?.data?.criteriasScores?.find((elm: any) => elm.criteriaId === criteria.id)?.averageScore
-                }}
-              </li>
-            </ul>
-          </td>
+            <td>
+              <ul>
+                <li v-for="criteria in secondProduct?.data?.criterias" :key="criteria.id">
+                  {{ criteria.name }}
+                  {{
+                    secondProduct?.data?.criteriasScores?.find(
+                      (elm: any) => elm.criteriaId === criteria.id
+                    )?.averageScore
+                  }}
+                </li>
+              </ul>
+            </td>
+          </tr>
 
-          <td>
-            <ul>
-              <li v-for="criteria in secondProduct?.data?.criterias"
-                  :key="criteria.id"
-              >
-                {{ criteria.name }}
-                {{ secondProduct?.data?.criteriasScores?.find((elm: any) => elm.criteriaId === criteria.id)?.averageScore
-                }}
-              </li>
-            </ul>
-          </td>
-        </tr>
+          <!-- Description -->
+          <tr>
+            <td>Description</td>
+            <td>{{ firstProduct?.data?.product.description }}</td>
+            <td>{{ secondProduct?.data?.product.description }}</td>
+          </tr>
 
-        <!-- Description -->
-        <tr>
-          <td>Description</td>
-          <td>{{ firstProduct?.data?.product.description }}</td>
-          <td>{{ secondProduct?.data?.product.description }}</td>
-        </tr>
-
-        <!-- Prix -->
-        <tr>
-          <td>Prix</td>
-          <td>{{ formatPrice(firstProduct?.data?.product.price) }}</td>
-          <td>{{ formatPrice(secondProduct?.data?.product.price) }}</td>
-        </tr>
-
+          <!-- Prix -->
+          <tr>
+            <td>Prix</td>
+            <td>{{ formatPrice(firstProduct?.data?.product.price) }}</td>
+            <td>{{ formatPrice(secondProduct?.data?.product.price) }}</td>
+          </tr>
         </tbody>
       </table>
     </section>
@@ -165,25 +168,15 @@ const filteredProductsWithoutSelectedFirstProduct = computed(() => {
   })
 })
 
-const {
-  data: products,
-  error: productsError
-} = useProducts({
+const { data: products, error: productsError } = useProducts({
   productCategoryFilterId: selectedCategoryId
 })
 
-const {
-  data: categories,
-  error: categoriesError
-} = useCategories()
+const { data: categories, error: categoriesError } = useCategories()
 
-const {
-  data: firstProduct
-} = useProduct(selectedFirstProductId)
+const { data: firstProduct } = useProduct(selectedFirstProductId)
 
-const {
-  data: secondProduct
-} = useProduct(selectedSecondProductId)
+const { data: secondProduct } = useProduct(selectedSecondProductId)
 
 watchEffect(() => {
   if (!selectedCategoryId.value) {
@@ -211,7 +204,6 @@ const onFirstProductChange = (e: Event) => {
     selectedFirstProductId.value = null
   }
 }
-
 
 const onSecondProductChange = (e: Event) => {
   const value = (e.target as HTMLSelectElement).value

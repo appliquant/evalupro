@@ -75,9 +75,8 @@
             <p class="card-text">{{ product.description }}</p>
             <p class="card-text">{{ product.price }} $</p>
             <RouterLink :to="`/product/${product.id}`" class="btn btn-primary"
-            >Voir le produit
-            </RouterLink
-            >
+              >Voir le produit
+            </RouterLink>
           </div>
         </div>
       </div>

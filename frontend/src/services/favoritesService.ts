@@ -17,7 +17,7 @@ const getFavorites = async (jwt: string): Promise<ApiResponseType> => {
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la récupération des favoris',
+      message: "Impossible d'attendre le serveur lors de la récupération des favoris",
       errors: [
         {
           field: 'network',
@@ -44,7 +44,7 @@ const addFavorite = async (jwt: string, productId: string): Promise<ApiResponseT
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de l\'ajout du favori',
+      message: "Impossible d'attendre le serveur lors de l'ajout du favori",
       errors: [
         {
           field: 'network',
@@ -56,7 +56,10 @@ const addFavorite = async (jwt: string, productId: string): Promise<ApiResponseT
   }
 }
 
-const checkIfProductIsFavorite = async (jwt: string, productId: string): Promise<ApiResponseType> => {
+const checkIfProductIsFavorite = async (
+  jwt: string,
+  productId: string
+): Promise<ApiResponseType> => {
   try {
     const res = await fetch(`${BACKEND_URL}/api/favorites/${productId}`, {
       method: 'GET',
@@ -70,7 +73,7 @@ const checkIfProductIsFavorite = async (jwt: string, productId: string): Promise
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la vérification du favori',
+      message: "Impossible d'attendre le serveur lors de la vérification du favori",
       errors: [
         {
           field: 'network',
@@ -96,7 +99,7 @@ const removeFavorite = async (jwt: string, productId: string): Promise<ApiRespon
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la suppression du favori',
+      message: "Impossible d'attendre le serveur lors de la suppression du favori",
       errors: [
         {
           field: 'network',

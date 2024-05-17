@@ -17,7 +17,7 @@ const getCriterias = async (jwt: string): Promise<ApiResponseType> => {
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la récupérations des critères',
+      message: "Impossible d'attendre le serveur lors de la récupérations des critères",
       errors: [
         {
           field: 'network',
@@ -44,7 +44,7 @@ const createCriteria = async (jwt: string, newCriteria: object): Promise<ApiResp
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la création du critère',
+      message: "Impossible d'attendre le serveur lors de la création du critère",
       errors: [
         {
           field: 'network',
@@ -71,7 +71,7 @@ const updateCriteria = async (jwt: string, updatedCriteria: Criteria): Promise<A
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la mise à jour du critère',
+      message: "Impossible d'attendre le serveur lors de la mise à jour du critère",
       errors: [
         {
           field: 'network',
@@ -81,7 +81,6 @@ const updateCriteria = async (jwt: string, updatedCriteria: Criteria): Promise<A
       ]
     } as ApiResponseType
   }
-
 }
 
 const deleteCriteria = async (jwt: string, criteriaId: string): Promise<ApiResponseType> => {
@@ -97,7 +96,7 @@ const deleteCriteria = async (jwt: string, criteriaId: string): Promise<ApiRespo
   } catch (e) {
     return {
       status: 500,
-      message: 'Impossible d\'attendre le serveur lors de la suppression du critère',
+      message: "Impossible d'attendre le serveur lors de la suppression du critère",
       errors: [
         {
           field: 'network',

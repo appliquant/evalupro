@@ -8,8 +8,12 @@
 
     <!-- Liste -->
     <ul class="list-group">
-      <RouterLink class="list-group-item" v-for="favorite in favorites?.data" :key="favorite.id"
-                  :to="`/product/${favorite.id}`">
+      <RouterLink
+        class="list-group-item"
+        v-for="favorite in favorites?.data"
+        :key="favorite.id"
+        :to="`/product/${favorite.id}`"
+      >
         <!-- Badge prix -->
         <span class="badge bg-primary rounded-pill">{{ favorite.price }} $</span>
 
@@ -17,10 +21,14 @@
         {{ favorite.name }}
 
         <!-- Bouton de suppression -->
-        <button class="btn btn-danger btn-sm float-end" @click.prevent="removeFavorite(favorite.id)">Supprimer</button>
+        <button
+          class="btn btn-danger btn-sm float-end"
+          @click.prevent="removeFavorite(favorite.id)"
+        >
+          Supprimer
+        </button>
       </RouterLink>
     </ul>
-
   </div>
 </template>
 
@@ -45,10 +53,7 @@ const removeFavorite = async (favoriteId: string) => {
     const confirmation = confirm('Voulez-vous vraiment retirer ce produit de vos favoris ?')
     if (!confirmation) return
 
-    const res = await favoritesService.removeFavorite(
-      authStore.jwt,
-      favoriteId
-    )
+    const res = await favoritesService.removeFavorite(authStore.jwt, favoriteId)
 
     if (res.status !== 200) {
       return push.error({

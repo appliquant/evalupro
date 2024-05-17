@@ -17,13 +17,14 @@
         <h1>{{ product.data.product.name }}</h1>
 
         <div class="d-flex align-items-baseline flex-wrap gap-2">
-          <p>Par
+          <p>
+            Par
             <strong>{{ product.data.product.brand }}</strong>
           </p>
           <span class="badge rounded-pill text-bg-light">{{ product.data.category.title }}</span>
           <div v-if="isUserLoggedIn">
-            <button v-if="!isFavorite" class="btn btn-link" @click.prevent="addFavorite">&hearts; Ajouter aux
-              favoris
+            <button v-if="!isFavorite" class="btn btn-link" @click.prevent="addFavorite">
+              &hearts; Ajouter aux favoris
             </button>
             <button v-else class="btn btn-link my-0 py-0" @click.prevent="removeFavorite">
               &#10006; Retirer des favoris
@@ -31,13 +32,16 @@
           </div>
         </div>
 
-
         <div>
           <h6>Critères d'évaluations</h6>
           <div class="d-flex gap-2 mb-2">
-            <span v-for="criteria in product?.data?.criterias" :key="criteria.id" class="badge bg-primary rounded-pill">
-            {{ criteria.name }}
-          </span>
+            <span
+              v-for="criteria in product?.data?.criterias"
+              :key="criteria.id"
+              class="badge bg-primary rounded-pill"
+            >
+              {{ criteria.name }}
+            </span>
           </div>
         </div>
 
@@ -46,7 +50,7 @@
           <RouterLink
             :to="`/create-evaluation-tester/${product.data.product.id}`"
             class="btn btn-outline-dark btn-sm"
-          >★ Évaluer ce produit
+            >★ Évaluer ce produit
           </RouterLink>
         </div>
 
@@ -65,7 +69,6 @@
         <p>todo: pointages des criteres</p>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -93,11 +96,7 @@ const canCreateEvaluation = computed(() => {
 })
 
 const productId = ref<null | string>(null)
-const {
-  data: product,
-  loading: productLoading,
-  error: productError
-} = useProduct(productId)
+const { data: product, loading: productLoading, error: productError } = useProduct(productId)
 
 watchEffect(() => {
   const id = route.params.id
@@ -110,7 +109,6 @@ watchEffect(() => {
   }
 })
 
-
 async function checkIfProductIsFavorite() {
   if (!product.value) return false
 
@@ -120,7 +118,7 @@ async function checkIfProductIsFavorite() {
       product.value?.data?.product.id
     )
 
-    return res?.data?.isFavorite ? isFavorite.value = true : isFavorite.value = false
+    return res?.data?.isFavorite ? (isFavorite.value = true) : (isFavorite.value = false)
   } catch (e) {
     const err = e as ApiResponseType
     push.error({
@@ -135,10 +133,7 @@ const addFavorite = async () => {
   try {
     if (!productId.value) return
 
-    const res = await favoritesService.addFavorite(
-      authStore.jwt,
-      productId.value
-    )
+    const res = await favoritesService.addFavorite(authStore.jwt, productId.value)
 
     if (res.status !== 200) {
       return push.error({
@@ -169,10 +164,7 @@ const removeFavorite = async () => {
   try {
     if (!productId.value) return
 
-    const res = await favoritesService.removeFavorite(
-      authStore.jwt,
-      productId.value
-    )
+    const res = await favoritesService.removeFavorite(authStore.jwt, productId.value)
 
     if (res.status !== 200) {
       return push.error({
@@ -189,7 +181,6 @@ const removeFavorite = async () => {
     })
 
     checkIfProductIsFavorite()
-
   } catch (e) {
     const err = e as ApiResponseType
     push.error({
@@ -199,5 +190,4 @@ const removeFavorite = async () => {
     })
   }
 }
-
 </script>

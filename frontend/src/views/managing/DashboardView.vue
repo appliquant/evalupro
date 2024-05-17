@@ -12,7 +12,7 @@
           to="/manage-categories"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-        >Gérer les catégories
+          >Gérer les catégories
         </RouterLink>
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
       </li>
@@ -23,7 +23,7 @@
           to="/manage-products"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-        >Gérer les produits
+          >Gérer les produits
         </RouterLink>
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
       </li>
@@ -34,7 +34,7 @@
           to="/manage-criterias"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-        >Gérer les critères
+          >Gérer les critères
         </RouterLink>
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
       </li>
@@ -45,7 +45,7 @@
           to="/manage-evaluations-tester"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-        >Gérer mes évaluations de testeur
+          >Gérer mes évaluations de testeur
         </RouterLink>
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.TESTER }}</span>
       </li>
@@ -56,7 +56,7 @@
           to="/manage-evaluations-admin"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-        >Gérer les évaluations (administration)
+          >Gérer les évaluations (administration)
         </RouterLink>
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.ADMIN }}</span>
       </li>
@@ -67,18 +67,15 @@
           to="/compare-products"
           style="margin-right: 0.5rem"
           class="link-underline-opacity-0"
-        >Comparer deux produits
+          >Comparer deux produits
         </RouterLink>
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.USER }}</span>
       </li>
 
       <!-- Favoris -->
       <li class="nav-item mt-2">
-        <RouterLink
-          to="/favorites"
-          style="margin-right: 0.5rem"
-          class="link-underline-opacity-0"
-        >Favoris
+        <RouterLink to="/favorites" style="margin-right: 0.5rem" class="link-underline-opacity-0"
+          >Favoris
         </RouterLink>
         <span class="badge rounded-pill text-bg-primary">{{ UserRoles.USER }}</span>
       </li>

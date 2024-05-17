@@ -35,7 +35,7 @@ export type Product = {
 export type Criteria = {
   id: string
   name: string
-  coefficient: number,
+  coefficient: number
   categoryId: string
 }
 

@@ -18,7 +18,7 @@ const notivue = createNotivue({
   position: 'bottom-right'
 })
 
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
   const requiresAuth = to.meta['requiresAuth'] ?? false
   if (!requiresAuth || requiresAuth === false) {
     return true

@@ -20,16 +20,20 @@
 
           <!-- Critères d'évaluation -->
           <div v-for="criteria in product?.data?.criterias" :key="criteria.id" class="mb-3">
-            <label :for="`criteria-${criteria.id}`" class="form-label
-            d-block">{{ criteria.name }} - Coefficient : {{ criteria.coefficient }}</label>
+            <label :for="`criteria-${criteria.id}`" class="form-label d-block"
+              >{{ criteria.name }} - Coefficient : {{ criteria.coefficient }}</label
+            >
 
-            <select :id="`criteria-${criteria.id}`"
-                    class="form-select"
-                    v-model="criteria.value"
-                    v-on:input="(e) => {
-                      onCriteriaChange(criteria.id, (e.target as HTMLSelectElement).value);
-                      removeErrors('fieldset');
-                    }"
+            <select
+              :id="`criteria-${criteria.id}`"
+              class="form-select"
+              v-model="criteria.value"
+              v-on:input="
+                (e) => {
+                  onCriteriaChange(criteria.id, (e.target as HTMLSelectElement).value)
+                  removeErrors('fieldset')
+                }
+              "
             >
               <option value="1">Excellent</option>
               <option value="0.8">Très bon</option>
@@ -44,11 +48,13 @@
       <!-- Champ pour donner un commentaire général -->
       <div class="mb-3">
         <label for="comment" class="form-label">(Facultatif) Commentaire</label>
-        <textarea id="commentTextArea"
-                  class="form-control"
-                  v-model="evaluationPayload.comment"
-                  @input="removeErrors('comment')"
-                  aria-describedby="commentInvalidFeedback commentHelpBlock"></textarea>
+        <textarea
+          id="commentTextArea"
+          class="form-control"
+          v-model="evaluationPayload.comment"
+          @input="removeErrors('comment')"
+          aria-describedby="commentInvalidFeedback commentHelpBlock"
+        ></textarea>
 
         <div id="commentInvalidFeedback" class="invalid-feedback"></div>
         <div id="commentHelpBlock" class="form-text">
@@ -59,13 +65,15 @@
       </div>
 
       <!-- Bouton pour soumettre l'évaluation -->
-      <button type="submit" class="btn btn-primary" @click.prevent="createEvaluation">Soumettre l'évaluation</button>
+      <button type="submit" class="btn btn-primary" @click.prevent="createEvaluation">
+        Soumettre l'évaluation
+      </button>
     </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { useProduct } from '@/composables/useProduct'
 import { useRoute } from 'vue-router'
 import { dataLengthValidations } from '@/validations'
@@ -78,16 +86,12 @@ const route = useRoute()
 const authStore = useAuthStore()
 
 const evaluationPayload = ref({
-  criterias: [] as { criteriaId: string, value: number }[],
+  criterias: [] as { criteriaId: string; value: number }[],
   comment: ''
 })
 
 const productId = ref<null | string>(null)
-const {
-  data: product,
-  loading: productLoading,
-  error: productError
-} = useProduct(productId)
+const { data: product, loading: productLoading, error: productError } = useProduct(productId)
 
 watchEffect(() => {
   const id = route.params.id
@@ -101,7 +105,7 @@ let commentInvalidFeedback: HTMLDivElement | null
 let fieldset: HTMLFieldSetElement | null
 
 const onCriteriaChange = (criteriaId: string, value: string) => {
-  const index = evaluationPayload.value.criterias.findIndex(c => c.criteriaId === criteriaId)
+  const index = evaluationPayload.value.criterias.findIndex((c) => c.criteriaId === criteriaId)
   if (index === -1) {
     const criteria = { criteriaId, value: Number(value) }
     evaluationPayload.value.criterias.push(criteria)
@@ -138,13 +142,11 @@ const createEvaluation = async () => {
       })
     }
 
-
     push.error({
       title: 'Erreur',
       message: res.message,
       duration: 5000
     })
-
   } catch (e) {
     const err = e as ApiResponseType
     push.error({
@@ -174,8 +176,10 @@ const validations = (): ValidationError[] => {
 
   const comment = evaluationPayload.value.comment.trim()
   if (comment.length > 0) {
-    if (comment.length < dataLengthValidations.optional_evaluationComment.minlength ||
-      comment.length > dataLengthValidations.optional_evaluationComment.maxlength) {
+    if (
+      comment.length < dataLengthValidations.optional_evaluationComment.minlength ||
+      comment.length > dataLengthValidations.optional_evaluationComment.maxlength
+    ) {
       errors.push({
         field: 'comment',
         message: `Le commentaire doit comprendre entre
@@ -183,7 +187,6 @@ const validations = (): ValidationError[] => {
         ${dataLengthValidations.optional_evaluationComment.maxlength} caractères.`
       })
     }
-
   }
 
   return errors

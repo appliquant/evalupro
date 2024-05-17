@@ -4,11 +4,10 @@ import type { ApiResponseType } from '@/types'
 import { productsService } from '@/services/productsService'
 
 export const useProducts = (filters?: {
-                              productNameFilter?: Ref<string | null>,
-                              productCategoryFilterId?: Ref<string | null>,
-                              productResultSort?: Ref<string | null>
-                            }
-) => {
+  productNameFilter?: Ref<string | null>
+  productCategoryFilterId?: Ref<string | null>
+  productResultSort?: Ref<string | null>
+}) => {
   const authStore = useAuthStore()
   const data = ref<ApiResponseType | null>(null)
   const loading = ref(true)
