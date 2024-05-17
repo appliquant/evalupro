@@ -67,6 +67,7 @@
         <p>{{ product.data.product.description }}</p>
       </div>
     </div>
+    <p v-else>Aucun produit trouvé.</p>
 
 
     <!-- Commentaires des testeurs -->
