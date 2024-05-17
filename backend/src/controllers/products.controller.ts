@@ -111,7 +111,8 @@ const getProduct = async (req: express.Request, res: express.Response, next: exp
     }
 
     // 6. Calculer la moyenne du score accordé par les testeurs à ce produit
-    const averageScore = productEvaluations.reduce((acc, evaluation) => acc + evaluation.dataValues.average, 0) / productEvaluations.length
+    let averageScore = productEvaluations.reduce((acc, evaluation) => acc + evaluation.dataValues.average, 0) / productEvaluations.length
+    averageScore = Math.round(averageScore * 100) / 100
 
     // 7. Retourner le produit
     const successResponse: ApiResponseType = {
