@@ -149,8 +149,7 @@ const createEvaluation = async (req: express.Request, res: express.Response, nex
       message: 'Evaluation créée'
     }
 
-    // todo: faire header Location
-    // res.setHeader('Location', '/evaluations/' + evaluation.dataValues.id);
+    res.setHeader('Location', '/evaluations/' + evaluation.dataValues.id);
     return res.status(response.status).json(response)
   } catch (err) {
     next(err)
