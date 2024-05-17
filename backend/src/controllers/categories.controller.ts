@@ -1,5 +1,5 @@
 import express from 'express'
-import { Category } from '../db'
+import { Category, Criteria, Product } from '../db'
 import { ApiResponseType } from '../types'
 
 const createCategory = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -295,7 +295,33 @@ const deleteCategory = async (req: express.Request, res: express.Response, next:
       return res.status(categoryNotFoundError.status).json(categoryNotFoundError)
     }
 
-    // 3. todo: Vérifier si la catégorie n'est pas associée à des produits ou caractériques
+    // 3. Vérifier si la catégorie n'est pas associée à des produits ou evaluations
+    const products = await Product.findOne({
+      where: {
+        categoryId: id
+      }
+    })
+
+    const criterias = await Criteria.findOne({
+      where: {
+        categoryId: id
+      }
+    })
+
+    if (products || criterias) {
+      const categoryHasProductsError: ApiResponseType = {
+        status: 400,
+        message: 'Catégorie associée à des produits ou évaluations',
+        errors: [
+          {
+            field: 'deleteCategory',
+            message: 'Catégorie associée à des produits ou évaluations'
+          }
+        ]
+      }
+
+      return res.status(categoryHasProductsError.status).json(categoryHasProductsError)
+    }
 
     // 4. Supprimer la catégorie
     await category.destroy()
@@ -311,5 +337,6 @@ const deleteCategory = async (req: express.Request, res: express.Response, next:
     next(err)
   }
 }
+
 
 export { getCategories, createCategory, updateCategory, deleteCategory }

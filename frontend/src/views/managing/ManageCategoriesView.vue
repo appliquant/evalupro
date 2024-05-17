@@ -368,6 +368,12 @@ const deleteCategory = async () => {
 
       reloadCategories()
       unSelectCategory()
+    } else {
+      push.error({
+        title: 'Erreur',
+        message: res.message,
+        duration: 13000
+      })
     }
   } catch (e) {
     const err = e as ApiResponseType
