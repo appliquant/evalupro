@@ -38,6 +38,7 @@
             type="email"
             v-model="payload.email"
             @input="removeServerErrors('email')"
+            @focusout="checkIfEmailIsUsed"
             name="email"
             :minlength="dataLengthValidations?.email?.minlength"
             :maxlength="dataLengthValidations?.email?.maxlength"
@@ -69,7 +70,7 @@
             required
           />
           <label for="passwdInput" class="form-label" aria-describedby="passwdHelp"
-            >Mot de passe</label
+          >Mot de passe</label
           >
           <div id="passwdHelp" class="form-text">
             Doit contenir au minimum 6 caractères, 1 majuscule, 1 chiffre et 1 des caractères
@@ -96,7 +97,7 @@
             required
           />
           <label for="passwdInput" class="form-label" aria-describedby="passwdConfirmationHelp"
-            >Confimer votre mot de passe</label
+          >Confimer votre mot de passe</label
           >
           <div id="passwdConfirmationHelp" class="form-text">
             Doit contenir au minimum 6 caractères, 1 majuscule, 1 chiffre et 1 des caractères
@@ -109,7 +110,8 @@
       <button class="btn btn-primary" style="margin-right: 2%">Créer</button>
       <a>
         <RouterLink to="/signin" class="link-underline-opacity-0"
-          >Vous avez déja un compte?</RouterLink
+        >Vous avez déja un compte?
+        </RouterLink
         >
       </a>
     </form>
@@ -174,6 +176,36 @@ const showPasswordMatchError = () => {
 
 const validatePasswordsMatch = (): boolean => {
   return payload.value.password === passwordConfirmation.value
+}
+
+const checkIfEmailIsUsed = async () => {
+  try {
+    const res = await authService.checkIfEmailIsUsed(payload.value.email)
+
+    if (res.errors && res.errors.length > 0) {
+      for (const error of res.errors) {
+        showServerErrors(error)
+      }
+      return
+    }
+
+    const emailUsed = res.data?.emailUsed
+
+    if (emailUsed) {
+      return showServerErrors({
+        field: 'email',
+        message: 'Cette adresse courriel est déjà utilisée'
+      })
+    }
+
+  } catch (e) {
+    const err = e as ApiResponseType
+    push.error({
+      title: 'Erreur',
+      message: err.message,
+      duration: 5000
+    })
+  }
 }
 
 const signup = async () => {
@@ -244,6 +276,11 @@ const showServerErrors = (error: ValidationError) => {
       break
     }
     default:
+      push.error({
+        title: 'Erreur',
+        message: error.message,
+        duration: 5000
+      })
   }
 }
 

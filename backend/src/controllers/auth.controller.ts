@@ -179,6 +179,49 @@ const signup = async (req: express.Request, res: express.Response, next: express
   }
 }
 
+const checkIfEmailIsUsed = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  try {
+    // 1. Vérifier les données
+    const { email } = req.query
+
+    console.log(`email >> ${email}`)
+
+    if (!email) {
+      const missingFieldsErrors: ApiResponseType = {
+        status: 400,
+        message: `Champs manquant(s)`,
+        errors: [
+          {
+            field: 'email',
+            message: `Adresse courriel manquante`
+          }
+        ]
+      }
+      return res.status(missingFieldsErrors.status).json(missingFieldsErrors)
+    }
+
+    // 2. Vérifier si courriel existe
+    const user = await User.findOne({
+      where: {
+        email: email
+      }
+    })
+
+    // 3. Renvoyer réponse
+    const response: ApiResponseType = {
+      status: 200,
+      message: `Courriel ${email} ${user ? 'utilisé' : 'disponible'}`,
+      data: {
+        emailUsed: user ? true : false
+      }
+    }
+
+    res.status(response.status).json(response)
+  } catch (error) {
+    next(error)
+  }
+}
+
 function signupValidations(username: string, email: string, password: string): ApiResponseType {
   const errorMessage: ApiResponseType = {
     status: 400,
@@ -228,4 +271,4 @@ function signupValidations(username: string, email: string, password: string): A
   return errorMessage
 }
 
-export { signin, signup }
+export { signin, signup, checkIfEmailIsUsed }

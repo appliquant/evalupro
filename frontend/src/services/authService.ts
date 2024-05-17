@@ -55,9 +55,30 @@ async function signin(email: string, password: string) {
   }
 }
 
+const checkIfEmailIsUsed = async (email: string) => {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/auth/check-email-is-used?email=${email}`)
+
+    return await handleApiResponse(res)
+  } catch (e) {
+    return {
+      status: 500,
+      message: `Impossible d'atteindre le serveur lors de la vérification de l'adresse courriel: ${e}`,
+      errors: [
+        {
+          field: 'network',
+          message:
+            e instanceof Error ? e.message : 'Erreur lors de la communication avec le serveur'
+        }
+      ]
+    } as ApiResponseType
+  }
+}
+
 const authService = {
   signup,
-  signin
+  signin,
+  checkIfEmailIsUsed
 }
 
 export { authService }

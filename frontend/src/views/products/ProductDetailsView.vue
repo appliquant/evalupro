@@ -65,8 +65,6 @@
         </div>
 
         <p>{{ product.data.product.description }}</p>
-
-        <p>todo: pointages des criteres</p>
       </div>
     </div>
 
