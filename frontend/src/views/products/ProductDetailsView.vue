@@ -56,7 +56,7 @@
         </div>
 
         <div class="d-flex gap-2 align-items-start">
-          <p class="fw-bolder">{{ product.data.product.price }} $</p>
+          <p class="fw-bolder">{{ formatPrice(product.data.product.price) }}</p>
           <div v-if="isUserLoggedIn">
             <p v-if="product.data?.averageScore">
               Pointage moyen : {{ product.data?.averageScore + '%' }}
@@ -98,6 +98,17 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 const route = useRoute()
 const authStore = useAuthStore()
+
+const formatPrice = (price: any) => {
+  if (isNaN(price)) {
+    return ''
+  }
+
+  return new Intl.NumberFormat('fr-CA', {
+    style: 'currency',
+    currency: 'CAD'
+  }).format(price)
+}
 
 const productId = ref<null | string>(null)
 const testersComments = ref<{ id: string; comment: string }[]>([])
