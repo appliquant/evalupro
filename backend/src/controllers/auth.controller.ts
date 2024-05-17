@@ -169,7 +169,7 @@ const signup = async (req: express.Request, res: express.Response, next: express
 
     // 4. Renvoyer réponse
     const response: ApiResponseType = {
-      status: 200,
+      status: 201,
       message: `Utilisateur ${username} créé`
     }
 
@@ -209,7 +209,7 @@ const checkIfEmailIsUsed = async (req: express.Request, res: express.Response, n
 
     // 3. Renvoyer réponse
     const response: ApiResponseType = {
-      status: 201,
+      status: 200,
       message: `Courriel ${email} ${user ? 'utilisé' : 'disponible'}`,
       data: {
         emailUsed: user ? true : false

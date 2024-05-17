@@ -230,7 +230,7 @@ const signup = async () => {
       return
     }
 
-    if (res.status === 200) {
+    if (res.status === 201) {
       return push.success({
         title: 'Compte créé',
         message: 'Vous pouvez maintenant vous connecter',
