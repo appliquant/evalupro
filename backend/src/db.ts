@@ -120,7 +120,7 @@ Product.init({
   },
 
   price: {
-    type: DataTypes.DECIMAL(10, 2),
+    type: DataTypes.DECIMAL(65, 2),
     allowNull: false
   },
 
@@ -323,7 +323,7 @@ const initDb = async (): Promise<void> => {
     await sequelize.authenticate()
     await sequelize.sync({
       // force: true
-      // alter: true
+      alter: true
     })
     console.log('✅ Db connectée et synchronisée.')
   } catch (error) {
