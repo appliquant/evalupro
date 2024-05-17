@@ -549,12 +549,17 @@ const getTestersComments = async (req: express.Request, res: express.Response, n
     attributes: ['id', 'comment']
   })
 
-  // 3. Répondre
+
+  // 3. Seulement garder les commentaires non vides (car les testeurs ne sont pas obligés de laisser un commentaire)
+  const definedComments = comments.filter(comment =>
+    comment.dataValues.comment !== null && comment.dataValues.comment.trim().length > 0)
+
+  // 4. Répondre
   const successResponse: ApiResponseType = {
     status: 200,
     message: 'Commentaires trouvés',
     data: {
-      comments
+      comments: definedComments
     }
   }
 
