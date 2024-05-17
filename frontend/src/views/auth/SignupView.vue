@@ -2,7 +2,7 @@
   <div class="container text-left mt-3">
     <h1 class="mb-2">Créer un compte</h1>
 
-    <form @submit.prevent="signup">
+    <form @submit.prevent="signup" novalidate>
       <!-- pseudo -->
       <div class="mb-3">
         <div class="input-group has-validation" id="usernameInputContainer">
@@ -164,7 +164,7 @@ onMounted(() => {
 })
 
 const showPasswordMatchError = () => {
-  if (!validatePasswordsMatch()) {
+  if (!checkIfPasswordsMatch()) {
     return showServerErrors({
       field: 'passwordConfirmation',
       message: 'Les mots de passe ne correspondent pas'
@@ -174,12 +174,13 @@ const showPasswordMatchError = () => {
   return removeServerErrors('passwordConfirmation')
 }
 
-const validatePasswordsMatch = (): boolean => {
+const checkIfPasswordsMatch = (): boolean => {
   return payload.value.password === passwordConfirmation.value
 }
 
 const checkIfEmailIsUsed = async () => {
   try {
+    if (!payload.value.email) return
     const res = await authService.checkIfEmailIsUsed(payload.value.email)
 
     if (res.errors && res.errors.length > 0) {
@@ -210,11 +211,9 @@ const checkIfEmailIsUsed = async () => {
 
 const signup = async () => {
   try {
-    if (!validatePasswordsMatch()) {
-      showServerErrors({
-        field: 'passwordConfirmation',
-        message: 'Les mots de passe ne correspondent pas'
-      })
+    const validationErrors = validations()
+    if (validationErrors.length > 0) {
+      validationErrors.forEach(err => showServerErrors(err))
       return
     }
 
@@ -246,6 +245,52 @@ const signup = async () => {
       duration: 13000
     })
   }
+}
+
+const validations = (): ValidationError[] => {
+  const errors: ValidationError[] = []
+
+  const usernameRegex = dataLengthValidations.username.regex
+  if (usernameRegex && (!new RegExp(usernameRegex).test(payload.value.username) ||
+    payload.value.username.length < dataLengthValidations.username.minlength ||
+    payload.value.username.length > dataLengthValidations.username.maxlength)) {
+    errors.push({
+      field: 'username',
+      message: `Le nom d'utilisateur doit être entre ${dataLengthValidations.username.minlength} et ${dataLengthValidations.username.maxlength} caractères`
+    })
+  }
+
+  const emailRegex = dataLengthValidations.email.regex
+  if (emailRegex && (!new RegExp(emailRegex).test(payload.value.email) ||
+    payload.value.email.length < dataLengthValidations.email.minlength ||
+    payload.value.email.length > dataLengthValidations.email.maxlength)) {
+    errors.push({
+      field: 'email',
+      message: `L'adresse courriel doit être entre ${dataLengthValidations.email.minlength} et ${dataLengthValidations.email.maxlength} caractères`
+    })
+  }
+
+  const passwordRegex = dataLengthValidations.password.regex
+  const password = payload.value.password.trim()
+  if (passwordRegex && (!new RegExp(passwordRegex).test(payload.value.password) ||
+    password.length < dataLengthValidations.password.minlength ||
+    password.length > dataLengthValidations.password.maxlength
+  )) {
+    errors.push({
+      field: 'password',
+      message: `Le mot de passe doit être entre ${dataLengthValidations.password.minlength} et ${dataLengthValidations.password.maxlength} caractères. Il doit contenir au moins une majuscule, un chiffre et un des caractères spéciaux suivants : #?!@$ %^&*-`
+    })
+  }
+
+
+  if (!checkIfPasswordsMatch()) {
+    errors.push({
+      field: 'passwordConfirmation',
+      message: 'Les mots de passe ne correspondent pas'
+    })
+  }
+
+  return errors
 }
 
 const showServerErrors = (error: ValidationError) => {
