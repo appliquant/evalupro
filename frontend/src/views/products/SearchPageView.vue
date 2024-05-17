@@ -1,6 +1,5 @@
 <template>
   <div class="container mt-3">
-    {{ productResultsSort }}
     <div>
       <p>Filtres & Triage</p>
 
@@ -76,7 +75,8 @@
             <p class="card-text">{{ product.description }}</p>
             <p class="card-text">{{ product.price }} $</p>
             <RouterLink :to="`/product/${product.id}`" class="btn btn-primary"
-              >Voir le produit</RouterLink
+            >Voir le produit
+            </RouterLink
             >
           </div>
         </div>
@@ -92,9 +92,9 @@ import { useCategories } from '@/composables/useCategories'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
-const productNameFilter = ref<null | string>()
-const productCategoryFilterId = ref<null | number>(null)
-const productResultsSort = ref<null | string>(null)
+const productNameFilter = ref<null | string>(null)
+const productCategoryFilterId = ref<null | string>(null)
+const productResultSort = ref<null | string>(null)
 
 const { data: categories, error: categoriesError } = useCategories()
 
@@ -102,7 +102,12 @@ const {
   data: products,
   loading: productsLoading,
   error: productsError
-} = useProducts(productNameFilter, productCategoryFilterId, productResultsSort)
+} = useProducts({
+  productNameFilter,
+  productCategoryFilterId,
+  productResultSort
+})
+// } = useProducts(productNameFilter, productCategoryFilterId, productResultsSort)
 
 let timeoutId: number | null = null
 
@@ -123,7 +128,8 @@ const debounceCategorySelect = (event: Event) => {
 
   timeoutId = setTimeout(() => {
     const categoryId = (event.target as HTMLSelectElement).value
-    if (!isNaN(categoryId)) {
+
+    if (Number(categoryId)) {
       productCategoryFilterId.value = categoryId
     } else {
       productCategoryFilterId.value = null
@@ -139,9 +145,9 @@ const debounceSortSelect = (event: Event) => {
   timeoutId = setTimeout(() => {
     const sort = (event.target as HTMLSelectElement).value
     if (sort === 'name' || sort === 'averageScore') {
-      productResultsSort.value = sort
+      productResultSort.value = sort
     } else {
-      productResultsSort.value = null
+      productResultSort.value = null
     }
   }, 300)
 }

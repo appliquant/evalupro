@@ -3,10 +3,11 @@ import { type Ref, ref, toValue, watchEffect } from 'vue'
 import type { ApiResponseType } from '@/types'
 import { productsService } from '@/services/productsService'
 
-export const useProducts = (
-  productNameFilter?: Ref<string>,
-  productCategoryFilterId?: Ref<string>,
-  productResultSort?: Ref<string>
+export const useProducts = (filters?: {
+                              productNameFilter?: Ref<string | null>,
+                              productCategoryFilterId?: Ref<string | null>,
+                              productResultSort?: Ref<string | null>
+                            }
 ) => {
   const authStore = useAuthStore()
   const data = ref<ApiResponseType | null>(null)
@@ -17,9 +18,9 @@ export const useProducts = (
     productsService
       .getProducts(
         authStore.jwt,
-        productNameFilter && toValue(productNameFilter),
-        productCategoryFilterId && toValue(productCategoryFilterId),
-        productResultSort && toValue(productResultSort)
+        filters?.productNameFilter && toValue(filters.productNameFilter),
+        filters?.productCategoryFilterId && toValue(filters.productCategoryFilterId),
+        filters?.productResultSort && toValue(filters.productResultSort)
       )
       .then((res) => (data.value = res))
       .catch((err) => (error.value = err))

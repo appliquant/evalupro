@@ -1,6 +1,6 @@
 import express from 'express'
 import { ApiResponseType } from '../types'
-import { Category, Criteria, Favorite, Product, User } from '../db'
+import { Category, Criteria, CriteriaEvaluation, Evaluation, Favorite, Product, User } from '../db'
 import formidable from 'formidable'
 import { dataLengthValidations } from '../validations'
 import { Op } from 'sequelize'
@@ -69,14 +69,57 @@ const getProduct = async (req: express.Request, res: express.Response, next: exp
     // 4. Trouver critères
     const criterias = await getCategoryAndAncestorCriterias(category)
 
-    // 5. Retourner le produit
+    // 5. Trouver le pointage de chaque critère évalués de ce produit
+    // Le pointage correspond à la moyenne des évaluations de chaque critère par les testeurs
+    // Resulat ressemble à : { criteriaId: "1", averageScore: "60%" }
+    let criteriasScores: { criteriaId: string, averageScore: string }[] = []
+
+    // 5.1 Trouver les évaluations de ce produit
+    const productEvaluations = await Evaluation.findAll({
+      where: {
+        productId: id
+      }
+    })
+
+    if (productEvaluations.length > 0) {
+      // 5.2 Trouver les CriteriaEvaluations
+      const productCriteriaEvaluations = await CriteriaEvaluation.findAll({
+        where: {
+          evaluationId: [productEvaluations.map(evaluation => evaluation.dataValues.id)]
+        }
+      })
+
+
+      // 5.3 Créer un Map pour stocker les scores de chaque critère
+      const res = new Map<string, number>()
+
+      // Itérer sur les CriteriaEvaluations pour caculer le pointage de évaluation
+      for (let i = 0; i < productCriteriaEvaluations.length; i++) {
+        const elm = productCriteriaEvaluations[i]
+        if (!res.has(elm.dataValues.evaluationId)) {
+          res.set(elm.dataValues.criteriaId, elm.dataValues.value)
+        }
+      }
+
+      // Calculer la moyenne des scores pour chaque critère
+      for (let [key, value] of res) {
+        const averageScore = productCriteriaEvaluations.filter(criteriaEvaluation => criteriaEvaluation.dataValues.criteriaId === key).reduce((acc, criteriaEvaluation) => acc + criteriaEvaluation.dataValues.value, 0) / productCriteriaEvaluations.filter(criteriaEvaluation => criteriaEvaluation.dataValues.criteriaId === key).length
+        criteriasScores.push({
+          criteriaId: key,
+          averageScore: (averageScore * 100).toFixed(2) + '%'
+        })
+      }
+    }
+
+    // 6. Retourner le produit
     const successResponse: ApiResponseType = {
       status: 200,
       message: 'Produit trouvé',
       data: {
         product,
         category,
-        criterias
+        criterias,
+        criteriasScores
       }
     }
 
@@ -461,20 +504,5 @@ const deleteProduct = async (req: express.Request, res: express.Response, next: 
     next(err)
   }
 }
-
-// const getCategoryAndAncestorCriterias = async (category: Category) => {
-//   let criterias: any[] = []
-//   let currentCategory: Category | null = category
-//
-//   while (currentCategory) {
-//     const categoryCriterias = await Criteria.findAll({
-//       where: { categoryId: currentCategory.dataValues.id }
-//     })
-//     criterias = criterias.concat(categoryCriterias)
-//     currentCategory = await Category.findByPk(currentCategory.dataValues.parentId)
-//   }
-//
-//   return criterias
-// }
 
 export { getProducts, getProduct, createProduct, updateProduct, deleteProduct }

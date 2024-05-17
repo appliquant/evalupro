@@ -5,18 +5,18 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL
 
 const getProducts = async (
   jwt: string,
-  productNameFilter?: string,
-  productCategoryFilterId?: string,
-  productResultSort?: string
+  productNameFilter?: string | null,
+  productCategoryFilterId?: string | null,
+  productResultSort?: string | null
 ): Promise<ApiResponseType> => {
   try {
     const res = await fetch(
       `${BACKEND_URL}/api/products?` +
-        new URLSearchParams({
-          ...(productNameFilter && { productNameFilter }),
-          ...(productCategoryFilterId && { productCategoryFilterId }),
-          ...(productResultSort && { productResultSort })
-        }),
+      new URLSearchParams({
+        ...(productNameFilter && { productNameFilter }),
+        ...(productCategoryFilterId && { productCategoryFilterId }),
+        ...(productResultSort && { productResultSort })
+      }),
       {
         method: 'GET',
         headers: {
@@ -33,7 +33,7 @@ const getProducts = async (
   } catch (e) {
     return {
       status: 500,
-      message: "Impossible d'attendre le serveur lors de la récupérations des produits",
+      message: 'Impossible d\'attendre le serveur lors de la récupérations des produits',
       errors: [
         {
           field: 'network',
@@ -60,7 +60,7 @@ const createProduct = async (jwt: string, newProduct: FormData): Promise<ApiResp
   } catch (e) {
     return {
       status: 500,
-      message: "Impossible d'attendre le serveur lors d'ajout de produits",
+      message: 'Impossible d\'attendre le serveur lors d\'ajout de produits',
       errors: [
         {
           field: 'network',
@@ -87,7 +87,7 @@ const updateProduct = async (jwt: string, updatedProduct: FormData): Promise<Api
   } catch (e) {
     return {
       status: 500,
-      message: "Impossible d'attendre le serveur lors de la mise à jour du produit",
+      message: 'Impossible d\'attendre le serveur lors de la mise à jour du produit',
       errors: [
         {
           field: 'network',
@@ -113,7 +113,7 @@ const deleteProduct = async (jwt: string, productId: string): Promise<ApiRespons
   } catch (e) {
     return {
       status: 500,
-      message: "Impossible d'attendre le serveur lors de la suppression du produit",
+      message: 'Impossible d\'attendre le serveur lors de la suppression du produit',
       errors: [
         {
           field: 'network',
@@ -139,7 +139,7 @@ const getProduct = async (jwt: string, productId: string): Promise<ApiResponseTy
   } catch (e) {
     return {
       status: 500,
-      message: "Impossible d'attendre le serveur lors de la récupération du produit",
+      message: 'Impossible d\'attendre le serveur lors de la récupération du produit',
       errors: [
         {
           field: 'network',
