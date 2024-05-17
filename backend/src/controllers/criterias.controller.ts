@@ -175,9 +175,6 @@ const createCriteria = async (req: express.Request, res: express.Response, next:
 
 const updateCriteria = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
   try {
-    // todo: le nom ne peut pas exister en double pour la même catégorie
-    // todo: ne pas modifier un critere deja evalué
-
     // 1. Extraire les données
     const { name, coefficient, categoryId } = req.body
     const { id } = req.params
@@ -244,6 +241,35 @@ const updateCriteria = async (req: express.Request, res: express.Response, next:
       }
 
       return res.status(existingCategoryResponse.status).json(existingCategoryResponse)
+    }
+
+    // Vérifier que le nom du critère ne peut pas exister en double pour la même catégorie
+    // ou sur une catégorie parente
+    let existingCategoryToCheck: Category | null = existingCategory
+    while (existingCategoryToCheck) {
+      let existingCriteria = await Criteria.findOne({
+        where: {
+          name,
+          categoryId: existingCategoryToCheck.dataValues.id
+        }
+      })
+
+      if (existingCriteria && existingCriteria.dataValues.id !== parseInt(id)) {
+        const existingCriteriaResponse: ApiResponseType = {
+          status: 400,
+          message: 'Critère existant',
+          errors: [
+            {
+              field: 'selectedCriteriaNameInput',
+              message: 'Un critère avec ce nom existe déjà dans la catégorie ou une catégorie parente'
+            }
+          ]
+        }
+
+        return res.status(existingCriteriaResponse.status).json(existingCriteriaResponse)
+      }
+
+      existingCategoryToCheck = await Category.findByPk(existingCategoryToCheck.dataValues.parentId)
     }
 
     // 5. Mettre à jour le critère
