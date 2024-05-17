@@ -35,7 +35,7 @@
 
         <div>
           <h6>Critères d'évaluations</h6>
-          <div class="d-flex gap-2 mb-2">
+          <div class="d-flex gap-2 mb-2 flex-wrap">
             <span
               v-for="criteria in product?.data?.criterias"
               :key="criteria.id"
