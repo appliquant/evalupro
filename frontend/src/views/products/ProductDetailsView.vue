@@ -71,10 +71,9 @@
 
 
     <!-- Commentaires des testeurs -->
-    <!-- Seuelement Afficher une liste avec la date et le commentaire -->
     <div v-if="testersComments.length > 0" class="mb-3">
       <h2>Commentaires des testeurs</h2>
-      <ul class="list-group">
+      <ul class="list-group" v-if="testersComments.length > 0">
         <li class="list-group-item" v-for="comment in testersComments" :key="comment.id">
           {{ comment?.comment }}
         </li>
