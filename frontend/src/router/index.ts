@@ -112,6 +112,13 @@ const router = createRouter({
       meta: {
         requiresAuth: true
       }
+    },
+
+    // 404
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('../views/Error404View.vue')
     }
   ]
 })
