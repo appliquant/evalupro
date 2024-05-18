@@ -73,7 +73,7 @@
           <div class="card-body">
             <h5 class="card-title">{{ product.name }}</h5>
             <p class="card-text">{{ product.description }}</p>
-            <p class="card-text">{{ product.price }} $</p>
+            <p class="card-text">{{ formatPrice(product.price) }}</p>
             <RouterLink :to="`/product/${product.id}`" class="btn btn-primary"
               >Voir le produit
             </RouterLink>
@@ -106,7 +106,17 @@ const {
   productCategoryFilterId,
   productResultSort
 })
-// } = useProducts(productNameFilter, productCategoryFilterId, productResultsSort)
+
+const formatPrice = (price: any) => {
+  if (isNaN(price)) {
+    return ''
+  }
+
+  return new Intl.NumberFormat('fr-CA', {
+    style: 'currency',
+    currency: 'CAD'
+  }).format(price)
+}
 
 let timeoutId: number | null = null
 
