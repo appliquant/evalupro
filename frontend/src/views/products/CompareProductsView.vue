@@ -56,80 +56,82 @@
     <section class="mt-3">
       <table class="table">
         <thead>
-          <tr>
-            <th scope="col">Caractéristique</th>
-            <th scope="col">Produit A</th>
-            <th scope="col">Produit B</th>
-          </tr>
+        <tr>
+          <th scope="col">Caractéristique</th>
+          <th scope="col">Produit A</th>
+          <th scope="col">Produit B</th>
+        </tr>
         </thead>
 
         <tbody>
-          <!-- Marque -->
-          <tr>
-            <td>Marque</td>
-            <td>{{ firstProduct?.data?.product.brand }}</td>
-            <td>{{ secondProduct?.data?.product.brand }}</td>
-          </tr>
+        <!-- Marque -->
+        <tr>
+          <td>Marque</td>
+          <td>{{ firstProduct?.data?.product.brand }}</td>
+          <td>{{ secondProduct?.data?.product.brand }}</td>
+        </tr>
 
-          <!-- Nom -->
-          <tr>
-            <td>Nom</td>
-            <td>{{ firstProduct?.data?.product.name }}</td>
-            <td>{{ secondProduct?.data?.product.name }}</td>
-          </tr>
+        <!-- Nom -->
+        <tr>
+          <td>Nom</td>
+          <td>{{ firstProduct?.data?.product.name }}</td>
+          <td>{{ secondProduct?.data?.product.name }}</td>
+        </tr>
 
-          <!-- Catégorie -->
-          <tr>
-            <td>Catégorie</td>
-            <td>{{ firstProduct?.data?.category.title }}</td>
-            <td>{{ secondProduct?.data?.category.title }}</td>
-          </tr>
+        <!-- Catégorie -->
+        <tr>
+          <td>Catégorie</td>
+          <td>{{ firstProduct?.data?.category.title }}</td>
+          <td>{{ secondProduct?.data?.category.title }}</td>
+        </tr>
 
-          <!-- Critères d'évaluations -->
-          <tr>
-            <td style="max-width: 30pt">
-              Critères d'évaluations (avec moyennes des notes par les testeurs)
-            </td>
-            <td>
-              <ul>
-                <li v-for="criteria in firstProduct?.data?.criterias" :key="criteria.id">
-                  {{ criteria.name }}
+        <!-- Critères d'évaluations -->
+        <tr>
+          <td style="max-width: 30pt">
+            Critères d'évaluations (avec moyennes des notes par les testeurs)
+          </td>
+          <td>
+            <ul>
+              <li v-for="criteria in firstProduct?.data?.criterias" :key="criteria.id">
+                {{ criteria.name }}
+                <abbr title="Moyenne attribué par les testeurs à ce critère">
                   {{
                     firstProduct?.data?.criteriasScores?.find(
                       (elm: any) => elm.criteriaId === criteria.id
                     )?.averageScore
                   }}
-                </li>
-              </ul>
-            </td>
+                </abbr>
+              </li>
+            </ul>
+          </td>
 
-            <td>
-              <ul>
-                <li v-for="criteria in secondProduct?.data?.criterias" :key="criteria.id">
-                  {{ criteria.name }}
-                  {{
-                    secondProduct?.data?.criteriasScores?.find(
-                      (elm: any) => elm.criteriaId === criteria.id
-                    )?.averageScore
-                  }}
-                </li>
-              </ul>
-            </td>
-          </tr>
+          <td>
+            <ul>
+              <li v-for="criteria in secondProduct?.data?.criterias" :key="criteria.id">
+                {{ criteria.name }}
+                {{
+                  secondProduct?.data?.criteriasScores?.find(
+                    (elm: any) => elm.criteriaId === criteria.id
+                  )?.averageScore
+                }}
+              </li>
+            </ul>
+          </td>
+        </tr>
 
-          <!-- Description -->
-          <tr>
-            <td>Description</td>
-            <td>{{ firstProduct?.data?.product.description }}</td>
-            <td>{{ secondProduct?.data?.product.description }}</td>
-          </tr>
+        <!-- Description -->
+        <tr>
+          <td>Description</td>
+          <td>{{ firstProduct?.data?.product.description }}</td>
+          <td>{{ secondProduct?.data?.product.description }}</td>
+        </tr>
 
-          <!-- Prix -->
-          <tr>
-            <td>Prix</td>
-            <td>{{ formatPrice(firstProduct?.data?.product.price) }}</td>
-            <td>{{ formatPrice(secondProduct?.data?.product.price) }}</td>
-          </tr>
+        <!-- Prix -->
+        <tr>
+          <td>Prix</td>
+          <td>{{ formatPrice(firstProduct?.data?.product.price) }}</td>
+          <td>{{ formatPrice(secondProduct?.data?.product.price) }}</td>
+        </tr>
         </tbody>
       </table>
     </section>
