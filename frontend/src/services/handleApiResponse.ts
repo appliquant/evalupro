@@ -8,7 +8,11 @@ export async function handleApiResponse(response: Response): Promise<ApiResponse
       await handleUnauthorizedAccess()
     }
 
-    throw res
+    if (response.status === 500) {
+      throw res
+    }
+
+    return res
   }
 
   return (await response.json()) as ApiResponseType

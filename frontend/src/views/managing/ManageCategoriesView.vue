@@ -358,6 +358,7 @@ const deleteCategory = async () => {
       }
       return
     }
+    
 
     if (res.status === 200) {
       push.success({
