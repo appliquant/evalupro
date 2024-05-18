@@ -1,0 +1,8 @@
+# Exemple .env
+JWT_SECRET=secret-secret
+DB_HOST=localhost
+DB_DIALECT=mariadb
+DB_PORT=3306
+DB_NAME=evalupro
+DB_USERNAME=admin
+DB_PASSWORD=admin
