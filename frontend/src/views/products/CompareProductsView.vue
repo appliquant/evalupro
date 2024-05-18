@@ -8,6 +8,10 @@
       <h1>Comparer deux produits</h1>
       <p>Sélectionnez deux produits de la même catégorie à comparer.</p>
 
+      <!-- Erreurs -->
+      <p v-if="firstProductError" class="text-danger">{{ firstProductError }}</p>
+      <p v-if="secondProductError" class="text-danger">{{ secondProductError }}</p>
+
       <select
         class="form-select form-select-sm mb-2"
         aria-label="Filter par catégories"
@@ -109,11 +113,13 @@
             <ul>
               <li v-for="criteria in secondProduct?.data?.criterias" :key="criteria.id">
                 {{ criteria.name }}
-                {{
-                  secondProduct?.data?.criteriasScores?.find(
-                    (elm: any) => elm.criteriaId === criteria.id
-                  )?.averageScore
-                }}
+                <abbr title="Moyenne attribué par les testeurs à ce critère">
+                  {{
+                    secondProduct?.data?.criteriasScores?.find(
+                      (elm: any) => elm.criteriaId === criteria.id
+                    )?.averageScore
+                  }}
+                </abbr>
               </li>
             </ul>
           </td>
@@ -176,16 +182,9 @@ const { data: products, error: productsError } = useProducts({
 
 const { data: categories, error: categoriesError } = useCategories()
 
-const { data: firstProduct } = useProduct(selectedFirstProductId)
+const { data: firstProduct, error: firstProductError } = useProduct(selectedFirstProductId)
 
-const { data: secondProduct } = useProduct(selectedSecondProductId)
-
-watchEffect(() => {
-  if (!selectedCategoryId.value) {
-    selectedFirstProductId.value = null
-    selectedSecondProductId.value = null
-  }
-})
+const { data: secondProduct, error: secondProductError } = useProduct(selectedSecondProductId)
 
 const onCategoryChange = (e: Event) => {
   const value = (e.target as HTMLSelectElement).value
@@ -198,22 +197,27 @@ const onCategoryChange = (e: Event) => {
 }
 
 const onFirstProductChange = (e: Event) => {
-  const value = (e.target as HTMLSelectElement).value
+  const value = (e.target as HTMLSelectElement)
 
-  if (Number(value)) {
-    selectedFirstProductId.value = value
+  if (value.selectedIndex !== 0) {
+    selectedFirstProductId.value = value.value
   } else {
     selectedFirstProductId.value = null
+    firstProduct.value = null
+
+    selectedSecondProductId.value = null
+    secondProduct.value = null
   }
 }
 
 const onSecondProductChange = (e: Event) => {
-  const value = (e.target as HTMLSelectElement).value
+  const value = (e.target as HTMLSelectElement)
 
-  if (Number(value)) {
-    selectedSecondProductId.value = value
+  if (value.selectedIndex !== 0) {
+    selectedSecondProductId.value = value.value
   } else {
     selectedSecondProductId.value = null
+    secondProduct.value = null
   }
 }
 </script>
