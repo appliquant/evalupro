@@ -36,13 +36,25 @@
         <div>
           <h6>Critères d'évaluations</h6>
           <div class="d-flex gap-2 mb-2 flex-wrap">
-            <span
+            <div
               v-for="criteria in product?.data?.criterias"
               :key="criteria.id"
-              class="badge bg-primary rounded-pill"
+              class="d-flex gap-2 badge bg-primary rounded-pill"
             >
-              {{ criteria.name }}
-            </span>
+              <span>{{ criteria.name }}</span>
+
+              <!-- Afficher la moyenne des notes des testeurs pour les utilisateurs connectés -->
+              <span v-if="isUserLoggedIn">
+                <abbr title="Moyenne attribué par les testeurs à ce critère">
+                {{
+                    product?.data?.criteriasScores?.find(
+                      (elm: any) => elm.criteriaId === criteria.id
+                    )?.averageScore
+                  }}
+                </abbr>
+              </span>
+
+            </div>
           </div>
         </div>
 
