@@ -15,7 +15,7 @@
         :to="`/product/${favorite.id}`"
       >
         <!-- Badge prix -->
-        <span class="badge bg-primary rounded-pill">{{ favorite.price }} $</span>
+        <span class="badge bg-primary rounded-pill">{{ formatPrice(favorite.price) }}</span>
 
         <!-- Nom -->
         {{ favorite.name }}
@@ -47,6 +47,17 @@ const {
 } = useUserFavorites()
 
 const authStore = useAuthStore()
+
+const formatPrice = (price: any) => {
+  if (isNaN(price)) {
+    return ''
+  }
+
+  return new Intl.NumberFormat('fr-CA', {
+    style: 'currency',
+    currency: 'CAD'
+  }).format(price)
+}
 
 const removeFavorite = async (favoriteId: string) => {
   try {
