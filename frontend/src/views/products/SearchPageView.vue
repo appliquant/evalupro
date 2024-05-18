@@ -46,7 +46,8 @@
           <div>
             <select class="form-select" aria-label="Trier par" @change="debounceSortSelect">
               <option selected>Trier par</option>
-              <option value="name-desc">Par nom</option>
+              <option value="name-desc">Par nom (desc)</option>
+              <option value="name-asc">Par nom (asc)</option>
               <option value="averageScore-desc">Pointage</option>
             </select>
           </div>
@@ -75,7 +76,7 @@
             <p class="card-text">{{ product.description }}</p>
             <p class="card-text">{{ formatPrice(product.price) }}</p>
             <RouterLink :to="`/product/${product.id}`" class="btn btn-primary"
-              >Voir le produit
+            >Voir le produit
             </RouterLink>
           </div>
         </div>
@@ -152,9 +153,10 @@ const debounceSortSelect = (event: Event) => {
   }
 
   timeoutId = setTimeout(() => {
-    const sort = (event.target as HTMLSelectElement).value
-    if (sort === 'name' || sort === 'averageScore') {
-      productResultSort.value = sort
+    const sort = (event.target as HTMLSelectElement)
+
+    if (sort.selectedIndex !== 0) {
+      productResultSort.value = sort.value
     } else {
       productResultSort.value = null
     }

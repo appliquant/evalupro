@@ -167,8 +167,10 @@ const getProducts = async (req: express.Request, res: express.Response, next: ex
         return
       }
 
-      queryOptions.order = [[field, order.toUpperCase()]] // Sequelize expects the order array
+      queryOptions.order = [[field, order.toUpperCase()]]
     }
+
+    console.log(queryOptions)
 
     // 2. Trouver les produits
     const products = await Product.findAll(queryOptions)
