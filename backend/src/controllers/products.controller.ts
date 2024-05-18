@@ -272,18 +272,28 @@ const createProduct = async (req: express.Request, res: express.Response, next: 
       return res.status(categoryNotFoundError.status).json(categoryNotFoundError)
     }
 
-    // 5. Créer le produit
-    console.log('Prix : ', parseFloat(price.toString()))
+    // 5. Calculer la moyenne du score accordé par les testeurs à ce produit par les testeurs
+    const evaluations = await Evaluation.findAll({
+      where: {
+        productId: categoryId
+      }
+    })
+
+    let averageScore = evaluations.reduce((acc, evaluation) => acc + evaluation.dataValues.average, 0) / evaluations.length
+    averageScore = Math.round(averageScore * 100) / 100
+
+    // 6. Créer le produit
     const newProduct = await Product.create({
       name: name.toString(),
       brand: brand.toString(),
       categoryId: categoryId.toString(),
       description: description.toString(),
       price: parseFloat(price.toString()),
-      image: imageFileName.toString()
+      image: imageFileName.toString(),
+      averageScore
     })
 
-    // 6. Répondre
+    // 7. Répondre
     const response: ApiResponseType = {
       status: 201,
       message: 'Produit créé',
@@ -440,16 +450,27 @@ const updateProduct = async (req: express.Request, res: express.Response, next: 
       }
     }
 
-    // 4. Vérifier si une nouvelle image a été envoyée
+    // 5. Vérifier si une nouvelle image a été envoyée
     const image = imageFileName ? imageFileName : product.dataValues.image
 
-    // 5. Mettre à jour le produit
+    // 6. Re-calcule de la moyenne du score accordé par les testeurs à ce produit
+    const evaluations = await Evaluation.findAll({
+      where: {
+        productId: id
+      }
+    })
+
+    let averageScore = evaluations.reduce((acc, evaluation) => acc + evaluation.dataValues.average, 0) / evaluations.length
+    averageScore = Math.round(averageScore * 100) / 100
+
+    // 7. Mettre à jour le produit
     await Product.update({
       name: name.toString(),
       brand: brand.toString(),
       description: description.toString(),
       price: parseFloat(price.toString()),
-      image
+      image,
+      averageScore
     }, {
       where: {
         id: id.toString()

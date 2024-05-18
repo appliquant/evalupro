@@ -130,7 +130,7 @@ Product.init({
   },
 
   averageScore: {
-    type: DataTypes.DECIMAL,
+    type: DataTypes.FLOAT,
     allowNull: true,
     defaultValue: 0
   }
@@ -323,7 +323,7 @@ const initDb = async (): Promise<void> => {
     await sequelize.authenticate()
     await sequelize.sync({
       // force: true
-      alter: true
+      // alter: true
     })
     console.log('✅ Db connectée et synchronisée.')
   } catch (error) {
