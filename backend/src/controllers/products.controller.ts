@@ -463,6 +463,8 @@ const updateProduct = async (req: express.Request, res: express.Response, next: 
     let averageScore = evaluations.reduce((acc, evaluation) => acc + evaluation.dataValues.average, 0) / evaluations.length
     averageScore = Math.round(averageScore * 100) / 100
 
+    console.log(averageScore)
+
     // 7. Mettre à jour le produit
     await Product.update({
       name: name.toString(),
@@ -470,7 +472,7 @@ const updateProduct = async (req: express.Request, res: express.Response, next: 
       description: description.toString(),
       price: parseFloat(price.toString()),
       image,
-      averageScore
+      averageScore: isNaN(averageScore) ? 0 : averageScore
     }, {
       where: {
         id: id.toString()
