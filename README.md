@@ -1,5 +1,4 @@
 https://github.com/appliquant/evalupro/assets/29934021/82be7730-27ec-42ba-87bf-5fb58598ab40
-Uploading Projet sans nom.mp4…
 
 [*english*](#En)
 
